@@ -9,6 +9,7 @@ next-env.d.ts
 
 # Konteks privat untuk Claude Code, jangan dipublikasikan
 docs/PROMPT_*.md
+docs/AUDIT_*.md
 
 # Berkas unggahan CMS (bisa memuat data pribadi), jangan masuk repo
 storage/
