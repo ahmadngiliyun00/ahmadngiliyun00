@@ -1,4 +1,5 @@
 import Script from "next/script";
+import { jsonForScript } from "@/lib/json-script";
 import { getSession } from "@/server/auth/session";
 import { loadSite } from "@/server/content";
 
@@ -13,7 +14,7 @@ export default async function Analytics() {
     "window.dataLayer=window.dataLayer||[];",
     "function gtag(){dataLayer.push(arguments);}",
     "gtag('js',new Date());",
-    `gtag('config',${JSON.stringify(id)});`,
+    `gtag('config',${jsonForScript(id)});`,
   ].join("");
   return (
     <>

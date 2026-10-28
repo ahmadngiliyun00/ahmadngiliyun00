@@ -37,6 +37,7 @@ import {
   getRecentRepos,
   languageColors,
 } from "@/lib/github";
+import { jsonForScript } from "@/lib/json-script";
 import { navItems } from "@/lib/nav";
 import { isoPartialDate, postsPath, publicPosts } from "@/lib/posts";
 import { loadSite } from "@/server/content";
@@ -179,7 +180,7 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonForScript(personJsonLd) }}
       />
       <a href="#main" className="skip-link">
         {t.nav.skip}

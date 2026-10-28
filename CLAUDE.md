@@ -43,6 +43,7 @@ tests/richtext.test.mjs          unit test pembersihan HTML editor (npm test)
 tests/views.test.mjs             unit test aturan hitungan pembaca (npm test)
 tests/comment.test.mjs           unit test validasi komentar (npm test)
 tests/i18n.test.mjs              unit test isian dua bahasa dan isi cadangan (npm test)
+tests/json-script.test.mjs       unit test JSON di dalam <script> (JSON-LD) tidak bisa menutup tag (npm test)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, sertifikat atau certificates, kabar atau news, s/[token]
@@ -80,6 +81,7 @@ src/
 - Field baru: tambah di `src/content/collections.ts` (formulir dan validasi ikut otomatis). Urutkan supaya isian pendek berpasangan di grid 12 kolom; atur `width` bila lebar bawaan `fieldWidth()` tidak pas. Kolom tabel baru: `src/db/schema.ts` lalu `npm run db:generate`
 - Aturan capaian (maksimal 6 sorotan, 5 HKI beranda, LinkedIn hanya sertifikat dan pelatihan) ada di `src/server/entries.ts`
 - Isian dua bahasa memakai bahasa utama dari Pengaturan, Bahasa (bawaan Indonesia). Isian wajib cukup dalam bahasa utama; situs mengisi terjemahan yang kosong dari bahasa utama lewat `fillLocalized` di `loadSite()`. Komponen baru yang membaca teks dua bahasa dari database lain wajib memakai aturan yang sama
+- JSON di dalam tag `<script>` (JSON-LD, konfigurasi Analytics) wajib lewat `jsonForScript` dari `src/lib/json-script.ts`, bukan `JSON.stringify` langsung
 - Isi tulisan memakai editor rich text. HTML wajib lewat `sanitizeRichText` saat disimpan dan `renderRichText` saat dirender; jangan merender HTML isi tanpa keduanya. Gambar diunggah ke `UPLOAD_DIR`, tidak pernah base64
 - Hitungan pembaca tidak menyimpan IP (hanya hash harian) dan tidak memakai cookie. Komentar selalu menunggu persetujuan; email pengomentar tidak pernah tampil di situs
 - Berita dan tulisan (koleksi `post`): liputan media wajib media dan tautan sumber, dan ringkasannya ditulis sendiri tanpa menyalin detail sistem internal kampus dari artikel. Hanya tulisan dengan isi lengkap yang punya halaman `/kabar/<slug>/`
@@ -129,7 +131,7 @@ npm run admin:create -- --email anda@contoh.id --name "Nama"
 npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
-npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa
+npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build

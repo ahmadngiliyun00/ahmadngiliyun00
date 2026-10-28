@@ -7,6 +7,7 @@ import ViewBeacon from "@/components/ViewBeacon";
 import { copy, site, type Lang } from "@/data/profile";
 import { homePath } from "@/lib/nav";
 import { formatNumber } from "@/lib/github";
+import { jsonForScript } from "@/lib/json-script";
 import { asHtml, htmlToText, readingMinutes } from "@/lib/richtext";
 import type { PublicComment } from "@/server/comments";
 import { renderRichText } from "@/server/richtext";
@@ -68,7 +69,7 @@ export default function NewsPostPage({
     <SubpageShell lang={lang} otherHref={otherHref}>
       <Analytics />
       <ViewBeacon slug={post.slug} lang={lang} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonForScript(structured) }} />
       <article aria-labelledby="post-title" className="section subpage-section">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <nav aria-label={t.archive.crumbs} className="crumbs">

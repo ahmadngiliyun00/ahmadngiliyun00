@@ -14,6 +14,7 @@ import {
   kindName,
   linkedInUrl,
 } from "@/lib/achievements";
+import { jsonForScript } from "@/lib/json-script";
 import { formatPasteText } from "@/lib/linkedin";
 import { homePath } from "@/lib/nav";
 
@@ -128,7 +129,7 @@ export default function DetailPage({
     <SubpageShell lang={lang} otherHref={otherHref ?? detailPath(other, item.id)}>
       {shared ? null : <Analytics />}
       {structured === null ? null : (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonForScript(structured) }} />
       )}
       <article aria-labelledby="detail-title" className="section subpage-section">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
