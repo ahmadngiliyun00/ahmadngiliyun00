@@ -352,9 +352,9 @@ export type Copy = {
 export const copy: Localized<Copy> = {
   id: {
     meta: {
-      title: "Ahmad Ngiliyun - AI Engineer, Dosen Informatika, dan Pengembang Full-stack",
+      title: "Ahmad Ngiliyun, AI engineer dan dosen informatika",
       description:
-        "Portofolio Ahmad Ngiliyun, M.Kom.: AI engineer, dosen informatika di Cirebon, pengembang full-stack, dan peneliti machine learning. Proyek, publikasi, sertifikat, mata kuliah, dan kontak kolaborasi.",
+        "Ahmad Ngiliyun adalah AI engineer dan dosen informatika di Universitas Insan Mahardika. Bergelar Magister Komputer, ia menekuni pengembangan full-stack.",
       jobTitle: "AI Engineer dan dosen informatika",
     },
     nav: {
@@ -524,9 +524,9 @@ export const copy: Localized<Copy> = {
       homeTitle: "Sorotan capaian",
     },
     archive: {
-      metaTitle: "Sertifikat dan Capaian - Ahmad Ngiliyun",
+      metaTitle: "Sertifikat dan capaian Ahmad Ngiliyun",
       metaDescription:
-        "Arsip lengkap sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, dan keanggotaan Ahmad Ngiliyun, M.Kom., dengan tautan verifikasi resmi.",
+        "Arsip sertifikat, pelatihan, hak cipta, buku, publikasi, dan hibah Ahmad Ngiliyun, lengkap dengan tautan verifikasi resmi dari setiap penerbitnya.",
       title: "Sertifikat dan capaian",
       intro: "Arsip lengkap. Cari berdasarkan judul, penerbit, atau keterampilan, lalu saring per kategori dan tahun.",
       searchLabel: "Cari",
@@ -608,9 +608,9 @@ export const copy: Localized<Copy> = {
       readOn: "Baca di {outlet}",
       read: "Baca selengkapnya",
       sourceLang: { id: "Dalam bahasa Indonesia", en: "Dalam bahasa Inggris" },
-      metaTitle: "Kabar dan Liputan - Ahmad Ngiliyun",
+      metaTitle: "Kabar dan liputan tentang Ahmad Ngiliyun",
       metaDescription:
-        "Liputan media tentang Ahmad Ngiliyun, M.Kom., tulisan tentang AI, pendidikan, dan pengembangan perangkat lunak, serta kabar terbaru.",
+        "Liputan media tentang kerja Ahmad Ngiliyun, tulisannya sendiri tentang AI, pendidikan, dan pengembangan perangkat lunak, serta kabar terbaru.",
       archiveIntro: "Semua liputan media, tulisan, dan kabar, terbaru di atas. Liputan media menaut ke sumber aslinya.",
       empty: "Belum ada kabar.",
       back: "Semua kabar",
@@ -707,9 +707,9 @@ export const copy: Localized<Copy> = {
   },
   en: {
     meta: {
-      title: "Ahmad Ngiliyun - AI Engineer, Informatics Lecturer, and Full-stack Developer",
+      title: "Ahmad Ngiliyun, AI engineer and informatics lecturer",
       description:
-        "Portfolio of Ahmad Ngiliyun, M.Kom.: AI engineer, informatics lecturer in Cirebon, full-stack developer, and machine learning researcher. Projects, publications, certificates, courses, and collaboration.",
+        "Ahmad Ngiliyun is an AI engineer and informatics lecturer at Universitas Insan Mahardika, with a Master of Computer Science and a focus on full-stack work.",
       jobTitle: "AI engineer and informatics lecturer",
     },
     nav: {
@@ -756,7 +756,7 @@ export const copy: Localized<Copy> = {
         intro: "How I got here since 2017, and where I am heading next.",
         metaTitle: "Ahmad Ngiliyun's path from web developer to AI engineer",
         metaDescription:
-          "Ahmad Ngiliyun started out writing code on GitHub, earned a Master of Computer Science, and became a permanent lecturer, now growing into the role of AI engineer.",
+          "Ahmad Ngiliyun started out writing code on GitHub, earned a Master of Computer Science, became a permanent lecturer, and is now growing into an AI engineer.",
       },
     },
     hero: {
@@ -879,9 +879,9 @@ export const copy: Localized<Copy> = {
       homeTitle: "Highlights",
     },
     archive: {
-      metaTitle: "Credentials and Achievements - Ahmad Ngiliyun",
+      metaTitle: "Certificates and achievements of Ahmad Ngiliyun",
       metaDescription:
-        "The full archive of certificates, training, copyrights, books, publications, grants, and memberships of Ahmad Ngiliyun, M.Kom., with official verification links.",
+        "The certificates, training, copyrights, books, publications, and grants of Ahmad Ngiliyun, each with an official verification link from its issuer.",
       title: "Credentials and achievements",
       intro: "The full archive. Search by title, issuer, or skill, then filter by category and year.",
       searchLabel: "Search",
@@ -963,9 +963,9 @@ export const copy: Localized<Copy> = {
       readOn: "Read on {outlet}",
       read: "Read more",
       sourceLang: { id: "In Indonesian", en: "In English" },
-      metaTitle: "News and Press - Ahmad Ngiliyun",
+      metaTitle: "News and press about Ahmad Ngiliyun",
       metaDescription:
-        "Press coverage of Ahmad Ngiliyun, M.Kom., writing on AI, education, and software development, and recent updates.",
+        "Press coverage of the work of Ahmad Ngiliyun, articles on AI, education, and software development written by Ahmad, and the latest updates.",
       archiveIntro: "All press coverage, writing, and updates, newest first. Press coverage links to the original source.",
       empty: "No news yet.",
       back: "All news",

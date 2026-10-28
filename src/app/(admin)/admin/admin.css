@@ -608,9 +608,10 @@
 
   .seo-toggle {
     display: inline-flex;
+    flex-wrap: wrap;
     padding: 0.2rem;
     border: 1px solid var(--color-line);
-    border-radius: 999px;
+    border-radius: 1.25rem;
   }
 
   .seo-toggle button {

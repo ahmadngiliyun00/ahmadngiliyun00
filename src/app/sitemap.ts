@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import type { Entry } from "@/content/types";
 import { site } from "@/data/profile";
 import { archivePath, detailPath } from "@/lib/achievements";
+import { type PageKey, PAGE_KEYS, pagePath } from "@/lib/nav";
 import { hasPage, postPath, postsPath, publicPosts } from "@/lib/posts";
 import { loadSite } from "@/server/content";
 
@@ -33,6 +34,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = publicPosts(content.post);
   const news = content.post.filter((e) => e.visibility === "public");
   // Halaman tulisan hanya untuk bahasa yang punya isi lengkap; liputan tanpa isi menaut ke luar.
+  // Halaman dalam memakai waktu ubah data yang tampil di dalamnya.
+  const sources: Record<PageKey, Entry[]> = {
+    projects: [...content.project, ...content.system, ...content.contribution, ...content.area],
+    research: achievements.filter((e) => ["publikasi", "hibah", "reviewer"].includes(e.data.kind)),
+    teaching: [...content.institution, ...content.course, ...content.term, ...content.focus],
+    journey: [...content.milestone, ...content.plan, ...content.principle],
+  };
+  const innerPages = PAGE_KEYS.flatMap((page) => pair(pagePath("id", page), pagePath("en", page), latest(sources[page])));
   const postPages = posts.flatMap((p) =>
     (["id", "en"] as const)
       .filter((l) => hasPage(p, l))
@@ -41,6 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...pair("/", "/en/", latest(everything)),
+    ...innerPages,
     ...pair(archivePath("id"), archivePath("en"), latest(achievements)),
     ...achievements.flatMap((e) =>
       pair(detailPath("id", e.slug), detailPath("en", e.slug), new Date(e.updatedAt)),

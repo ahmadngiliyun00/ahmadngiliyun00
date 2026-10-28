@@ -33,6 +33,31 @@ const loc = (v: unknown): string => {
 };
 const s = (v: unknown): string => (typeof v === "string" ? v : "");
 
+// Judul dan deskripsi SEO halaman dalam, satu pasang isian per halaman.
+const PAGE_SEO: { key: "projects" | "research" | "teaching" | "journey"; label: string; paths: string }[] = [
+  { key: "projects", label: "Proyek", paths: "/proyek/ dan /en/projects/" },
+  { key: "research", label: "Riset dan Publikasi", paths: "/riset/ dan /en/research/" },
+  { key: "teaching", label: "Mengajar", paths: "/mengajar/ dan /en/teaching/" },
+  { key: "journey", label: "Perjalanan", paths: "/perjalanan/ dan /en/journey/" },
+];
+
+const pageSeoFields: Field[] = PAGE_SEO.flatMap((p) => [
+  {
+    name: `${p.key}.title`,
+    label: `${p.label}: judul`,
+    type: "localized" as const,
+    placeholder: { id: copy.id.pages[p.key].metaTitle, en: copy.en.pages[p.key].metaTitle },
+    help: `Halaman ${p.paths}. Kosongkan untuk memakai judul bawaan (teks samar).`,
+  },
+  {
+    name: `${p.key}.description`,
+    label: `${p.label}: deskripsi`,
+    type: "localized" as const,
+    multiline: true,
+    placeholder: { id: copy.id.pages[p.key].metaDescription, en: copy.en.pages[p.key].metaDescription },
+  },
+]);
+
 const kindOptions: Option[] = (Object.keys(kindLabels) as AchievementKind[]).map((k) => ({
   value: k,
   label: kindLabels[k].id,
@@ -473,6 +498,7 @@ export const settingsConfigs: SettingsConfig[] = [
         multiline: true,
         placeholder: { id: copy.id.archive.metaDescription, en: copy.en.archive.metaDescription },
       },
+      ...pageSeoFields,
       {
         name: "keywords",
         label: "Kata kunci",
@@ -481,7 +507,7 @@ export const settingsConfigs: SettingsConfig[] = [
           id: "AI engineer\nDosen informatika Cirebon\nMachine learning",
           en: "AI engineer\nInformatics lecturer\nMachine learning",
         },
-        help: "Satu kata kunci per baris, maksimal 15. Dipasang sebagai meta keywords di beranda dan arsip. Google tidak memakai meta keywords untuk peringkat; yang berpengaruh adalah judul, deskripsi, dan isi halaman.",
+        help: "Satu kata kunci per baris, maksimal 15. Dipasang sebagai meta keywords di beranda, arsip, dan halaman dalam. Google tidak memakai meta keywords untuk peringkat; yang berpengaruh adalah judul, deskripsi, dan isi halaman.",
       },
       {
         name: "googleVerification",

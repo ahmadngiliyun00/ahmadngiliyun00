@@ -10,12 +10,14 @@ import { getSettingsConfig } from "@/content/collections";
 import { formValue } from "@/content/fields";
 import { adminCopy } from "@/data/admin";
 import { site } from "@/data/profile";
-import { archivePath } from "@/lib/achievements";
-import { defaultPageText } from "@/lib/metadata";
+import { defaultPageText, SEO_PAGES, type SeoPage, seoPagePath } from "@/lib/metadata";
 import { requireAdmin } from "@/server/auth/session";
 import { getSettingDoc, primaryLang } from "@/server/content";
 
 export const dynamic = "force-dynamic";
+
+type SeoPaths = Record<SeoPage, Record<"id" | "en", string>>;
+type SeoDefaults = Record<SeoPage, Record<"id" | "en", { title: string; description: string }>>;
 
 type Props = { params: Promise<{ key: string }> };
 
@@ -35,11 +37,12 @@ export default async function AdminSettings({ params }: Props) {
         <SeoPreview
           siteUrl={site.url}
           siteName={site.name}
-          paths={{ home: { id: "/", en: "/en/" }, archive: { id: archivePath("id"), en: archivePath("en") } }}
-          defaults={{
-            home: { id: defaultPageText("id", "home"), en: defaultPageText("en", "home") },
-            archive: { id: defaultPageText("id", "archive"), en: defaultPageText("en", "archive") },
-          }}
+          paths={Object.fromEntries(SEO_PAGES.map((p) => [p, { id: seoPagePath("id", p), en: seoPagePath("en", p) }])) as SeoPaths}
+          defaults={
+            Object.fromEntries(
+              SEO_PAGES.map((p) => [p, { id: defaultPageText("id", p), en: defaultPageText("en", p) }]),
+            ) as SeoDefaults
+          }
           labels={adminCopy.settings.seo.preview}
         />
       ) : null}

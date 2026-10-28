@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 
 type Lang = "id" | "en";
-type Page = "home" | "archive";
+// Halaman yang punya isian SEO, sama dengan SEO_PAGES di src/lib/metadata.ts.
+type Page = "home" | "archive" | "projects" | "research" | "teaching" | "journey";
+const PAGES: Page[] = ["home", "archive", "projects", "research", "teaching", "journey"];
 type Text = { title: string; description: string };
 
 export type SeoPreviewLabels = {
@@ -33,7 +35,7 @@ function fieldName(page: Page, part: keyof Text, lang: Lang) {
 // Isi isian di formulir saat ini (kosong bila belum diisi).
 function readForm(): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const page of ["home", "archive"] as const) {
+  for (const page of PAGES) {
     for (const part of ["title", "description"] as const) {
       for (const lang of ["id", "en"] as const) {
         const name = fieldName(page, part, lang);
@@ -45,7 +47,7 @@ function readForm(): Record<string, string> {
   return out;
 }
 
-// Pratinjau hasil pencarian Google untuk beranda dan arsip, diperbarui saat mengetik.
+// Pratinjau hasil pencarian Google untuk beranda, arsip, dan halaman dalam, diperbarui saat mengetik.
 export default function SeoPreview({
   siteUrl,
   siteName,
@@ -107,7 +109,7 @@ export default function SeoPreview({
 
       <div className="seo-toggles mt-4">
         <div className="seo-toggle" role="group" aria-label={labels.page}>
-          {(["home", "archive"] as const).map((p) => (
+          {PAGES.map((p) => (
             <button key={p} type="button" aria-pressed={page === p} onClick={() => setPage(p)}>
               {labels.pages[p]}
             </button>
