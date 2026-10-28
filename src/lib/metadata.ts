@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { SeoSettings } from "@/content/types";
 import { copy, site, type Lang } from "@/data/profile";
 import { type AchievementItem, archivePath, detailPath, formatPartialDate, kindName } from "@/lib/achievements";
+import { type PostItem, hasPage, isoPartialDate, postPath, postsPath } from "@/lib/posts";
 
 export type SeoPage = "home" | "archive";
 
@@ -87,6 +88,56 @@ export function buildDetailMetadata(lang: Lang, item: AchievementItem): Metadata
       locale: lang === "id" ? "id_ID" : "en_US",
       type: "article",
     },
+    icons: { icon: "/favicon.svg" },
+  };
+}
+
+export function buildNewsMetadata(lang: Lang): Metadata {
+  const t = copy[lang].news;
+  return {
+    metadataBase: new URL(site.url),
+    title: t.metaTitle,
+    description: t.metaDescription,
+    alternates: {
+      canonical: postsPath(lang),
+      languages: { id: postsPath("id"), en: postsPath("en"), "x-default": postsPath("id") },
+    },
+    openGraph: {
+      title: t.metaTitle,
+      description: t.metaDescription,
+      url: postsPath(lang),
+      siteName: site.name,
+      locale: lang === "id" ? "id_ID" : "en_US",
+      type: "website",
+    },
+    icons: { icon: "/favicon.svg" },
+  };
+}
+
+export function buildPostMetadata(lang: Lang, post: PostItem): Metadata {
+  const title = `${post.title[lang]} - ${site.name}`;
+  const description = post.summary ? post.summary[lang] : copy[lang].news.metaDescription;
+  const path = postPath(lang, post.slug);
+  // Pasangan bahasa hanya dicantumkan bila versi bahasa itu punya isi lengkap.
+  const languages: Record<string, string> = {};
+  for (const l of ["id", "en"] as const) {
+    if (hasPage(post, l)) languages[l] = postPath(l, post.slug);
+  }
+  return {
+    metadataBase: new URL(site.url),
+    title,
+    description,
+    alternates: { canonical: path, languages },
+    openGraph: {
+      title,
+      description,
+      url: path,
+      siteName: site.name,
+      locale: lang === "id" ? "id_ID" : "en_US",
+      type: "article",
+      publishedTime: post.date ? isoPartialDate(post.date) : undefined,
+    },
+    twitter: { card: "summary", title, description },
     icons: { icon: "/favicon.svg" },
   };
 }

@@ -2,7 +2,7 @@
 // Jalankan: npm run db:seed
 // Bila tabel entries sudah berisi, skrip berhenti supaya isian dari CMS tidak tertimpa.
 // Tambahkan --force untuk MENGHAPUS semua konten dan pengaturan lalu mengisi ulang dari seed/.
-// --only=plan,principle mengisi koleksi tertentu saja (hanya bila koleksi itu masih kosong),
+// --only=plan,principle,post mengisi koleksi tertentu saja (hanya bila koleksi itu masih kosong),
 // berguna setelah koleksi baru ditambahkan ke database yang sudah berisi.
 
 import mysql from "mysql2/promise";
@@ -56,6 +56,10 @@ for (const c of p.collabs) add("collab", slugify(c.title.id), c);
 for (const c of p.channels) add("channel", slugify(c.label), c);
 for (const pl of p.plans) add("plan", slugify(`${pl.period}-${pl.title.id}`), pl);
 for (const pr of p.principles) add("principle", slugify(pr.title.id), pr);
+for (const n of p.posts) {
+  const { slug, visibility, ...data } = n;
+  add("post", slug, data, visibility);
+}
 
 const conn = await mysql.createConnection({ uri: process.env.DATABASE_URL, timezone: "Z", charset: "utf8mb4" });
 

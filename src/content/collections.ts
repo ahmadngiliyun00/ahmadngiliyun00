@@ -2,7 +2,7 @@
 // Menambah field baru di sini otomatis muncul di formulir admin dan ikut divalidasi.
 
 import type { Field, Option } from "@/content/fields";
-import { kindLabels, programLabels, type AchievementKind, type CollectionKey, type Program } from "@/content/types";
+import { kindLabels, postKindLabels, programLabels, type AchievementKind, type CollectionKey, type PostKind, type Program } from "@/content/types";
 import { copy } from "@/data/profile";
 
 type Doc = Record<string, unknown>;
@@ -12,13 +12,14 @@ export type CollectionConfig = {
   label: string; // nama jamak di admin
   singular: string;
   description: string;
-  group: "Capaian" | "Proyek" | "Mengajar" | "Profil";
+  group: "Capaian" | "Kabar" | "Proyek" | "Mengajar" | "Profil";
   fields: Field[];
   title: (data: Doc) => string;
   subtitle?: (data: Doc) => string;
   // "date" = urut tanggal terbit terbaru (capaian); "position" = urutan manual
   order: "date" | "position";
   publicPath?: { id: string; en: string }; // halaman detail publik, bila ada
+  hasPage?: (data: Doc) => boolean; // bila ada, hanya data yang lolos fungsi ini punya halaman detail
 };
 
 const loc = (v: unknown): string => {
@@ -88,6 +89,56 @@ export const collections: CollectionConfig[] = [
       { name: "featured", label: "Sorot di beranda (maksimal 6)", type: "boolean" },
       { name: "showOnHome", label: "Tampilkan di tab Hak cipta beranda (khusus HKI, maksimal 5)", type: "boolean" },
       { name: "linkedin", label: "Tombol Tambahkan ke LinkedIn (khusus sertifikat dan pelatihan)", type: "boolean" },
+    ],
+  },
+  {
+    key: "post",
+    label: "Berita dan tulisan",
+    singular: "berita",
+    description: "Liputan media tentang Anda, tulisan sendiri, dan kabar terbaru. Isi lengkap yang diisi membuat halaman sendiri di situs.",
+    group: "Kabar",
+    order: "date",
+    publicPath: { id: "/kabar/", en: "/en/news/" },
+    hasPage: (d) => loc(d.body) !== "",
+    title: (d) => loc(d.title),
+    subtitle: (d) => {
+      const kind = s(d.kind) as PostKind;
+      const label = postKindLabels[kind] ? postKindLabels[kind].id : kind;
+      return [label, s(d.outlet), dateText(d.date)].filter((x) => x !== "").join(" | ");
+    },
+    fields: [
+      {
+        name: "kind",
+        width: "third",
+        label: "Jenis",
+        type: "select",
+        required: true,
+        options: (Object.keys(postKindLabels) as PostKind[]).map((k) => ({ value: k, label: postKindLabels[k].id })),
+      },
+      { name: "date", width: "third", label: "Tanggal terbit", type: "date", help: "Wajib untuk data public." },
+      {
+        name: "sourceLang",
+        width: "third",
+        label: "Bahasa sumber",
+        type: "select",
+        options: [
+          { value: "id", label: "Bahasa Indonesia" },
+          { value: "en", label: "Bahasa Inggris" },
+        ],
+        help: "Untuk tautan ke luar. Situs versi lain menandai bahasa artikel sumber.",
+      },
+      { name: "title", label: "Judul", type: "localized", required: true, help: "Untuk liputan, tulis judul asli di versi bahasa sumber dan terjemahannya di versi lain." },
+      { name: "outlet", label: "Media atau penerbit", type: "text", placeholder: "Dicoding Blog", help: "Wajib untuk liputan media." },
+      { name: "url", label: "Tautan sumber", type: "url", placeholder: "https://www.dicoding.com/blog/...", help: "Wajib untuk liputan. Untuk tulisan, isi bila diterbitkan di tempat lain." },
+      { name: "summary", label: "Ringkasan", type: "localized", multiline: true, help: "Satu sampai tiga kalimat, tampil di kartu beranda dan arsip." },
+      {
+        name: "body",
+        label: "Isi lengkap",
+        type: "localized",
+        multiline: true,
+        rows: 14,
+        help: "Opsional. Bila diisi, tulisan punya halaman sendiri di /kabar/. Pisahkan paragraf dengan satu baris kosong; baris yang diawali ## menjadi subjudul.",
+      },
     ],
   },
   {

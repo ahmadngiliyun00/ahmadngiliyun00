@@ -10,6 +10,7 @@ import { countMessages } from "@/server/messages";
 
 const GROUPS = [
   { key: "Capaian", icon: "award" },
+  { key: "Kabar", icon: "newspaper" },
   { key: "Proyek", icon: "code" },
   { key: "Mengajar", icon: "chalkboard-user" },
   { key: "Profil", icon: "user" },

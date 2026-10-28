@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import type { Entry } from "@/content/types";
 import { site } from "@/data/profile";
 import { archivePath, detailPath } from "@/lib/achievements";
+import { hasPage, postPath, postsPath, publicPosts } from "@/lib/posts";
 import { loadSite } from "@/server/content";
 
 // Dibaca dari database saat diminta, jadi data yang baru dipublikasikan di CMS langsung masuk
@@ -29,6 +30,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const achievements = content.achievement.filter((e) => e.visibility === "public");
   const everything = Object.values(content).filter(Array.isArray).flat() as Entry[];
+  const posts = publicPosts(content.post);
+  const news = content.post.filter((e) => e.visibility === "public");
+  // Halaman tulisan hanya untuk bahasa yang punya isi lengkap; liputan tanpa isi menaut ke luar.
+  const postPages = posts.flatMap((p) =>
+    (["id", "en"] as const)
+      .filter((l) => hasPage(p, l))
+      .map((l) => ({ url: `${site.url}${postPath(l, p.slug)}`, lastModified: new Date(p.updatedAt) })),
+  );
 
   return [
     ...pair("/", "/en/", latest(everything)),
@@ -36,5 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...achievements.flatMap((e) =>
       pair(detailPath("id", e.slug), detailPath("en", e.slug), new Date(e.updatedAt)),
     ),
+    ...(news.length === 0 ? [] : pair(postsPath("id"), postsPath("en"), latest(news))),
+    ...postPages,
   ];
 }

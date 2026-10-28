@@ -35,7 +35,7 @@ Buka <http://localhost:3000> untuk situs dan <http://localhost:3000/admin/> untu
 | `npm run readme` | Buat ulang gambar README dan bagian teks README dari database |
 | `npm run db:generate` | Buat berkas migrasi baru setelah mengubah `src/db/schema.ts` |
 | `npm run db:migrate` | Terapkan migrasi di folder `drizzle/` |
-| `npm run db:seed` | Isi database dari `seed/` (berhenti bila sudah berisi; `-- --force` menghapus dan mengisi ulang; `-- --only=plan,principle` mengisi koleksi tertentu yang masih kosong) |
+| `npm run db:seed` | Isi database dari `seed/` (berhenti bila sudah berisi; `-- --force` menghapus dan mengisi ulang; `-- --only=plan,principle,post` mengisi koleksi tertentu yang masih kosong) |
 | `npm run admin:create` | Buat akun admin atau ganti kata sandinya |
 
 Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`. Opsional: set `GITHUB_TOKEN` agar batas rate limit API lebih longgar.
@@ -45,6 +45,7 @@ Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`.
 | Bagian | Isi |
 | --- | --- |
 | Capaian | Sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, reviewer, keanggotaan |
+| Kabar | Berita dan tulisan: liputan media (wajib media dan tautan sumber), tulisan sendiri, kabar singkat. Isi lengkap membuat halaman `/kabar/<slug>/`; tanpa isi, kartu menaut ke sumber |
 | Proyek | Proyek unggulan (kode terbuka) dan sistem yang dikembangkan (repo privat) |
 | Mengajar | Kampus, mata kuliah dengan kode semester, semester, bidang keahlian mengajar |
 | Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama, rencana ke depan, prinsip kerja dengan AI, kanal kontak |

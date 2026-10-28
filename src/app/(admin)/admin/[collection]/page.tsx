@@ -7,9 +7,10 @@ import Pagination from "@/components/admin/Pagination";
 import FlashToast from "@/components/FlashToast";
 import { paginate } from "@/components/admin/paginate";
 import { getCollection } from "@/content/collections";
-import type { Achievement } from "@/content/types";
+import type { Achievement, Post } from "@/content/types";
 import { adminCopy as t } from "@/data/admin";
 import { byNewest } from "@/lib/achievements";
+import { byPostDate } from "@/lib/posts";
 import { requireAdmin } from "@/server/auth/session";
 import { listEntries } from "@/server/content";
 
@@ -30,7 +31,10 @@ export default async function AdminList({ params, searchParams }: Props) {
 
   let list = await listEntries(cfg.key, { publicOnly: false });
   if (cfg.order === "date") {
-    list = [...list].sort((a, b) => byNewest(a.data as Achievement, b.data as Achievement));
+    list =
+      cfg.key === "post"
+        ? [...list].sort((a, b) => byPostDate(a.data as Post, b.data as Post))
+        : [...list].sort((a, b) => byNewest(a.data as Achievement, b.data as Achievement));
   }
   const filtered = list
     .filter((e) => (v === "all" ? true : e.visibility === v))
@@ -87,7 +91,8 @@ export default async function AdminList({ params, searchParams }: Props) {
           {pg.items.map((e, idx) => {
             const i = pg.from - 1 + idx;
             const data = e.data as Record<string, unknown>;
-            const publicHref = cfg.publicPath ? (e.visibility === "public" ? `${cfg.publicPath.id}${e.slug}/` : null) : null;
+            const withPage = cfg.hasPage ? cfg.hasPage(data) : true;
+            const publicHref = cfg.publicPath ? (e.visibility === "public" ? (withPage ? `${cfg.publicPath.id}${e.slug}/` : null) : null) : null;
             return (
               <li key={e.id} className="admin-row">
                 <div className="min-w-0">

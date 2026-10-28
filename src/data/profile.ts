@@ -53,6 +53,7 @@ export type Copy = {
     teaching: string;
     journey: string;
     next: string;
+    news: string;
     contact: string;
     skip: string;
     label: string;
@@ -219,6 +220,22 @@ export type Copy = {
     principlesTitle: string;
     learningTitle: string;
   };
+  news: {
+    title: string;
+    intro: string;
+    all: string;
+    readOn: string;
+    read: string;
+    sourceLang: Record<Lang, string>;
+    metaTitle: string;
+    metaDescription: string;
+    archiveIntro: string;
+    empty: string;
+    back: string;
+    published: string;
+    source: string;
+    original: string;
+  };
   contact: {
     marquee: string;
     title: string;
@@ -278,6 +295,7 @@ export const copy: Localized<Copy> = {
       teaching: "Mengajar",
       journey: "Perjalanan",
       next: "Ke depan",
+      news: "Kabar",
       contact: "Kontak",
       skip: "Lompat ke konten",
       label: "Navigasi utama",
@@ -453,6 +471,23 @@ export const copy: Localized<Copy> = {
       principlesTitle: "Cara saya bekerja dengan AI",
       learningTitle: "Sedang saya dalami",
     },
+    news: {
+      title: "Kabar dan liputan",
+      intro: "Liputan media tentang kerja saya, tulisan saya sendiri, dan kabar terbaru.",
+      all: "Lihat semua kabar",
+      readOn: "Baca di {outlet}",
+      read: "Baca selengkapnya",
+      sourceLang: { id: "Dalam bahasa Indonesia", en: "Dalam bahasa Inggris" },
+      metaTitle: "Kabar dan Liputan - Ahmad Ngiliyun",
+      metaDescription:
+        "Liputan media tentang Ahmad Ngiliyun, M.Kom., tulisan tentang AI, pendidikan, dan pengembangan perangkat lunak, serta kabar terbaru.",
+      archiveIntro: "Semua liputan media, tulisan, dan kabar, terbaru di atas. Liputan media menaut ke sumber aslinya.",
+      empty: "Belum ada kabar.",
+      back: "Semua kabar",
+      published: "Terbit",
+      source: "Sumber",
+      original: "Baca versi asli di {outlet}",
+    },
     contact: {
       marquee: "Mari berkolaborasi",
       title: "Mari bekerja sama",
@@ -514,6 +549,7 @@ export const copy: Localized<Copy> = {
       teaching: "Teaching",
       journey: "Journey",
       next: "Next",
+      news: "News",
       contact: "Contact",
       skip: "Skip to content",
       label: "Main navigation",
@@ -688,6 +724,23 @@ export const copy: Localized<Copy> = {
       current: "In progress",
       principlesTitle: "How I work with AI",
       learningTitle: "Currently studying",
+    },
+    news: {
+      title: "News and press",
+      intro: "Press coverage of my work, my own writing, and recent updates.",
+      all: "See all news",
+      readOn: "Read on {outlet}",
+      read: "Read more",
+      sourceLang: { id: "In Indonesian", en: "In English" },
+      metaTitle: "News and Press - Ahmad Ngiliyun",
+      metaDescription:
+        "Press coverage of Ahmad Ngiliyun, M.Kom., writing on AI, education, and software development, and recent updates.",
+      archiveIntro: "All press coverage, writing, and updates, newest first. Press coverage links to the original source.",
+      empty: "No news yet.",
+      back: "All news",
+      published: "Published",
+      source: "Source",
+      original: "Read the original on {outlet}",
     },
     contact: {
       marquee: "Let's work together",

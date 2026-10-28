@@ -34,8 +34,17 @@ export default async function EntryEditor({
   const fileId = typeof data.fileId === "string" ? data.fileId : "";
   const meta = fileId === "" ? undefined : await getFileMeta(fileId);
   const siteUrl = (process.env.SITE_URL ?? site.url).replace(/\/+$/, "");
+  const withPage = cfg.hasPage ? cfg.hasPage(data) : true;
   const publicUrl =
-    entry !== null ? (cfg.publicPath ? (entry.visibility === "public" ? `${siteUrl}${cfg.publicPath.id}${entry.slug}/` : null) : null) : null;
+    entry !== null
+      ? cfg.publicPath
+        ? entry.visibility === "public"
+          ? withPage
+            ? `${siteUrl}${cfg.publicPath.id}${entry.slug}/`
+            : null
+          : null
+        : null
+      : null;
   const heading = (entry === null ? t.form.newTitle : t.form.editTitle).replace("{name}", cfg.singular);
 
   return (

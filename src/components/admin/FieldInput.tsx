@@ -188,7 +188,7 @@ export default function FieldInput({
                       id={`${id}-${lang}`}
                       name={name}
                       className="field"
-                      rows={field.type === "localizedList" ? 5 : 3}
+                      rows={field.type === "localized" ? (field.rows ?? 3) : 5}
                       defaultValue={v}
                       placeholder={placeholderFor(field, labels, lang)}
                       aria-required={required}

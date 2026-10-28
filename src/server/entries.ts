@@ -33,6 +33,19 @@ async function checkRules(
   id: number | null,
   errors: FieldErrors,
 ) {
+  if (collection === "post") {
+    const hasBody = data.body !== undefined;
+    if (data.kind === "liputan") {
+      if (data.outlet === undefined) errors.outlet = "Liputan media wajib menyebut nama media atau penerbit.";
+      if (data.url === undefined) errors.url = "Liputan media wajib punya tautan sumber.";
+    } else if (!hasBody) {
+      if (data.url === undefined) errors.body = "Isi lengkap atau tautan sumber wajib diisi salah satu.";
+    }
+    if (visibility === "public") {
+      if (data.date === null) errors.date = "Data public wajib punya tanggal terbit.";
+    }
+    return;
+  }
   if (collection === "achievement") {
     const kind = data.kind;
     if (kind !== "publikasi") {

@@ -2,7 +2,7 @@ import type { NavItem } from "@/components/Header";
 import { copy, type Lang } from "@/data/profile";
 
 // Urutan bagian beranda. Di halaman lain, tautan diarahkan ke bagian beranda yang sama.
-const SECTIONS = ["about", "projects", "activity", "achievements", "research", "teaching", "journey", "next", "contact"] as const;
+const SECTIONS = ["about", "projects", "activity", "achievements", "news", "research", "teaching", "journey", "next", "contact"] as const;
 
 export function homePath(lang: Lang): string {
   return lang === "id" ? "/" : "/en/";

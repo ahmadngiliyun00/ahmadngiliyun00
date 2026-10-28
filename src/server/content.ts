@@ -81,6 +81,7 @@ export type SiteContent = {
   channel: Entry<"channel">[];
   plan: Entry<"plan">[];
   principle: Entry<"principle">[];
+  post: Entry<"post">[];
 };
 
 const TTL_MS = 5 * 60 * 1000;
@@ -119,6 +120,7 @@ async function fetchSite(): Promise<SiteContent> {
     channel: pick("channel"),
     plan: pick("plan"),
     principle: pick("principle"),
+    post: pick("post"),
   };
 }
 

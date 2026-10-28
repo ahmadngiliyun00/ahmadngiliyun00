@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 import KMeans from "@/components/KMeans";
 import LiveClock from "@/components/LiveClock";
 import Marquee from "@/components/Marquee";
+import NewsCard from "@/components/NewsCard";
 import ProjectVisual from "@/components/ProjectVisual";
 import Reveal from "@/components/Reveal";
 import SiteFooter from "@/components/SiteFooter";
@@ -37,6 +38,7 @@ import {
   languageColors,
 } from "@/lib/github";
 import { navItems } from "@/lib/nav";
+import { isoPartialDate, postsPath, publicPosts } from "@/lib/posts";
 import { loadSite } from "@/server/content";
 
 function d(ms: number): CSSProperties {
@@ -128,6 +130,8 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
   const grants = achievements.filter((a) => a.kind === "hibah");
   const pubYears = publicationsByYear(achievements);
   const totalPublic = achievements.length;
+  const posts = publicPosts(content.post);
+  const latestPosts = posts.slice(0, 3);
 
   const personJsonLd = {
     "@context": "https://schema.org",
@@ -139,6 +143,16 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
     worksFor: { "@type": "CollegeOrUniversity", name: "Universitas Insan Mahardika" },
     address: { "@type": "PostalAddress", addressLocality: "Cirebon", addressCountry: "ID" },
     sameAs: profile.sameAs,
+    // Liputan media tentang Mas Ilyun, supaya mesin pencari mengaitkan artikelnya dengan orang ini.
+    subjectOf: posts
+      .filter((p) => p.kind === "liputan")
+      .map((p) => ({
+        "@type": "NewsArticle",
+        headline: p.title[p.sourceLang ?? "id"],
+        url: p.url,
+        datePublished: p.date ? isoPartialDate(p.date) : undefined,
+        publisher: p.outlet ? { "@type": "Organization", name: p.outlet } : undefined,
+      })),
   };
 
   const stats = [
@@ -539,6 +553,28 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
             </p>
           </Reveal>
         </Section>
+
+        {/* Kabar dan liputan */}
+        {latestPosts.length === 0 ? null : (
+          <Section id="news" title={t.news.title} intro={t.news.intro}>
+            <Spotlight className="mt-12">
+              <ul className="cred-grid">
+                {latestPosts.map((post, i) => (
+                  <li key={post.slug}>
+                    <Reveal delay={i * 70} className="h-full">
+                      <NewsCard post={post} lang={lang} />
+                    </Reveal>
+                  </li>
+                ))}
+              </ul>
+            </Spotlight>
+            <Reveal className="mt-10">
+              <a href={postsPath(lang)} className="btn btn-line">
+                {t.news.all}
+              </a>
+            </Reveal>
+          </Section>
+        )}
 
         {/* Riset */}
         <Section id="research" title={t.research.title} intro={t.research.intro}>

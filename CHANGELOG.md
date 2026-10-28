@@ -22,6 +22,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 - CMS: sidebar yang bisa dilipat dengan ikon, formulir grid 12 kolom (isian pendek berbagi baris), placeholder di semua isian, tanda * merah untuk isian wajib, pembagian halaman 10, 25, 50, atau 100 data, dan pencarian yang langsung memperbarui daftar
 - Pengaturan "Email dan SMTP" di CMS dengan tombol kirim email uji, menggantikan variabel SMTP di berkas environment
 - Pengaturan "SEO dan Search Console": judul, deskripsi, dan kata kunci beranda serta arsip sertifikat (ID dan EN, kosong berarti teks bawaan), dengan pratinjau hasil Google yang berubah saat mengetik dan penghitung panjang ideal
+- Kabar dan liputan: koleksi CMS "Berita dan tulisan" untuk liputan media (menaut ke sumber), tulisan sendiri, dan kabar singkat. Tiga terbaru tampil di beranda, arsip lengkap di `/kabar/` dan `/en/news/`, dan tulisan dengan isi lengkap punya halaman sendiri dengan JSON-LD. Liputan media juga dicantumkan sebagai `subjectOf` di data terstruktur Person
 - Email notifikasi form kontak dan email uji kini berdesain (HTML dengan versi teks polos), berisi rincian pengirim, isi pesan, serta tombol Balas dan Buka di CMS
 - Isian "Teruskan juga ke" di pengaturan Email dan SMTP: salinan tersembunyi (BCC) notifikasi ke email pribadi tanpa menampilkannya di situs
 - Notifikasi toast untuk CMS dan situs: muncul sebentar lalu hilang sendiri, berhenti saat disorot atau difokus, dan bisa ditutup. Menggantikan kotak notifikasi di halaman
@@ -39,6 +40,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 - Situs kini berjalan sebagai server Node.js dan membaca konten dari database, bukan build statis
 - Sitemap tidak lagi memuat pasangan bahasa `xhtml:link` (sudah ada di `<head>` tiap halaman), sehingga browser menampilkannya sebagai pohon XML yang rapi
 - Meta halaman beranda dan arsip kini memuat author dan Twitter card
+- Menu navigasi desktop tampil mulai lebar 1100px; di bawahnya memakai menu ponsel supaya sepuluh tautan tidak terpotong
 
 - Mengajar dipisah per kampus dengan "Semester ini" dan "Pernah diampu", ditambah bidang keahlian mengajar
 - Garis waktu dikoreksi: jalur S1 (STIKOM Poltek Cirebon lalu UNU Cirebon), S2 STMIK LIKMI Bandung, AWATARA Februari 2022, dan Dicoding 2020 sebagai "bergabung"

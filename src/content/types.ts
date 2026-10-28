@@ -130,6 +130,22 @@ export type Plan = {
 // Prinsip kerja dengan AI di bagian "Arah ke depan".
 export type Principle = { title: Localized<string>; body: Localized<string> };
 
+// ---------- Berita dan tulisan ----------
+
+// liputan = ditulis pihak lain tentang Mas Ilyun; tulisan = artikel sendiri; kabar = pembaruan singkat.
+export type PostKind = "liputan" | "tulisan" | "kabar";
+
+export type Post = {
+  kind: PostKind;
+  title: Localized<string>;
+  date: PartialDate | null;
+  outlet?: string; // media atau penerbit, wajib untuk liputan
+  url?: string; // tautan sumber; tanpa isi lengkap, kartu menaut ke sini
+  sourceLang?: Lang; // bahasa artikel sumber, untuk keterangan di situs bahasa lain
+  summary?: Localized<string>;
+  body?: Localized<string>; // isi lengkap; bila ada, tulisan punya halaman sendiri di situs
+};
+
 export type Channel = { label: string; handle: string; href: string; note: Localized<string> };
 
 export type ProfileLink = { label: string; href: string };
@@ -204,6 +220,7 @@ export type CollectionData = {
   channel: Channel;
   plan: Plan;
   principle: Principle;
+  post: Post;
 };
 
 export type CollectionKey = keyof CollectionData;
@@ -246,6 +263,12 @@ export const kindSingular: Record<AchievementKind, Localized<string>> = {
   reviewer: { id: "Reviewer", en: "Reviewer" },
   keanggotaan: { id: "Keanggotaan", en: "Membership" },
   penghargaan: { id: "Penghargaan", en: "Award" },
+};
+
+export const postKindLabels: Record<PostKind, Localized<string>> = {
+  liputan: { id: "Liputan media", en: "Press coverage" },
+  tulisan: { id: "Tulisan", en: "Article" },
+  kabar: { id: "Kabar", en: "Update" },
 };
 
 export const authorshipLabels: Record<Authorship, Localized<string>> = {

@@ -19,6 +19,7 @@ interface PlainField extends Base {
 interface LocalizedField extends Base {
   type: "localized";
   multiline?: boolean;
+  rows?: number; // tinggi area ketik bila multiline, bawaan 3 baris
 }
 interface NumberField extends Base {
   type: "number";

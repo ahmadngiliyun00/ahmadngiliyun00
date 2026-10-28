@@ -41,7 +41,7 @@ tests/contact.test.mjs           unit test validasi form kontak (npm test)
 tests/mail.test.mjs              unit test template email: escape isian dan baris baru (npm test)
 src/
   app/
-    (id)/, (en)/en/              situs publik ID dan EN: beranda, sertifikat atau certificates, s/[token]
+    (id)/, (en)/en/              situs publik ID dan EN: beranda, sertifikat atau certificates, kabar atau news, s/[token]
     (admin)/admin/               CMS: login, ringkasan, [collection], settings/[key], actions.ts
     files/[id]/route.ts          sajikan berkas unggahan dengan pemeriksaan izin
     globals.css                  token warna, tekstur, animasi, gaya semua komponen situs
@@ -65,7 +65,7 @@ src/
     profile.ts                   identitas situs dan teks antarmuka situs ID/EN
     admin.ts                     teks antarmuka CMS
     github.json                  data GitHub hasil skrip (jangan diedit manual)
-  lib/                           achievements, linkedin, github, metadata, nav
+  lib/                           achievements, posts, linkedin, github, metadata, nav, mail-template
 ```
 
 ## Aturan kerja
@@ -75,6 +75,7 @@ src/
 - Setiap halaman dan Server Action admin wajib memanggil `requireAdmin()`. Server Action bisa dipanggil langsung tanpa halaman
 - Field baru: tambah di `src/content/collections.ts` (formulir dan validasi ikut otomatis). Urutkan supaya isian pendek berpasangan di grid 12 kolom; atur `width` bila lebar bawaan `fieldWidth()` tidak pas. Kolom tabel baru: `src/db/schema.ts` lalu `npm run db:generate`
 - Aturan capaian (maksimal 6 sorotan, 5 HKI beranda, LinkedIn hanya sertifikat dan pelatihan) ada di `src/server/entries.ts`
+- Berita dan tulisan (koleksi `post`): liputan media wajib media dan tautan sumber, dan ringkasannya ditulis sendiri tanpa menyalin detail sistem internal kampus dari artikel. Hanya tulisan dengan isi lengkap yang punya halaman `/kabar/<slug>/`
 - Metrik riset wajib bertanggal (`asOf`) dan bersumber
 - Berkas unggahan disimpan di `UPLOAD_DIR` (di luar repo dan `public/`), disajikan lewat `/files/<id>/`
 - Bagian README di antara penanda `<!-- ...:mulai -->` dibangkitkan skrip, jangan diedit manual

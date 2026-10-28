@@ -2358,6 +2358,83 @@ select.field {
 
 /* ---------- Kurangi gerakan ---------- */
 
+/* Kabar dan liputan: arsip per tahun dan halaman tulisan. */
+@layer components {
+  .news-years {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .news-year {
+    display: grid;
+    gap: 1rem 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  @media (min-width: 900px) {
+    .news-year {
+      grid-template-columns: 4.5rem minmax(0, 1fr);
+    }
+
+    .news-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .news-lang {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+
+  .post {
+    max-width: 46rem;
+  }
+
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.25rem;
+    margin-top: 1.25rem;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+
+  .post-body {
+    margin-top: 2.5rem;
+    font-size: 1.075rem;
+    line-height: 1.8;
+  }
+
+  .post-body p + p {
+    margin-top: 1.25em;
+  }
+
+  .post-body h2 {
+    margin-top: 2.2em;
+    margin-bottom: 0.6em;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+
+  .post-body p,
+  .post-body h2 {
+    overflow-wrap: anywhere;
+  }
+
+  .post-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-line);
+  }
+}
+
 /* Toast: notifikasi yang muncul sebentar di pojok kanan bawah (di ponsel di atas, selebar layar). */
 @layer components {
   .toast-region {

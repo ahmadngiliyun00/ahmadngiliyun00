@@ -13,6 +13,7 @@ import type {
   Localized,
   Milestone,
   Plan,
+  Post,
   Principle,
   ProfileSettings,
   SystemProject,
@@ -809,5 +810,58 @@ export const principles: Principle[] = [
       id: "AI adalah model prediktif, bukan penalar. Ia mempercepat kerja, tetapi logika sistem yang rumit tetap saya tulis dan analisis sendiri, karena halusinasi model hanya tertangkap oleh nalar yang terlatih.",
       en: "AI is a predictive model, not a reasoner. It speeds up the work, but I still write and analyze complex system logic myself, because only trained judgment catches a model's hallucinations.",
     },
+  },
+];
+
+// Berita dan tulisan. Liputan menaut ke sumber aslinya; ringkasan sengaja tidak memuat detail sistem kampus.
+interface SeedPost extends Post {
+  slug: string;
+  visibility: Visibility;
+}
+
+export const posts: SeedPost[] = [
+  {
+    slug: "dicoding-ikhtiar-menjemput-indonesia-emas-2045",
+    visibility: "public",
+    kind: "liputan",
+    title: {
+      id: "Ikhtiar Ahmad Ngiliyun Menjemput Masa Depan Indonesia Emas 2045",
+      en: "Ahmad Ngiliyun's Effort Toward a Golden Indonesia 2045",
+    },
+    date: { year: 2026, month: 5, day: 13 },
+    outlet: "Dicoding Blog",
+    url: "https://www.dicoding.com/blog/ikhtiar-ahmad-ngiliyun-menjemput-masa-depan-indonesia-emas-2045/",
+    sourceLang: "id",
+    summary: {
+      id: "Kisah saya mengikuti Pijak, program Dicoding dan IBM SkillsBuild: mendalami AI di sela mengajar, menerapkannya di kampus, dan mencatatkan hak cipta perangkat lunak.",
+      en: "My story in Pijak, a program by Dicoding and IBM SkillsBuild: studying AI alongside teaching, applying it on campus, and registering copyrights for my software.",
+    },
+  },
+  {
+    slug: "mahardika-jembatani-kampus-dan-industri",
+    visibility: "public",
+    kind: "liputan",
+    title: {
+      id: "Jembatani Kampus dan Industri, Dosen Institut Mahardika Dalami AI Bareng IBM SkillsBuild",
+      en: "Bridging Campus and Industry: An Institut Mahardika Lecturer Studies AI with IBM SkillsBuild",
+    },
+    date: { year: 2026, month: 5, day: 16 },
+    outlet: "Institut Mahardika",
+    url: "https://mahardika.ac.id/info/jembatani-kampus-dan-industri-dosen-institut-mahardika-dalami-ai-bareng-ibm-skillsbuild",
+    sourceLang: "id",
+    summary: {
+      id: "Berita kampus tentang keikutsertaan saya di program Pijak bersama IBM SkillsBuild dan Dicoding, serta cara ilmu AI itu saya bawa kembali ke kampus.",
+      en: "Campus news on my participation in Pijak with IBM SkillsBuild and Dicoding, and how I brought that AI knowledge back to campus.",
+    },
+  },
+  {
+    // Isi unggahan tidak bisa dibaca otomatis. Lengkapi judul, tanggal, dan ringkasan di CMS, lalu jadikan public.
+    slug: "instagram-dzml36ako",
+    visibility: "private",
+    kind: "liputan",
+    title: { id: "Unggahan Instagram, lengkapi judulnya", en: "Instagram post, complete the title" },
+    date: null,
+    outlet: "Instagram",
+    url: "https://www.instagram.com/p/DZMl36ako_i/",
   },
 ];
