@@ -8,6 +8,9 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Ditambahkan
 
+- Halaman error yang serasi dengan beranda: 404 dan 500 untuk situs ID dan EN (dengan header dan footer), CMS, dan `global-error`, berisi kode besar beranimasi, kalimat bahwa ini halaman error, penyebabnya, rincian kode dan alamat, kode referensi untuk log, serta tombol Kembali dan Ke beranda
+- Halaman error statis 500, 502, 503, dan 504 untuk Nginx (`npm run errors`), tetap tampil saat aplikasi mati dan memuat ulang sendiri setelah 20 detik
+- Halaman login CMS baru: panel merek, isian berikon, tombol lihat dan sembunyikan kata sandi, peringatan Caps Lock
 - Halaman dalam dua bahasa: Proyek (`/proyek/`, `/en/projects/`), Riset dan Publikasi (`/riset/`, `/en/research/`), Mengajar (`/mengajar/`, `/en/teaching/`), dan Perjalanan dengan Arah ke depan (`/perjalanan/`, `/en/journey/`), masing-masing dengan breadcrumb, data terstruktur BreadcrumbList, metadata, canonical, hreflang, dan entri sitemap
 - Bagian "Jelajahi" di beranda: tiga kartu menuju Riset, Mengajar, dan Perjalanan, masing-masing dengan satu angka ringkas
 - Isian SEO di CMS untuk judul dan deskripsi empat halaman baru, dengan pratinjau hasil Google untuk keenam halaman

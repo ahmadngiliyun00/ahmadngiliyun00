@@ -76,6 +76,22 @@ location / {
 }
 ```
 
+Halaman error statis saat aplikasi Next.js tidak menjawab (mati, sedang dimulai ulang, atau terlalu lama). Tambahkan juga di blok `server` yang sama, dan hapus baris `error_page` bawaan aaPanel bila ada:
+
+```nginx
+error_page 500 /errors/500.html;
+error_page 502 /errors/502.html;
+error_page 503 /errors/503.html;
+error_page 504 /errors/504.html;
+
+location ^~ /errors/ {
+    root /www/wwwroot/ngiliyun.my.id/public;   # sesuaikan dengan folder public situs
+}
+```
+
+- Berkasnya ada di `public/errors/` dan dibuat oleh `npm run errors` (`scripts/error-pages.mjs`). Nginx menyajikannya langsung dari disk, jadi tetap tampil walau proses PM2 mati. Halaman 502, 503, dan 504 mencoba memuat ulang sendiri setelah 20 detik
+- Jangan pasang `error_page 404` dan jangan aktifkan `proxy_intercept_errors`: 404 dan 500 dari aplikasi sudah ditangani Next.js dengan halaman yang memakai header dan footer situs
+- Uji: `pm2 stop ngiliyun`, buka situs (harus tampil halaman 502), lalu `pm2 start ngiliyun`
 - `Host` wajib diteruskan apa adanya. Server Action Next.js menolak permintaan bila Origin dan Host tidak cocok
 - SSL: pakai Let's Encrypt dari aaPanel, atau sertifikat Origin Cloudflare bila DNS diproksikan
 - Bila DNS lewat proxy Cloudflare (awan oranye), pulihkan IP asli pengunjung supaya pembatas percobaan login bekerja per pengunjung, bukan per IP Cloudflare. Tambahkan `set_real_ip_from` untuk setiap rentang IP di <https://www.cloudflare.com/ips/> lalu `real_ip_header CF-Connecting-IP;`

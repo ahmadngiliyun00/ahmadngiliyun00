@@ -35,6 +35,7 @@ scripts/prebuild.mjs             prebuild: data GitHub lalu README
 scripts/fetch-github.mjs         ambil data GitHub, fallback ke data lama bila gagal
 scripts/readme-assets.mjs        buat gambar SVG README
 scripts/readme-sections.mjs      bagian proyek, capaian, mengajar, perjalanan README dari database
+scripts/error-pages.mjs          halaman error statis untuk Nginx (public/errors/500, 502, 503, 504), npm run errors
 scripts/db/                      migrate, seed, create-admin, env, content (baca konten public)
 scripts/lib/load-ts.mjs          memuat berkas .ts dari skrip Node
 tests/linkedin.test.mjs          unit test URL LinkedIn dan teks siap tempel (npm test)
@@ -58,6 +59,7 @@ src/
   components/                    komponen situs (PortfolioPage, ProjectsPage, ResearchPage, TeachingPage, JourneyPage,
                                  ArchivePage, DetailPage, dan lainnya). Bersama: SubpageShell, PageHead, Section
   components/LegacyAnchors.tsx   alihkan jangkar beranda lama (#research, #teaching, #journey, #next, #activity)
+  components/ErrorView.tsx       isi halaman error (404, 500) untuk situs ID dan EN, CMS, dan global-error
   components/admin/              komponen CMS (AdminShell, EntryForm, FieldInput, ShareBox)
   content/
     types.ts                     tipe semua konten dan label kategori
@@ -102,6 +104,7 @@ src/
 - Jangkar beranda yang dipindah ke halaman dalam dicatat di `LEGACY_ANCHORS` (`src/lib/nav.ts`) supaya tautan lama tetap bekerja
 - Judul SEO bawaan paling banyak 60 karakter, deskripsi 120 sampai 160, kalimat naratif tanpa titik dua, tanpa strip pemisah, tanpa nama kota (diuji `tests/seo-text.test.mjs`)
 - Kanal kontak di beranda hanya yang bertanda "Tampil di kontak beranda" (bawaan LinkedIn, GitHub, ORCID, YouTube)
+- Halaman error: `not-found.tsx` dan `error.tsx` di `(id)/`, `(en)/en/`, dan `(admin)/admin/`, plus `app/global-error.tsx`. Alamat tak dikenal ditangkap rute `[...missing]` supaya 404 berbahasa sesuai. Teks di `copy.errors` (`profile.ts`) dan `adminCopy.errors`. Halaman 500, 502, 503, 504 untuk Nginx dibuat `npm run errors`; jangan edit `public/errors/` manual
 - Header keamanan dan CSP ada di `next.config.ts`. Skrip, gambar, iframe, atau `fetch` ke domain pihak ketiga baru wajib ditambahkan ke CSP, kalau tidak peramban memblokirnya
 - Gaya komponen ditulis di `globals.css` (situs) atau `admin.css` (CMS) di dalam `@layer components`
 - Ikon Font Awesome Free hanya untuk CMS (dimuat di layout admin). Situs publik tetap tanpa ikon font dan tanpa emoji
@@ -143,6 +146,7 @@ npm run admin:create -- --email anda@contoh.id --name "Nama"
 npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
+npm run errors         # buat ulang halaman error statis Nginx di public/errors/
 npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build

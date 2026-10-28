@@ -33,6 +33,7 @@ Buka <http://localhost:3000> untuk situs dan <http://localhost:3000/admin/> untu
 | `npm test` | Unit test URL LinkedIn, form kontak, template email, rich text, hitungan pembaca, komentar, isian dua bahasa, JSON-LD, aturan beranda, dan teks SEO bawaan |
 | `npm run data` | Ambil data GitHub ke `src/data/github.json`, lalu buat ulang gambar dan teks README |
 | `npm run readme` | Buat ulang gambar README dan bagian teks README dari database |
+| `npm run errors` | Buat ulang halaman error statis untuk Nginx di `public/errors/` (500, 502, 503, 504) |
 | `npm run db:generate` | Buat berkas migrasi baru setelah mengubah `src/db/schema.ts` |
 | `npm run db:migrate` | Terapkan migrasi di folder `drizzle/` |
 | `npm run db:seed` | Isi database dari `seed/` (berhenti bila sudah berisi; `-- --force` menghapus dan mengisi ulang; `-- --only=plan,principle,post` mengisi koleksi tertentu yang masih kosong) |
@@ -58,6 +59,17 @@ Beranda sengaja ringkas: tujuh bagian yang menjawab siapa, keahlian apa, bukti t
 - Alamat halaman, menu header, dan tautan footer diatur di `src/lib/nav.ts`. Menu desktop tampil mulai lebar 1024px; di bawahnya menu ponsel yang ditutup dengan Escape
 - Jangkar beranda lama (`/#research`, `/#teaching`, `/#journey`, `/#next`, `/#activity`) dialihkan ke halaman barunya oleh `LegacyAnchors`. Tautan berawalan `#` di koleksi Di luar kode diarahkan dengan `sectionHref`
 - Di ponsel, kartu proyek, sorotan, dan kabar di beranda menjadi baris geser (kelas `snap-row`) supaya beranda tidak memanjang
+
+### Halaman error
+
+| Kode | Kapan | Berkas |
+| --- | --- | --- |
+| 404 | Alamat tidak dikenal atau `notFound()` (data tidak ada, privat, atau tautan berbagi dicabut) | `(id)/not-found.tsx`, `(en)/en/not-found.tsx`, `(admin)/admin/not-found.tsx`, rute penampung `[...missing]` |
+| 500 | Galat saat merender halaman | `(id)/error.tsx`, `(en)/en/error.tsx`, `(admin)/admin/error.tsx` |
+| 500 | Galat di root layout | `src/app/global-error.tsx` (memasang `<html>` sendiri, bahasa ditebak dari alamat) |
+| 500, 502, 503, 504 | Aplikasi tidak menjawab, disajikan Nginx | `public/errors/*.html`, dibuat `npm run errors` |
+
+Semua memakai `ErrorView`: kode besar beranimasi, kalimat bahwa ini halaman error, rincian (kode, alamat, kode referensi `error.digest` untuk dicari di `pm2 logs`), kemungkinan penyebab, dan tombol Kembali, Ke beranda, serta Coba lagi untuk 500. Situs memiliki beberapa root layout, jadi 404 untuk alamat tak dikenal memakai rute `[...missing]` yang memanggil `notFound()`, bukan `global-not-found`. Pemasangan Nginx ada di `docs/DEPLOY.md` langkah 5.
 
 ## CMS
 
