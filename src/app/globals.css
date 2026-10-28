@@ -2197,6 +2197,105 @@ select.field {
   color: var(--color-muted);
 }
 
+/* Arah ke depan: rencana per tahun. Ponsel: bertumpuk; desktop: satu baris kartu.
+   Tahap yang sedang berjalan diberi aksen hijau. */
+.roadmap {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 700px) {
+  .roadmap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .roadmap {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.roadmap-step {
+  padding: 1.35rem;
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+  background: var(--color-surface);
+}
+
+.roadmap-step[data-current] {
+  border-color: color-mix(in srgb, var(--color-leaf) 55%, var(--color-line));
+  background: color-mix(in srgb, var(--color-leaf) 6%, var(--color-surface));
+}
+
+.roadmap-period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 0.6rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-sky);
+}
+
+.roadmap-step[data-current] .roadmap-period {
+  color: var(--color-leaf);
+}
+
+.roadmap-now {
+  padding: 0.15rem 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--color-leaf) 60%, transparent);
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--color-leaf);
+}
+
+.roadmap-title {
+  margin-top: 0.7rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.roadmap-points {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.roadmap-points li {
+  position: relative;
+  padding-left: 0.95rem;
+}
+
+.roadmap-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-sky) 60%, var(--color-line));
+}
+
+.principles {
+  display: grid;
+  gap: 1rem;
+}
+
 /* Form kontak: galat per kolom, kolom jebakan robot, dan panel terkirim. */
 .field-error {
   font-size: 0.875rem;

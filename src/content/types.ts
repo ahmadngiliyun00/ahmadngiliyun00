@@ -119,6 +119,17 @@ export type Contribution = {
 
 export type Collab = { title: Localized<string>; body: Localized<string> };
 
+// Satu tahap rencana ke depan di bagian "Arah ke depan".
+export type Plan = {
+  period: string; // misalnya "2026"
+  title: Localized<string>;
+  points: Localized<string[]>;
+  current?: boolean; // tahap yang sedang berjalan
+};
+
+// Prinsip kerja dengan AI di bagian "Arah ke depan".
+export type Principle = { title: Localized<string>; body: Localized<string> };
+
 export type Channel = { label: string; handle: string; href: string; note: Localized<string> };
 
 export type ProfileLink = { label: string; href: string };
@@ -133,6 +144,7 @@ export type ProfileSettings = {
   skills: string[];
   topics: Localized<string[]>;
   researchThemes: Localized<string[]>;
+  learning?: Localized<string[]>; // "Sedang saya dalami" di bagian Arah ke depan
   researchProfiles: ProfileLink[];
   credentialProfiles: ProfileLink[];
   sameAs: string[]; // profil untuk JSON-LD Person
@@ -183,6 +195,8 @@ export type CollectionData = {
   contribution: Contribution;
   collab: Collab;
   channel: Channel;
+  plan: Plan;
+  principle: Principle;
 };
 
 export type CollectionKey = keyof CollectionData;

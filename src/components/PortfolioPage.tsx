@@ -106,6 +106,9 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
   const contributions = content.contribution.map((e) => e.data);
   const featured = content.project.map((e) => e.data);
   const journey = content.milestone.map((e) => e.data);
+  const plans = content.plan.map((e) => e.data);
+  const principles = content.principle.map((e) => e.data);
+  const learning = profile.learning ? profile.learning[lang] : [];
   const teachingFocus = content.focus.map((e) => e.data);
   const termMap = new Map(content.term.map((e) => [e.data.code, e.data.label]));
   const currentTerm = content.term.find((e) => e.data.current)?.data.code ?? "";
@@ -717,6 +720,67 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
             />
           </div>
         </Section>
+
+        {/* Arah ke depan */}
+        {plans.length + principles.length + learning.length === 0 ? null : (
+          <Section id="next" title={t.next.title} intro={t.next.intro}>
+            {plans.length === 0 ? null : (
+              <div className="mt-12">
+                <Reveal>
+                  <h3 className="sub-title">{t.next.roadmapTitle}</h3>
+                </Reveal>
+                <ol className="roadmap mt-6">
+                  {plans.map((plan, i) => (
+                    <li key={plan.period} className="roadmap-step" data-current={plan.current ? "true" : undefined}>
+                      <Reveal delay={i * 70}>
+                        <p className="roadmap-period">
+                          <span>{plan.period}</span>
+                          {plan.current ? <span className="roadmap-now">{t.next.current}</span> : null}
+                        </p>
+                        <h4 className="roadmap-title">{plan.title[lang]}</h4>
+                        <ul className="roadmap-points">
+                          {plan.points[lang].map((point) => (
+                            <li key={point}>{point}</li>
+                          ))}
+                        </ul>
+                      </Reveal>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            <div className="mt-16 grid gap-12 lg:grid-cols-[1.6fr_1fr] lg:gap-16">
+              {principles.length === 0 ? null : (
+                <div>
+                  <Reveal>
+                    <h3 className="sub-title">{t.next.principlesTitle}</h3>
+                  </Reveal>
+                  <Spotlight className="principles mt-6">
+                    {principles.map((pr, i) => (
+                      <Reveal key={pr.title.id} delay={i * 70}>
+                        <div className="collab" data-spot>
+                          <h4 className="font-display text-lg font-bold tracking-tight">{pr.title[lang]}</h4>
+                          <p className="mt-2 text-sm text-muted">{pr.body[lang]}</p>
+                        </div>
+                      </Reveal>
+                    ))}
+                  </Spotlight>
+                </div>
+              )}
+              {learning.length === 0 ? null : (
+                <Reveal delay={120}>
+                  <h3 className="sub-title">{t.next.learningTitle}</h3>
+                  <ul className="tags mt-6">
+                    {learning.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </Reveal>
+              )}
+            </div>
+          </Section>
+        )}
 
         {/* Kolaborasi dan kontak */}
         <div className="giant-band">

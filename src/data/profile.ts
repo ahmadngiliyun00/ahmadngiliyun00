@@ -52,6 +52,7 @@ export type Copy = {
     achievements: string;
     teaching: string;
     journey: string;
+    next: string;
     contact: string;
     skip: string;
     label: string;
@@ -210,6 +211,14 @@ export type Copy = {
     noneCurrent: string;
   };
   journey: { title: string; intro: string };
+  next: {
+    title: string;
+    intro: string;
+    roadmapTitle: string;
+    current: string;
+    principlesTitle: string;
+    learningTitle: string;
+  };
   contact: {
     marquee: string;
     title: string;
@@ -268,6 +277,7 @@ export const copy: Localized<Copy> = {
       achievements: "Capaian",
       teaching: "Mengajar",
       journey: "Perjalanan",
+      next: "Ke depan",
       contact: "Kontak",
       skip: "Lompat ke konten",
       label: "Navigasi utama",
@@ -434,6 +444,15 @@ export const copy: Localized<Copy> = {
       title: "Perjalanan",
       intro: "Dari repositori pertama sampai ruang kelas.",
     },
+    next: {
+      title: "Arah ke depan",
+      intro:
+        "Saya sedang berpindah dari pengembang web menjadi AI engineer, tanpa meninggalkan ruang kelas. Ini rencana lima tahun saya, cara saya bekerja dengan AI, dan hal yang sedang saya dalami.",
+      roadmapTitle: "Rencana 2026 sampai 2030",
+      current: "Sedang berjalan",
+      principlesTitle: "Cara saya bekerja dengan AI",
+      learningTitle: "Sedang saya dalami",
+    },
     contact: {
       marquee: "Mari berkolaborasi",
       title: "Mari bekerja sama",
@@ -494,6 +513,7 @@ export const copy: Localized<Copy> = {
       achievements: "Credentials",
       teaching: "Teaching",
       journey: "Journey",
+      next: "Next",
       contact: "Contact",
       skip: "Skip to content",
       label: "Main navigation",
@@ -659,6 +679,15 @@ export const copy: Localized<Copy> = {
     journey: {
       title: "Journey",
       intro: "From the first repository to the classroom.",
+    },
+    next: {
+      title: "What comes next",
+      intro:
+        "I am moving from web developer to AI engineer without leaving the classroom. Here is my five-year plan, how I work with AI, and what I am studying right now.",
+      roadmapTitle: "Plan for 2026 to 2030",
+      current: "In progress",
+      principlesTitle: "How I work with AI",
+      learningTitle: "Currently studying",
     },
     contact: {
       marquee: "Let's work together",

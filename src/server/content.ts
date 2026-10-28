@@ -79,6 +79,8 @@ export type SiteContent = {
   contribution: Entry<"contribution">[];
   collab: Entry<"collab">[];
   channel: Entry<"channel">[];
+  plan: Entry<"plan">[];
+  principle: Entry<"principle">[];
 };
 
 const TTL_MS = 5 * 60 * 1000;
@@ -115,6 +117,8 @@ async function fetchSite(): Promise<SiteContent> {
     contribution: pick("contribution"),
     collab: pick("collab"),
     channel: pick("channel"),
+    plan: pick("plan"),
+    principle: pick("principle"),
   };
 }
 

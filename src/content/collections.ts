@@ -269,6 +269,34 @@ export const collections: CollectionConfig[] = [
     ],
   },
   {
+    key: "plan",
+    label: "Rencana ke depan",
+    singular: "rencana",
+    description: "Tahap rencana per tahun di bagian Arah ke depan, urut dari yang terdekat.",
+    group: "Profil",
+    order: "position",
+    title: (d) => `${s(d.period)} ${loc(d.title)}`.trim(),
+    fields: [
+      { name: "period", label: "Periode", type: "text", required: true, placeholder: "2027" },
+      { name: "current", width: "half", label: "Sedang berjalan", type: "boolean", help: "Tandai satu tahap yang sedang dikerjakan." },
+      { name: "title", label: "Judul", type: "localized", required: true },
+      { name: "points", label: "Butir rencana", type: "localizedList", required: true },
+    ],
+  },
+  {
+    key: "principle",
+    label: "Prinsip kerja dengan AI",
+    singular: "prinsip",
+    description: "Cara bekerja dengan AI di bagian Arah ke depan.",
+    group: "Profil",
+    order: "position",
+    title: (d) => loc(d.title),
+    fields: [
+      { name: "title", label: "Judul", type: "localized", required: true },
+      { name: "body", label: "Isi", type: "localized", multiline: true, required: true },
+    ],
+  },
+  {
     key: "channel",
     label: "Kanal kontak",
     singular: "kanal",
@@ -309,6 +337,7 @@ export const settingsConfigs: SettingsConfig[] = [
       { name: "skills", label: "Running text teknologi", type: "list", required: true },
       { name: "topics", label: "Running text topik", type: "localizedList", required: true },
       { name: "researchThemes", label: "Tema riset", type: "localizedList", required: true },
+      { name: "learning", label: "Sedang saya dalami", type: "localizedList", help: "Daftar di bagian Arah ke depan. Kosongkan untuk menyembunyikan." },
     ],
   },
   {

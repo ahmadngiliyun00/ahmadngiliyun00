@@ -12,6 +12,8 @@ import type {
   Institution,
   Localized,
   Milestone,
+  Plan,
+  Principle,
   ProfileSettings,
   SystemProject,
   TeachingFocus,
@@ -119,6 +121,20 @@ export const profile: ProfileSettings = {
     "Digital community service",
   ],
 },
+  learning: {
+    id: [
+      "Aljabar linear, kalkulus, dan statistik untuk machine learning",
+      "Ekosistem Python untuk data science: Pandas dan TensorFlow",
+      "Integrasi model machine learning ke arsitektur web dan cloud",
+      "Pedagogi untuk mengajar AI",
+    ],
+    en: [
+      "Linear algebra, calculus, and statistics for machine learning",
+      "The Python data science stack: Pandas and TensorFlow",
+      "Integrating machine learning models into web and cloud architectures",
+      "Pedagogy for teaching AI",
+    ],
+  },
   researchProfiles: [
   { label: "Google Scholar", href: links.scholar },
   { label: "SINTA", href: links.sinta },
@@ -676,6 +692,122 @@ export const collabs: Collab[] = [
     body: {
       id: "Penyiapan, pengamanan, dan optimasi VPS serta LMS Moodle.",
       en: "Setting up, securing, and tuning VPS hosts and Moodle LMS.",
+    },
+  },
+];
+
+// Rencana 2026 sampai 2030 untuk bagian "Arah ke depan". Sumber: rencana pengembangan diri
+// (SMART goals dan growth mindset, program Pijak) dan roadmap penelitian pribadi.
+// Hanya arah dan tema; judul penelitian yang belum terbit dan target jurnal tidak dimasukkan.
+export const plans: Plan[] = [
+  {
+    period: "2026",
+    title: { id: "Dari pengembang web ke AI engineer", en: "From web developer to AI engineer" },
+    points: {
+      id: [
+        "Lulus program AI Engineer Pijak bersama IBM SkillsBuild (Juli 2026)",
+        "Merilis aplikasi web dengan model machine learning, target akurasi di atas 80 persen",
+        "Penelitian NetA: agen jaringan berbasis IoT dan large language model",
+        "Menyusun bahan ajar AI yang selaras dengan fokus cloud dan big data program studi",
+      ],
+      en: [
+        "Completed the Pijak AI Engineer program with IBM SkillsBuild (July 2026)",
+        "Release a web application with a machine learning model, targeting accuracy above 80 percent",
+        "NetA research: a network agent built on IoT and a large language model",
+        "Write AI course material aligned with the study program's cloud and big data focus",
+      ],
+    },
+    current: true,
+  },
+  {
+    period: "2027",
+    title: { id: "Riset dan publikasi AI", en: "AI research and publication" },
+    points: {
+      id: [
+        "Publikasi riset AI di jurnal nasional terakreditasi",
+        "Platform analitik berbasis cloud untuk digipreneur",
+        "AI dan big data untuk personalisasi pembelajaran",
+        "Laboratorium virtual berbasis cloud",
+      ],
+      en: [
+        "Publish AI research in accredited national journals",
+        "A cloud-based analytics platform for digital entrepreneurs",
+        "AI and big data for personalized learning",
+        "Cloud-based virtual laboratories",
+      ],
+    },
+  },
+  {
+    period: "2028",
+    title: { id: "AI di sistem kampus", en: "AI inside campus systems" },
+    points: {
+      id: [
+        "Fitur AI berjalan penuh di sistem akademik kampus",
+        "Teknologi prediktif untuk pendidikan dengan big data",
+        "Arsitektur serverless untuk aplikasi UMKM",
+      ],
+      en: [
+        "AI features running fully in the campus academic system",
+        "Predictive technology for education with big data",
+        "Serverless architecture for small business applications",
+      ],
+    },
+  },
+  {
+    period: "2029",
+    title: { id: "AI yang transparan dan aman", en: "Transparent, secure AI" },
+    points: {
+      id: [
+        "Explainable AI untuk transparansi sistem rekomendasi pendidikan",
+        "Blockchain dan cloud untuk keamanan data UMKM digital",
+        "Green computing: deep learning hemat energi di edge computing",
+      ],
+      en: [
+        "Explainable AI for transparent educational recommender systems",
+        "Blockchain and cloud for data security in digital small businesses",
+        "Green computing: energy-efficient deep learning at the edge",
+      ],
+    },
+  },
+  {
+    period: "2030",
+    title: { id: "Berbagi lebih luas", en: "Sharing more widely" },
+    points: {
+      id: [
+        "Membawa sistem cerdas ke institusi lain",
+        "Menjadi rujukan AI di kampus dan pembicara seminar",
+        "Menambah sertifikasi lanjutan",
+      ],
+      en: [
+        "Bring intelligent systems to other institutions",
+        "Be a go-to AI reference on campus and a seminar speaker",
+        "Earn advanced certifications",
+      ],
+    },
+  },
+];
+
+// Prinsip kerja dengan AI. Sumber: esai Critical Thinking and Problem Solving (program Pijak).
+export const principles: Principle[] = [
+  {
+    title: { id: "Fondasi dulu, AI kemudian", en: "Foundations first, AI second" },
+    body: {
+      id: "Materi kuliah saya bangun dari jurnal dan literatur yang valid. Dengan fondasi itu saya punya patokan untuk memeriksa jawaban AI, bukan sekadar menerimanya.",
+      en: "I build course material from journals and sound literature. That foundation gives me a yardstick to check what AI says instead of simply accepting it.",
+    },
+  },
+  {
+    title: { id: "Bandingkan, jangan telan mentah", en: "Compare, never take it whole" },
+    body: {
+      id: "Satu instruksi saya uji di beberapa model. Perbedaan jawabannya menjadi bahan menimbang, dan proses menimbang itulah yang melatih nalar kritis.",
+      en: "I test the same prompt on several models. Where the answers differ, I have something to weigh, and that weighing is what keeps critical thinking sharp.",
+    },
+  },
+  {
+    title: { id: "Keputusan tetap di manusia", en: "People make the final call" },
+    body: {
+      id: "AI adalah model prediktif, bukan penalar. Ia mempercepat kerja, tetapi logika sistem yang rumit tetap saya tulis dan analisis sendiri, karena halusinasi model hanya tertangkap oleh nalar yang terlatih.",
+      en: "AI is a predictive model, not a reasoner. It speeds up the work, but I still write and analyze complex system logic myself, because only trained judgment catches a model's hallucinations.",
     },
   },
 ];

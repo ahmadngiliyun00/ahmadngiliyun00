@@ -2,6 +2,8 @@
 // Jalankan: npm run db:seed
 // Bila tabel entries sudah berisi, skrip berhenti supaya isian dari CMS tidak tertimpa.
 // Tambahkan --force untuk MENGHAPUS semua konten dan pengaturan lalu mengisi ulang dari seed/.
+// --only=plan,principle mengisi koleksi tertentu saja (hanya bila koleksi itu masih kosong),
+// berguna setelah koleksi baru ditambahkan ke database yang sudah berisi.
 
 import mysql from "mysql2/promise";
 import { importTs } from "../lib/load-ts.mjs";
@@ -9,6 +11,8 @@ import { loadEnv } from "./env.mjs";
 
 loadEnv();
 const force = process.argv.includes("--force");
+const onlyArg = process.argv.find((a) => a.startsWith("--only="));
+const only = onlyArg ? onlyArg.slice("--only=".length).split(",").filter((x) => x !== "") : null;
 const root = new URL("../../", import.meta.url);
 const { achievements } = await importTs(new URL("seed/achievements.ts", root));
 const { metrics } = await importTs(new URL("seed/metrics.ts", root));
@@ -50,8 +54,39 @@ for (const a of p.areas) add("area", a.icon, a);
 for (const c of p.contributions) add("contribution", slugify(c.title.id), c);
 for (const c of p.collabs) add("collab", slugify(c.title.id), c);
 for (const c of p.channels) add("channel", slugify(c.label), c);
+for (const pl of p.plans) add("plan", slugify(`${pl.period}-${pl.title.id}`), pl);
+for (const pr of p.principles) add("principle", slugify(pr.title.id), pr);
 
 const conn = await mysql.createConnection({ uri: process.env.DATABASE_URL, timezone: "Z", charset: "utf8mb4" });
+
+if (only !== null) {
+  try {
+    const now = new Date();
+    for (const collection of only) {
+      const [[{ n }]] = await conn.query("SELECT COUNT(*) AS n FROM entries WHERE collection = ?", [collection]);
+      const subset = rows.filter((r) => r.collection === collection);
+      if (subset.length === 0) {
+        console.error(`[seed] koleksi ${collection} tidak dikenal atau tidak punya data awal.`);
+        continue;
+      }
+      if (n > 0) {
+        console.log(`[seed] ${collection} sudah berisi ${n} baris, dilewati.`);
+        continue;
+      }
+      for (const r of subset) {
+        await conn.query(
+          "INSERT INTO entries (collection, slug, visibility, position, data, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [r.collection, r.slug, r.visibility, r.position, JSON.stringify(r.data), now, now],
+        );
+      }
+      console.log(`[seed] ${collection}: ${subset.length} baris dimasukkan.`);
+    }
+  } finally {
+    await conn.end();
+  }
+  process.exit(0);
+}
+
 try {
   const [[{ n }]] = await conn.query("SELECT COUNT(*) AS n FROM entries");
   if (n > 0) {
