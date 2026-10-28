@@ -28,11 +28,18 @@ function keyOf(key: string): string {
 
 export async function clientIp(): Promise<string> {
   const h = await headers();
-  // Di belakang Nginx, alamat asli dikirim lewat X-Real-IP atau X-Forwarded-For (lihat docs/DEPLOY.md).
+  // Di belakang Nginx, alamat asli dikirim lewat X-Real-IP (lihat docs/DEPLOY.md). Nginx
+  // menimpa header itu, jadi nilainya tidak bisa dipalsukan pengunjung.
   const real = h.get("x-real-ip");
   if (real) return real.trim();
-  const fwd = h.get("x-forwarded-for");
-  return fwd ? fwd.split(",")[0].trim() : "unknown";
+  // Cadangan: entri terakhir X-Forwarded-For, yaitu alamat yang dilihat proxy kita sendiri
+  // (atau soket, yang diisi Next.js bila header kosong). Entri di depannya dikirim pengunjung
+  // dan bisa diisi apa saja.
+  const fwd = (h.get("x-forwarded-for") ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s !== "");
+  return fwd.length > 0 ? fwd[fwd.length - 1] : "unknown";
 }
 
 // Tambah satu percobaan untuk satu kunci dalam satu pernyataan SQL dan kembalikan hitungan
