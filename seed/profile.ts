@@ -53,7 +53,7 @@ export const profile: ProfileSettings = {
         { label: "Co-founder", value: "AWATARA Research and Education Solution" },
         { label: "Location", value: "Cirebon, West Java, Indonesia" },
       ] },
-  email: { user: "ahmadngiliyun", domain: "gmail.com" },
+  email: { user: "ahmad", domain: "ngiliyun.my.id" },
   skills: [
   "Next.js",
   "React",

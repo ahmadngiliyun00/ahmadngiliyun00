@@ -217,20 +217,36 @@ export type Copy = {
     formTitle: string;
     name: string;
     namePlaceholder: string;
+    emailField: string;
+    emailPlaceholder: string;
     topic: string;
     otherTopic: string;
     message: string;
     messagePlaceholder: string;
     send: string;
+    sending: string;
     sendNote: string;
-    needMessage: string;
     emailLabel: string;
     copy: string;
     copied: string;
     channelsTitle: string;
     localTime: string;
-    subjectPrefix: string;
-    greeting: string;
+    sentTitle: string;
+    sentBody: string;
+    sendAnother: string;
+    errors: {
+      nameRequired: string;
+      emailRequired: string;
+      emailInvalid: string;
+      topicRequired: string;
+      bodyRequired: string;
+      bodyTooShort: string;
+      tooLong: string;
+      tooManyLinks: string;
+      captcha: string;
+      tooMany: string;
+      failed: string;
+    };
   };
   footer: { built: string; jobTitle: string; top: string };
   newTab: string;
@@ -425,20 +441,36 @@ export const copy: Localized<Copy> = {
       formTitle: "Kirim pesan",
       name: "Nama",
       namePlaceholder: "Nama Anda",
+      emailField: "Email Anda",
+      emailPlaceholder: "nama@contoh.com",
       topic: "Topik",
       otherTopic: "Lainnya",
       message: "Pesan",
       messagePlaceholder: "Ceritakan singkat apa yang ingin dikerjakan bersama.",
-      send: "Buka di aplikasi email",
-      sendNote: "Tombol ini membuka aplikasi email Anda dengan pesan yang sudah terisi.",
-      needMessage: "Tulis pesan terlebih dahulu.",
+      send: "Kirim pesan",
+      sending: "Mengirim...",
+      sendNote: "Pesan masuk langsung ke kotak masuk saya. Balasan saya kirim ke email Anda.",
       emailLabel: "Email",
       copy: "Salin email",
       copied: "Email tersalin",
       channelsTitle: "Atau temukan saya di",
       localTime: "Sekarang pukul {time} di Cirebon",
-      subjectPrefix: "Kolaborasi",
-      greeting: "Halo Mas Ilyun,",
+      sentTitle: "Pesan terkirim",
+      sentBody: "Terima kasih, {name}. Pesan Anda sudah saya terima dan akan saya balas ke {email}.",
+      sendAnother: "Kirim pesan lain",
+      errors: {
+        nameRequired: "Tulis nama Anda.",
+        emailRequired: "Tulis email Anda supaya saya bisa membalas.",
+        emailInvalid: "Format email belum benar, contoh: nama@contoh.com.",
+        topicRequired: "Pilih salah satu topik.",
+        bodyRequired: "Tulis pesan terlebih dahulu.",
+        bodyTooShort: "Pesan terlalu singkat, minimal 10 karakter.",
+        tooLong: "Isian ini terlalu panjang.",
+        tooManyLinks: "Pesan berisi terlalu banyak tautan. Kurangi menjadi paling banyak tiga.",
+        captcha: "Verifikasi keamanan belum selesai. Tunggu sebentar lalu coba lagi.",
+        tooMany: "Terlalu banyak pesan dari jaringan Anda. Coba lagi sekitar satu jam lagi.",
+        failed: "Pesan gagal dikirim. Coba lagi, atau salin email di atas dan kirim langsung.",
+      },
     },
     footer: {
       built: "Dibuat di Cirebon dengan Next.js, TypeScript, dan Tailwind CSS.",
@@ -635,20 +667,36 @@ export const copy: Localized<Copy> = {
       formTitle: "Send a message",
       name: "Name",
       namePlaceholder: "Your name",
+      emailField: "Your email",
+      emailPlaceholder: "name@example.com",
       topic: "Topic",
       otherTopic: "Something else",
       message: "Message",
       messagePlaceholder: "Briefly describe what you would like to work on together.",
-      send: "Open in email app",
-      sendNote: "This button opens your email app with the message filled in.",
-      needMessage: "Write a message first.",
+      send: "Send message",
+      sending: "Sending...",
+      sendNote: "Your message goes straight to my inbox. I will reply to your email.",
       emailLabel: "Email",
       copy: "Copy email",
       copied: "Email copied",
       channelsTitle: "Or find me on",
       localTime: "It is {time} in Cirebon right now",
-      subjectPrefix: "Collaboration",
-      greeting: "Hello Ahmad,",
+      sentTitle: "Message sent",
+      sentBody: "Thank you, {name}. I have received your message and will reply to {email}.",
+      sendAnother: "Send another message",
+      errors: {
+        nameRequired: "Please enter your name.",
+        emailRequired: "Please enter your email so I can reply.",
+        emailInvalid: "That email does not look right, for example: name@example.com.",
+        topicRequired: "Please choose a topic.",
+        bodyRequired: "Please write a message first.",
+        bodyTooShort: "The message is too short, at least 10 characters.",
+        tooLong: "This field is too long.",
+        tooManyLinks: "The message contains too many links. Please keep it to three at most.",
+        captcha: "The security check has not finished yet. Wait a moment and try again.",
+        tooMany: "Too many messages from your network. Please try again in about an hour.",
+        failed: "The message could not be sent. Try again, or copy the email above and write directly.",
+      },
     },
     footer: {
       built: "Made in Cirebon with Next.js, TypeScript, and Tailwind CSS.",
