@@ -232,17 +232,17 @@ export type Copy = {
     subjectPrefix: string;
     greeting: string;
   };
-  footer: { built: string; top: string };
+  footer: { built: string; jobTitle: string; top: string };
   newTab: string;
 };
 
 export const copy: Localized<Copy> = {
   id: {
     meta: {
-      title: "Ahmad Ngiliyun - Dosen Informatika dan Pengembang Full-stack",
+      title: "Ahmad Ngiliyun - AI Engineer, Dosen Informatika, dan Pengembang Full-stack",
       description:
-        "Portofolio Ahmad Ngiliyun, M.Kom.: dosen informatika di Cirebon, pengembang full-stack, dan peneliti machine learning. Proyek, publikasi, sertifikat, mata kuliah, dan kontak kolaborasi.",
-      jobTitle: "Dosen informatika dan pengembang full-stack",
+        "Portofolio Ahmad Ngiliyun, M.Kom.: AI engineer, dosen informatika di Cirebon, pengembang full-stack, dan peneliti machine learning. Proyek, publikasi, sertifikat, mata kuliah, dan kontak kolaborasi.",
+      jobTitle: "AI Engineer dan dosen informatika",
     },
     nav: {
       about: "Tentang",
@@ -442,16 +442,17 @@ export const copy: Localized<Copy> = {
     },
     footer: {
       built: "Dibuat di Cirebon dengan Next.js, TypeScript, dan Tailwind CSS.",
+      jobTitle: "AI Engineer, dosen informatika, pengembang full-stack, dan spesialis IT support",
       top: "Kembali ke atas",
     },
     newTab: "membuka tab baru",
   },
   en: {
     meta: {
-      title: "Ahmad Ngiliyun - Informatics Lecturer and Full-stack Developer",
+      title: "Ahmad Ngiliyun - AI Engineer, Informatics Lecturer, and Full-stack Developer",
       description:
-        "Portfolio of Ahmad Ngiliyun, M.Kom.: informatics lecturer in Cirebon, full-stack developer, and machine learning researcher. Projects, publications, certificates, courses, and collaboration.",
-      jobTitle: "Informatics lecturer and full-stack developer",
+        "Portfolio of Ahmad Ngiliyun, M.Kom.: AI engineer, informatics lecturer in Cirebon, full-stack developer, and machine learning researcher. Projects, publications, certificates, courses, and collaboration.",
+      jobTitle: "AI engineer and informatics lecturer",
     },
     nav: {
       about: "About",
@@ -651,6 +652,7 @@ export const copy: Localized<Copy> = {
     },
     footer: {
       built: "Made in Cirebon with Next.js, TypeScript, and Tailwind CSS.",
+      jobTitle: "AI engineer, informatics lecturer, full-stack developer, and IT support specialist",
       top: "Back to top",
     },
     newTab: "opens in a new tab",
