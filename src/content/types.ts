@@ -191,6 +191,10 @@ export type PageSeo = { title?: Localized<string>; description?: Localized<strin
 export type SeoSettings = {
   home?: PageSeo; // beranda / dan /en/
   archive?: PageSeo; // arsip /sertifikat/ dan /en/certificates/
+  projects?: PageSeo; // /proyek/ dan /en/projects/
+  research?: PageSeo; // /riset/ dan /en/research/
+  teaching?: PageSeo; // /mengajar/ dan /en/teaching/
+  journey?: PageSeo; // /perjalanan/ dan /en/journey/
   keywords?: Localized<string[]>;
   googleVerification?: string; // isi content dari meta google-site-verification
   googleHtmlFile?: string; // nama berkas verifikasi HTML, misalnya google1a2b3c4d5e6f7a8b.html

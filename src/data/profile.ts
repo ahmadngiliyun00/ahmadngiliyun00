@@ -140,6 +140,11 @@ export type Copy = {
     systemsTitle: string;
     systemsIntro: string;
     privateRepo: string;
+    featuredTitle: string;
+    allProjects: string;
+    stackTitle: string;
+    stackIntro: string;
+    byArea: string;
   };
   activity: {
     title: string;
@@ -421,6 +426,11 @@ export const copy: Localized<Copy> = {
       systemsTitle: "Sistem yang saya kembangkan",
       systemsIntro: "Sebagian besar dipakai di kampus dan mitra, jadi kodenya berada di repositori privat.",
       privateRepo: "Repositori privat",
+      featuredTitle: "Proyek unggulan",
+      allProjects: "Semua proyek",
+      stackTitle: "Teknologi dan topik",
+      stackIntro: "Alat yang saya pakai di tiap bidang kerja, ditambah topik yang sedang saya dalami.",
+      byArea: "Alat per bidang",
     },
     activity: {
       title: "Kontribusi",
@@ -747,6 +757,11 @@ export const copy: Localized<Copy> = {
       systemsTitle: "Systems I have built",
       systemsIntro: "Most of them run at universities and partner organizations, so the code lives in private repositories.",
       privateRepo: "Private repository",
+      featuredTitle: "Featured projects",
+      allProjects: "All projects",
+      stackTitle: "Tools and topics",
+      stackIntro: "The tools I use in each area of my work, plus the topics I am focusing on.",
+      byArea: "Tools by area",
     },
     activity: {
       title: "Activity",
