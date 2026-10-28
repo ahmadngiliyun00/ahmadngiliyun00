@@ -20,7 +20,7 @@ import type { Lang } from "@/content/types";
 import { copy, site } from "@/data/profile";
 import { archivePath, countKind, homeCopyrights, homeFeatured, publicItems, toCards } from "@/lib/achievements";
 import { formatDate, formatNumber, getContributionModel, getGithubMeta } from "@/lib/github";
-import { firstYear, mainTools } from "@/lib/home";
+import { firstYear, mainTools, showsInContact } from "@/lib/home";
 import { jsonForScript } from "@/lib/json-script";
 import { navItems, pagePath } from "@/lib/nav";
 import { isoPartialDate, postsPath, publicPosts } from "@/lib/posts";
@@ -55,7 +55,8 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
   const profile = content.profile;
   const { scholar, sinta } = content.metrics;
   const areas = content.area.map((e) => e.data);
-  const channels = content.channel.map((e) => e.data);
+  // Kanal lain tetap di CMS dan di sameAs JSON-LD, tetapi tidak tampil di Kontak beranda.
+  const channels = content.channel.filter((e) => showsInContact(e.slug, e.data.onHome)).map((e) => e.data);
   const collabs = content.collab.map((e) => e.data);
   const featured = content.project.map((e) => e.data).slice(0, HOME_PROJECTS);
   const achievements = publicItems(content.achievement);
@@ -158,7 +159,7 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
         {/* Hero */}
         <section className="hero" aria-labelledby="hero-title">
           <div className="hero-grid" aria-hidden="true" />
-          <div className="hero-layout mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-8 lg:pb-24 lg:pt-14">
+          <div className="hero-layout mx-auto max-w-6xl px-5 pb-12 pt-8 sm:px-8 sm:pb-16 sm:pt-10 lg:pb-24 lg:pt-14">
             <div className="hero-copy">
               <p className="status rise" style={d(0)}>
                 <span className="pulse-dot" aria-hidden="true" />
@@ -375,25 +376,14 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
         </div>
 
         <Section id="contact" title={t.contact.title} intro={t.contact.intro} className="section-home">
-          <Spotlight className="collabs">
-            {collabs.map((c, i) => (
-              <Reveal key={c.title.id} delay={i * 70} className="h-full">
-                <div className="collab" data-spot>
-                  <h3 className="font-display text-lg font-bold tracking-tight">{c.title[lang]}</h3>
-                  <p className="mt-2 text-sm text-muted">{c.body[lang]}</p>
-                </div>
-              </Reveal>
-            ))}
-          </Spotlight>
-
-          <div className="mt-14 grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
+          <div className="grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
             {profile.email.user === "" ? null : (
               <Reveal>
                 <ContactPanel
                   lang={lang}
                   user={profile.email.user}
                   domain={profile.email.domain}
-                  topics={collabs.map((c) => c.title[lang])}
+                  topics={collabs.map((c) => ({ title: c.title[lang], note: c.body[lang] }))}
                   labels={t.contact}
                   timeZone={site.timeZone}
                   zoneLabel={site.timeZoneLabel}
@@ -403,7 +393,7 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
             <Reveal delay={120}>
               <div>
                 <h3 className="sub-title">{t.contact.channelsTitle}</h3>
-                <ul className="channels mt-6">
+                <ul className="channels channels-home mt-6">
                   {channels.map((ch) => (
                     <li key={ch.label}>
                       <ExternalLink href={ch.href} newTab={t.newTab} className="channel">

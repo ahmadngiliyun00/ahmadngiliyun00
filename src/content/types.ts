@@ -147,7 +147,9 @@ export type Post = {
   comments?: boolean; // kolom komentar di halaman tulisan
 };
 
-export type Channel = { label: string; handle: string; href: string; note: Localized<string> };
+// onHome: tampil di Kontak beranda. Bila belum pernah disimpan, LinkedIn, GitHub, ORCID, dan YouTube
+// tampil (DEFAULT_CONTACT_CHANNELS di src/lib/home.ts).
+export type Channel = { label: string; handle: string; href: string; note: Localized<string>; onHome?: boolean };
 
 export type ProfileLink = { label: string; href: string };
 

@@ -22,7 +22,8 @@ export default async function EntryEditor({
   cfg: CollectionConfig;
   entry: Entry | null;
 }) {
-  const data = (entry?.data ?? {}) as Doc;
+  const saved = (entry?.data ?? {}) as Doc;
+  const data = entry !== null ? (cfg.fill ? cfg.fill(entry.slug, saved) : saved) : saved;
   const values: Record<string, FieldValue> = {};
   for (const f of cfg.fields) values[f.name] = formValue(f, data);
 

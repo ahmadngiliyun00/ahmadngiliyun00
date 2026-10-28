@@ -4,6 +4,7 @@
 import type { Field, Option } from "@/content/fields";
 import { kindLabels, postKindLabels, programLabels, type AchievementKind, type CollectionKey, type PostKind, type Program } from "@/content/types";
 import { copy } from "@/data/profile";
+import { showsInContact } from "@/lib/home";
 
 type Doc = Record<string, unknown>;
 
@@ -20,6 +21,8 @@ export type CollectionConfig = {
   order: "date" | "position";
   publicPath?: { id: string; en: string }; // halaman detail publik, bila ada
   hasPage?: (data: Doc) => boolean; // bila ada, hanya data yang lolos fungsi ini punya halaman detail
+  // Nilai formulir untuk isian yang belum pernah disimpan, supaya formulir menampilkan apa yang tampil di situs.
+  fill?: (slug: string, data: Doc) => Doc;
 };
 
 // Teks dua bahasa untuk judul di CMS: Indonesia, atau Inggris bila Indonesia belum diisi.
@@ -87,8 +90,8 @@ export const collections: CollectionConfig[] = [
       { name: "fileId", label: "Berkas sertifikat", type: "file", help: "PDF atau gambar, maksimal 5 MB. Tutup data pribadi (NIK, alamat, nomor anggota, kode QR) sebelum mengunggah." },
       { name: "skills", label: "Keterampilan", type: "list", help: "Satu per baris." },
       { name: "related", label: "Tautan terkait", type: "links", help: "Satu per baris: Label Indonesia | Label Inggris | https://..." },
-      { name: "featured", label: "Sorot di beranda (maksimal 6)", type: "boolean" },
-      { name: "showOnHome", label: "Tampilkan di tab Hak cipta beranda (khusus HKI, maksimal 5)", type: "boolean" },
+      { name: "featured", label: "Sorot di beranda (maksimal 6, tiga terbaru yang tampil)", type: "boolean" },
+      { name: "showOnHome", label: "Tampilkan di tab Hak cipta beranda (khusus HKI, maksimal 5, tiga terbaru yang tampil)", type: "boolean" },
       { name: "linkedin", label: "Tombol Tambahkan ke LinkedIn (khusus sertifikat dan pelatihan)", type: "boolean" },
     ],
   },
@@ -151,7 +154,7 @@ export const collections: CollectionConfig[] = [
     key: "project",
     label: "Proyek unggulan",
     singular: "proyek",
-    description: "Kartu besar di bagian Proyek, dengan kode terbuka.",
+    description: "Tiga pertama tampil ringkas di beranda; semuanya tampil lengkap di halaman Proyek. Kode terbuka.",
     group: "Proyek",
     order: "position",
     title: (d) => s(d.name),
@@ -182,7 +185,7 @@ export const collections: CollectionConfig[] = [
     key: "system",
     label: "Sistem yang dikembangkan",
     singular: "sistem",
-    description: "Sistem dengan repositori privat: tampil tanpa tautan kode.",
+    description: "Sistem di halaman Proyek. Repositori privat tampil tanpa tautan kode.",
     group: "Proyek",
     order: "position",
     title: (d) => s(d.name),
@@ -201,7 +204,7 @@ export const collections: CollectionConfig[] = [
     key: "institution",
     label: "Kampus",
     singular: "kampus",
-    description: "Kampus tempat mengajar. Mata kuliah merujuk ke kampus lewat slug.",
+    description: "Kampus di halaman Mengajar. Mata kuliah merujuk ke kampus lewat slug.",
     group: "Mengajar",
     order: "position",
     title: (d) => s(d.name),
@@ -261,7 +264,7 @@ export const collections: CollectionConfig[] = [
     key: "milestone",
     label: "Perjalanan",
     singular: "peristiwa",
-    description: "Garis waktu, urut dari yang paling awal.",
+    description: "Garis waktu di halaman Perjalanan, urut dari yang paling awal.",
     group: "Profil",
     order: "position",
     title: (d) => `${loc(d.when)}: ${loc(d.title)}`,
@@ -276,7 +279,7 @@ export const collections: CollectionConfig[] = [
     key: "area",
     label: "Yang saya kerjakan",
     singular: "bidang kerja",
-    description: "Empat panel di bagian Tentang.",
+    description: "Empat baris di bagian Tentang beranda (judul dan isi) dan alat per bidang di halaman Proyek.",
     group: "Profil",
     order: "position",
     title: (d) => loc(d.title),
@@ -302,14 +305,14 @@ export const collections: CollectionConfig[] = [
     key: "contribution",
     label: "Di luar kode",
     singular: "kontribusi",
-    description: "Kontribusi di bawah grafik GitHub.",
+    description: "Kontribusi di halaman Proyek, di bawah grafik GitHub. Tautan berawalan # ke bagian beranda lama (misalnya #research) otomatis diarahkan ke halaman barunya.",
     group: "Profil",
     order: "position",
     title: (d) => loc(d.title),
     fields: [
       { name: "title", label: "Judul", type: "localized", required: true },
       { name: "body", label: "Isi", type: "localized", multiline: true, required: true },
-      { name: "href", label: "Tautan", type: "url", help: "Awali dengan # untuk bagian di halaman, misalnya #research." },
+      { name: "href", label: "Tautan", type: "url", help: "Awali dengan # untuk bagian situs, misalnya #achievements (beranda) atau #research (halaman Riset)." },
       { name: "linkLabel", width: "half", label: "Teks tautan", type: "localized" },
     ],
   },
@@ -317,7 +320,7 @@ export const collections: CollectionConfig[] = [
     key: "collab",
     label: "Jenis kerja sama",
     singular: "kerja sama",
-    description: "Juga dipakai sebagai pilihan topik di formulir kontak.",
+    description: "Judulnya menjadi pilihan topik di formulir kontak; keterangannya tampil di bawah pilihan saat topik itu dipilih.",
     group: "Profil",
     order: "position",
     title: (d) => loc(d.title),
@@ -330,7 +333,7 @@ export const collections: CollectionConfig[] = [
     key: "plan",
     label: "Rencana ke depan",
     singular: "rencana",
-    description: "Tahap rencana per tahun di bagian Arah ke depan, urut dari yang terdekat.",
+    description: "Tahap rencana per tahun di bagian Arah ke depan, halaman Perjalanan, urut dari yang terdekat.",
     group: "Profil",
     order: "position",
     title: (d) => `${s(d.period)} ${loc(d.title)}`.trim(),
@@ -345,7 +348,7 @@ export const collections: CollectionConfig[] = [
     key: "principle",
     label: "Prinsip kerja dengan AI",
     singular: "prinsip",
-    description: "Cara bekerja dengan AI di bagian Arah ke depan.",
+    description: "Cara bekerja dengan AI di bagian Arah ke depan, halaman Perjalanan.",
     group: "Profil",
     order: "position",
     title: (d) => loc(d.title),
@@ -358,7 +361,7 @@ export const collections: CollectionConfig[] = [
     key: "channel",
     label: "Kanal kontak",
     singular: "kanal",
-    description: "Tautan media sosial di bagian Kontak.",
+    description: "Tautan media sosial. Hanya kanal bertanda Tampil di kontak beranda yang muncul di bagian Kontak; sisanya tetap tersimpan di sini.",
     group: "Profil",
     order: "position",
     title: (d) => s(d.label),
@@ -368,7 +371,14 @@ export const collections: CollectionConfig[] = [
       { name: "handle", label: "Nama akun", type: "text", required: true },
       { name: "href", label: "Tautan", type: "url", required: true },
       { name: "note", width: "half", label: "Keterangan", type: "localized", required: true },
+      {
+        name: "onHome",
+        label: "Tampil di kontak beranda",
+        type: "boolean",
+        help: "Sebaiknya paling banyak empat kanal utama supaya bagian Kontak tetap ringkas.",
+      },
     ],
+    fill: (slug, data) => (typeof data.onHome === "boolean" ? data : { ...data, onHome: showsInContact(slug, undefined) }),
   },
 ];
 

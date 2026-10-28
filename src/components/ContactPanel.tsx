@@ -78,7 +78,7 @@ export default function ContactPanel({
   lang: Lang;
   user: string;
   domain: string;
-  topics: string[];
+  topics: { title: string; note: string }[]; // jenis kerja sama dari CMS; note tampil di bawah pilihan
   labels: ContactLabels;
   timeZone: string;
   zoneLabel: string;
@@ -88,7 +88,7 @@ export default function ContactPanel({
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [senderEmail, setSenderEmail] = useState("");
-  const [topic, setTopic] = useState(topics[0] ?? labels.otherTopic);
+  const [topic, setTopic] = useState(topics[0]?.title ?? labels.otherTopic);
   const [body, setBody] = useState("");
   const [startedAt, setStartedAt] = useState("");
   const [dismissed, setDismissed] = useState(false);
@@ -144,7 +144,8 @@ export default function ContactPanel({
     }
   };
 
-  const allTopics = [...topics, labels.otherTopic];
+  const allTopics = [...topics.map((t) => t.title), labels.otherTopic];
+  const topicNote = topics.find((t) => t.title === topic)?.note ?? "";
   const describe = (field: ContactField) => (errors[field] === undefined ? undefined : `${uid}-${field}-error`);
   const errorText = (field: ContactField) => {
     const code = errors[field];
@@ -260,7 +261,10 @@ export default function ContactPanel({
             </div>
           </div>
 
-          <fieldset className="grid gap-2" aria-describedby={describe("topic")}>
+          <fieldset
+            className="grid gap-2"
+            aria-describedby={[describe("topic"), topicNote === "" ? undefined : `${uid}-topic-note`].filter(Boolean).join(" ") || undefined}
+          >
             <legend className="mb-2 text-sm text-muted">{labels.topic}</legend>
             <div className="flex flex-wrap gap-2">
               {allTopics.map((t, i) => (
@@ -277,6 +281,11 @@ export default function ContactPanel({
                 </label>
               ))}
             </div>
+            {topicNote === "" ? null : (
+              <p id={`${uid}-topic-note`} className="topic-note">
+                {topicNote}
+              </p>
+            )}
             {errorText("topic")}
           </fieldset>
 
