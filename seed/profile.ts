@@ -267,7 +267,9 @@ export const featured: FeaturedProject[] = [
   },
 ];
 
-export type SeedSystem = SystemProject & { visibility: Visibility };
+export interface SeedSystem extends SystemProject {
+  visibility: Visibility;
+}
 
 export const systems: SeedSystem[] = [
   {
@@ -343,7 +345,10 @@ export const terms: Record<string, Localized<string>> = {
   "23241": { id: "2023/2024", en: "2023/2024" },
 };
 
-export type SeedInstitution = Institution & { slug: string; courses: Omit<Course, "institution">[] };
+export interface SeedInstitution extends Institution {
+  slug: string;
+  courses: Omit<Course, "institution">[];
+}
 
 export const teaching: SeedInstitution[] = [
   {

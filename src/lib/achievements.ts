@@ -16,7 +16,11 @@ export const HOME_FEATURED_LIMIT = 6;
 export const HOME_HKI_LIMIT = 5;
 
 // Satu capaian seperti yang dipakai komponen: data ditambah slug (id) dan visibility.
-export type AchievementItem = Achievement & { id: string; visibility: Visibility; fileUrl?: string };
+export interface AchievementItem extends Achievement {
+  id: string;
+  visibility: Visibility;
+  fileUrl?: string;
+}
 
 // Kategori yang punya formulir sertifikasi resmi di LinkedIn.
 const LINKEDIN_KINDS: AchievementKind[] = ["sertifikat", "pelatihan"];

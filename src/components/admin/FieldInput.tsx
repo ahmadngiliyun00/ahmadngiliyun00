@@ -106,7 +106,7 @@ export default function FieldInput({
       );
     case "localized":
     case "localizedList": {
-      const multi = field.type === "localizedList" ? true : field.multiline === true;
+      const multi = field.type === "localized" ? field.multiline === true : true;
       return (
         <fieldset className="admin-field" aria-describedby={describedBy}>
           <legend>{label}</legend>

@@ -5,21 +5,34 @@ import type { PartialDate } from "@/content/types";
 
 export type Option = { value: string; label: string };
 
-type Base = { name: string; label: string; help?: string; required?: boolean };
+interface Base {
+  name: string;
+  label: string;
+  help?: string;
+  required?: boolean;
+}
+interface PlainField extends Base {
+  type: "text" | "url" | "textarea" | "boolean" | "date" | "list" | "localizedList" | "links" | "file";
+}
+interface LocalizedField extends Base {
+  type: "localized";
+  multiline?: boolean;
+}
+interface NumberField extends Base {
+  type: "number";
+  min?: number;
+  max?: number;
+}
+interface ChoiceField extends Base {
+  type: "select" | "multiselect";
+  options: Option[];
+}
+interface ReferenceField extends Base {
+  type: "reference";
+  collection: string;
+}
 
-export type Field =
-  | (Base & { type: "text" | "url" | "textarea" })
-  | (Base & { type: "localized"; multiline?: boolean })
-  | (Base & { type: "number"; min?: number; max?: number })
-  | (Base & { type: "boolean" })
-  | (Base & { type: "select"; options: Option[] })
-  | (Base & { type: "multiselect"; options: Option[] })
-  | (Base & { type: "date" })
-  | (Base & { type: "list" })
-  | (Base & { type: "localizedList" })
-  | (Base & { type: "links" })
-  | (Base & { type: "file" })
-  | (Base & { type: "reference"; collection: string });
+export type Field = PlainField | LocalizedField | NumberField | ChoiceField | ReferenceField;
 
 export type FieldErrors = Record<string, string>;
 

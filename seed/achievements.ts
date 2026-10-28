@@ -7,7 +7,10 @@
 
 import type { Achievement, Localized, Visibility } from "../src/content/types";
 
-export type SeedAchievement = Achievement & { id: string; visibility: Visibility };
+export interface SeedAchievement extends Achievement {
+  id: string;
+  visibility: Visibility;
+}
 
 // ---------- Pembantu untuk sertifikat Dicoding ----------
 // Sertifikat Dicoding berlaku tiga tahun sejak terbit dan punya halaman verifikasi resmi.

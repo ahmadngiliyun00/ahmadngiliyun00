@@ -5,7 +5,7 @@ import type { FormState } from "@/app/(admin)/admin/actions";
 import FieldInput, { type FieldLabels, type FieldValue } from "@/components/admin/FieldInput";
 import type { Field, Option } from "@/content/fields";
 
-export type EntryFormLabels = FieldLabels & {
+export interface EntryFormLabels extends FieldLabels {
   meta: string;
   visibility: string;
   visibilityPublic: string;
@@ -18,7 +18,7 @@ export type EntryFormLabels = FieldLabels & {
   saving: string;
   saved: string;
   errorsTitle: string;
-};
+}
 
 // Formulir generik untuk satu data koleksi atau satu pengaturan.
 // meta = null untuk pengaturan (tanpa slug, status, dan urutan).
