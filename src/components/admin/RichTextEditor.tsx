@@ -97,7 +97,10 @@ export default function RichTextEditor({
     extensions: [
       StarterKit.configure({
         heading: { levels: [2, 3] },
-        link: { openOnClick: false, autolink: true, defaultProtocol: "https", protocols: ["https", "mailto"] },
+        // https dan mailto sudah dikenali linkify secara bawaan. Mendaftarkannya lagi lewat
+        // "protocols" memicu peringatan karena satu halaman punya dua editor (ID dan EN).
+        // Skema tautan tetap dibatasi sanitizer saat disimpan.
+        link: { openOnClick: false, autolink: true, defaultProtocol: "https" },
       }),
       Image.configure({ allowBase64: false }),
       Placeholder.configure({ placeholder }),

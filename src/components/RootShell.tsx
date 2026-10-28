@@ -20,7 +20,9 @@ export default function RootShell({
   children: ReactNode;
 }) {
   return (
-    <html lang={lang}>
+    // data-scroll-behavior: Next.js mematikan gulir halus saat pindah halaman, supaya
+    // halaman baru langsung tampil dari atas (scroll-behavior: smooth ada di globals.css).
+    <html lang={lang} data-scroll-behavior="smooth">
       <body>
         {children}
         <Toaster closeLabel={TOAST_LABELS[lang].close} moreLabel={TOAST_LABELS[lang].more} />
