@@ -88,6 +88,7 @@ src/
 - Bagian README di antara penanda `<!-- ...:mulai -->` dibangkitkan skrip, jangan diedit manual
 - `src/data/profile.ts`, `src/content/types.ts`, `src/lib/linkedin.ts`, dan `seed/` hanya boleh `import type` (dibaca skrip Node)
 - Repo terbaru otomatis dari GitHub, atur lewat `recentRepos.exclude` di `profile.ts`
+- Header keamanan dan CSP ada di `next.config.ts`. Skrip, gambar, iframe, atau `fetch` ke domain pihak ketiga baru wajib ditambahkan ke CSP, kalau tidak peramban memblokirnya
 - Gaya komponen ditulis di `globals.css` (situs) atau `admin.css` (CMS) di dalam `@layer components`
 - Ikon Font Awesome Free hanya untuk CMS (dimuat di layout admin). Situs publik tetap tanpa ikon font dan tanpa emoji
 - Umpan balik aksi di CMS dan situs memakai toast (`toast()` dari `src/components/Toaster.tsx`, atau `FlashToast` setelah redirect), bukan kotak alert di halaman (keputusan Mas Ilyun)
