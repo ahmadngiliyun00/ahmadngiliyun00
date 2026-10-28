@@ -1209,23 +1209,299 @@
     line-height: 1.65;
   }
 
-  .admin-login {
+  /* ---------- Halaman masuk ---------- */
+
+  /* Ponsel: panel merek ringkas di atas, kartu masuk di bawah. Desktop: dua kolom. */
+  .login {
+    display: grid;
+    min-height: 100dvh;
+  }
+
+  @media (min-width: 960px) {
+    .login {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    }
+  }
+
+  .login-brand {
+    order: -1;
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    overflow: hidden;
+    padding: 1.5rem 1.25rem 2rem;
+    border-bottom: 1px solid var(--color-line);
+    background:
+      radial-gradient(60% 50% at 80% 10%, color-mix(in srgb, var(--color-sky) 22%, transparent), transparent 70%),
+      radial-gradient(50% 45% at 10% 95%, color-mix(in srgb, var(--color-leaf) 14%, transparent), transparent 70%),
+      var(--color-surface);
+  }
+
+  @media (min-width: 960px) {
+    .login-brand {
+      justify-content: space-between;
+      padding: 2.5rem clamp(2rem, 4vw, 4rem);
+      border-bottom: 0;
+      border-right: 1px solid var(--color-line);
+    }
+  }
+
+  .login-brand-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--color-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+    background-size: 56px 56px;
+    opacity: 0.35;
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 80%);
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 80%);
+  }
+
+  .login-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    align-self: flex-start;
+    border-radius: 0.75rem;
+  }
+
+  .login-wordmark {
+    width: 8.5rem;
+    height: auto;
+  }
+
+  .login-brand-body {
+    max-width: 30rem;
+  }
+
+  .login-plot {
+    display: none;
+    width: 100%;
+    max-width: 22rem;
+    height: auto;
+    margin-bottom: 2rem;
+    overflow: visible;
+  }
+
+  @media (min-width: 960px) {
+    .login-plot {
+      display: block;
+    }
+  }
+
+  .login-plot-link {
+    stroke: color-mix(in srgb, var(--color-muted) 30%, transparent);
+    stroke-width: 1;
+  }
+
+  .login-plot-dot {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: login-dot 3.6s ease-in-out infinite;
+  }
+
+  @keyframes login-dot {
+    50% {
+      opacity: 0.55;
+      transform: scale(0.8);
+    }
+  }
+
+  .login-brand-title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+  }
+
+  .login-brand-text {
+    margin-top: 0.9rem;
+    max-width: 44ch;
+    color: var(--color-muted);
+  }
+
+  .login-features {
+    display: none;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  @media (min-width: 960px) {
+    .login-features {
+      display: grid;
+    }
+  }
+
+  .login-features li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .login-feature-icon {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 0.65rem;
+    background: color-mix(in srgb, var(--color-leaf) 13%, transparent);
+    color: var(--color-leaf);
+    font-size: 0.85rem;
+  }
+
+  .login-back {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: flex-start;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    transition: color 0.2s ease;
+  }
+
+  .login-back:hover {
+    color: var(--color-fg);
+  }
+
+  @media (min-width: 960px) {
+    .login-back {
+      display: inline-flex;
+    }
+  }
+
+  .login-panel {
     display: grid;
     place-items: center;
-    min-height: 100dvh;
-    padding: 1.25rem;
+    padding: 2rem 1.25rem 3rem;
   }
 
-  .admin-login-card {
+  .login-card {
     width: 100%;
-    max-width: 26rem;
+    max-width: 25rem;
   }
 
-  .admin-or {
-    margin: 1rem 0;
-    text-align: center;
+  @media (min-width: 960px) {
+    .login-card {
+      padding: 2.25rem;
+      border: 1px solid var(--color-line);
+      border-radius: 1.5rem;
+      background: color-mix(in srgb, var(--color-surface) 75%, var(--color-ink));
+      box-shadow: 0 30px 80px -40px rgba(3, 8, 24, 0.9);
+    }
+  }
+
+  .login-card-logo {
+    display: none;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 960px) {
+    .login-card-logo {
+      display: block;
+    }
+  }
+
+  .login-input {
+    position: relative;
+  }
+
+  .login-input-icon {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    pointer-events: none;
+    transition: color 0.2s ease;
+  }
+
+  .login-input:focus-within .login-input-icon {
+    color: var(--color-sky);
+  }
+
+  .login-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.4rem;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    transform: translateY(-50%);
+    border-radius: 0.6rem;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .login-toggle:hover,
+  .login-toggle[aria-pressed="true"] {
+    color: var(--color-fg);
+    background: var(--color-raised);
+  }
+
+  .login-caps {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.85rem;
+    color: #f5c451;
+  }
+
+  .login-submit {
+    gap: 0.6rem;
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+
+  .login-or {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin: 1.5rem 0;
     font-size: 0.85rem;
     color: var(--color-muted);
+  }
+
+  .login-or::before,
+  .login-or::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--color-line);
+  }
+
+  .login-github {
+    gap: 0.6rem;
+    width: 100%;
+  }
+
+  .login-github .fa-brands {
+    font-size: 1.1rem;
+  }
+
+  .login-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-line);
+    font-size: 0.825rem;
+    color: var(--color-muted);
+  }
+
+  .login-note .fa-solid {
+    margin-top: 0.2rem;
+    color: var(--color-leaf);
   }
 
   .btn[disabled] {
@@ -1235,8 +1511,16 @@
 
   @media (prefers-reduced-motion: reduce) {
     .admin-nav-chevron,
-    .admin-search .fa-solid {
+    .admin-search .fa-solid,
+    .login-input-icon,
+    .login-toggle,
+    .login-back {
       transition: none;
+    }
+
+    .login-plot-dot,
+    .login-submit .fa-spin {
+      animation: none;
     }
   }
 }
@@ -1244,4 +1528,13 @@
 /* Di luar layer karena .field di globals.css juga di luar layer (gaya tanpa layer selalu menang). */
 .admin-search .field {
   padding-left: 2.6rem;
+}
+
+/* Ruang untuk ikon di kiri dan tombol lihat kata sandi di kanan. */
+.login-input .field {
+  padding-left: 2.75rem;
+}
+
+.login-input .login-password {
+  padding-right: 3.25rem;
 }
