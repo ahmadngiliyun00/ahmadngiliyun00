@@ -435,6 +435,104 @@
     color: #fff;
   }
 
+  /* Pesan masuk */
+  .admin-nav-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    margin-left: 0.45rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: var(--color-leaf);
+    color: var(--color-ink);
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .admin-badge[data-v="new"] {
+    border-color: var(--color-leaf);
+    background: color-mix(in srgb, var(--color-leaf) 14%, transparent);
+    color: var(--color-leaf);
+  }
+
+  .admin-badge[data-v="archived"] {
+    border-style: dashed;
+  }
+
+  .admin-note {
+    padding: 0.75rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--color-sky) 50%, transparent);
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--color-sky) 10%, transparent);
+    color: #cfdcff;
+    font-size: 0.9rem;
+  }
+
+  .admin-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 2rem;
+  }
+
+  .admin-tabs a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+
+  .admin-tabs a:hover {
+    border-color: var(--color-sky);
+    color: var(--color-fg);
+  }
+
+  .admin-tabs a[aria-current="page"] {
+    border-color: var(--color-leaf);
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-leaf) 10%, transparent);
+  }
+
+  .admin-tab-count {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-muted);
+  }
+
+  .admin-messages {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .admin-message[data-status="new"] {
+    border-color: color-mix(in srgb, var(--color-leaf) 55%, var(--color-line));
+  }
+
+  .admin-message[data-status="archived"] {
+    opacity: 0.8;
+  }
+
+  .admin-message-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+
+  .admin-message-body {
+    margin-top: 1rem;
+    max-width: 75ch;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.65;
+  }
+
   .admin-login {
     display: grid;
     place-items: center;

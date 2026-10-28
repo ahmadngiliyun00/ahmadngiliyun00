@@ -99,4 +99,32 @@ export const adminCopy = {
   settings: {
     title: "Pengaturan",
   },
+  messages: {
+    nav: "Pesan masuk",
+    title: "Pesan masuk",
+    intro: "Pesan dari form kontak situs. Balas lewat email; pesan tidak pernah tampil di situs publik.",
+    tile: "Pesan dari form kontak situs, dibalas lewat email.",
+    tabsLabel: "Saring pesan",
+    tabs: { inbox: "Kotak masuk", new: "Belum dibaca", archived: "Arsip" },
+    status: { new: "Baru", read: "Dibaca", archived: "Arsip" },
+    count: "{n} pesan",
+    newCount: "{n} baru",
+    empty: "Belum ada pesan di sini.",
+    reply: "Balas lewat email",
+    replySubject: "Re: {topic}",
+    markRead: "Tandai dibaca",
+    markNew: "Tandai belum dibaca",
+    archive: "Arsipkan",
+    restore: "Kembalikan",
+    delete: "Hapus",
+    deleteConfirm: "Hapus pesan ini secara permanen? Tindakan ini tidak bisa dibatalkan.",
+    deleted: "Pesan dihapus.",
+    notified: "Diteruskan ke email",
+    notNotified: "Belum diteruskan ke email",
+    lang: { id: "Form Indonesia", en: "Form Inggris" },
+    mailOff:
+      "SMTP belum diatur, jadi pesan baru hanya tersimpan di sini dan belum diteruskan ke email. Lihat docs/DEPLOY.md bagian Form kontak dan email.",
+    tableMissing:
+      "Tabel pesan belum ada di database. Jalankan npm run db:migrate lalu muat ulang halaman ini.",
+  },
 };

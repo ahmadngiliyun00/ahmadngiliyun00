@@ -4,11 +4,21 @@ import Monogram from "@/components/Monogram";
 import { collections, settingsConfigs } from "@/content/collections";
 import { adminCopy as t } from "@/data/admin";
 import type { AdminSession } from "@/server/auth/session";
+import { countMessages } from "@/server/messages";
 
 const GROUPS = ["Capaian", "Proyek", "Mengajar", "Profil"] as const;
 
+// Jumlah pesan belum dibaca untuk lencana di menu. Bila tabel pesan belum dimigrasi, anggap nol.
+async function unreadMessages(): Promise<number> {
+  try {
+    return (await countMessages()).new;
+  } catch {
+    return 0;
+  }
+}
+
 // Kerangka halaman admin: navigasi samping, konten, tombol keluar.
-export default function AdminShell({
+export default async function AdminShell({
   session,
   active,
   children,
@@ -17,6 +27,7 @@ export default function AdminShell({
   active: string;
   children: ReactNode;
 }) {
+  const unread = await unreadMessages();
   return (
     <div className="admin-shell">
       <a href="#admin-main" className="skip-link">
@@ -30,6 +41,14 @@ export default function AdminShell({
         <nav aria-label={t.nav.label} className="admin-nav">
           <a href="/admin/" aria-current={active === "dashboard" ? "page" : undefined}>
             {t.nav.dashboard}
+          </a>
+          <a href="/admin/pesan/" aria-current={active === "messages" ? "page" : undefined}>
+            {t.messages.nav}
+            {unread > 0 ? (
+              <span className="admin-nav-count" aria-label={t.messages.newCount.replace("{n}", String(unread))}>
+                {unread}
+              </span>
+            ) : null}
           </a>
           {GROUPS.map((g) => (
             <div key={g} className="admin-nav-group">

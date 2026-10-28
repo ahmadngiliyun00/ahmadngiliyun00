@@ -4,6 +4,7 @@ import { adminCopy as t } from "@/data/admin";
 import { db } from "@/db";
 import { entries } from "@/db/schema";
 import { requireAdmin } from "@/server/auth/session";
+import { countMessages } from "@/server/messages";
 import { count, sql } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +16,7 @@ export default async function AdminDashboard() {
     .from(entries)
     .groupBy(entries.collection, entries.visibility)
     .orderBy(sql`1`);
+  const inbox = await countMessages().catch(() => ({ new: 0, read: 0, archived: 0 }));
   const tally = (key: string, v: string) => rows.find((r) => r.collection === key ? r.visibility === v : false)?.n ?? 0;
 
   return (
@@ -22,6 +24,21 @@ export default async function AdminDashboard() {
       <h1 className="admin-title">{t.dashboard.title}</h1>
       <p className="admin-intro">{t.dashboard.intro}</p>
       <ul className="admin-grid mt-8">
+        <li>
+          <a href="/admin/pesan/" className="admin-card admin-tile">
+            <span className="text-sm text-muted">{t.messages.nav}</span>
+            <span className="font-display text-xl font-bold tracking-tight">{t.messages.title}</span>
+            <span className="text-sm text-muted">{t.messages.tile}</span>
+            <span className="admin-tally">
+              <span className="admin-badge" data-v={inbox.new > 0 ? "new" : undefined}>
+                {t.messages.newCount.replace("{n}", String(inbox.new))}
+              </span>
+              <span className="admin-badge">
+                {inbox.archived} {t.messages.tabs.archived.toLowerCase()}
+              </span>
+            </span>
+          </a>
+        </li>
         {collections.map((c) => (
           <li key={c.key}>
             <a href={`/admin/${c.key}/`} className="admin-card admin-tile">

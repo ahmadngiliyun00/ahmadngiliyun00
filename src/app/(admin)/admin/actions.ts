@@ -10,6 +10,7 @@ import { admins } from "@/db/schema";
 import { DUMMY_HASH, verifyPassword } from "@/server/auth/password";
 import { clearFailures, clientIp, isLimited, recordFailure } from "@/server/auth/rate-limit";
 import { createSession, destroySession, requireAdmin } from "@/server/auth/session";
+import { deleteMessage, setMessageStatus, type MessageStatus } from "@/server/messages";
 import {
   createShare,
   deleteEntry,
@@ -132,4 +133,29 @@ export async function saveSettingsAction(_prev: FormState, form: FormData): Prom
   const res = await saveSettings(String(form.get("key") ?? ""), form);
   if (!res.ok) return { message: res.message, errors: res.errors, values: rawValues(form) };
   return { ok: true, message: "Tersimpan." };
+}
+
+// ---------- Pesan masuk ----------
+
+const MESSAGE_STATUSES: MessageStatus[] = ["new", "read", "archived"];
+
+function messageFilter(value: unknown): string {
+  const f = String(value ?? "");
+  return f === "new" ? "new" : f === "archived" ? "archived" : "inbox";
+}
+
+export async function setMessageStatusAction(form: FormData) {
+  await requireAdmin();
+  const id = toId(form.get("id"));
+  const status = String(form.get("status")) as MessageStatus;
+  if (!MESSAGE_STATUSES.includes(status)) throw new Error("Status pesan tidak dikenal");
+  await setMessageStatus(id, status);
+  redirect(`/admin/pesan/?f=${messageFilter(form.get("filter"))}`);
+}
+
+export async function deleteMessageAction(form: FormData) {
+  await requireAdmin();
+  await deleteMessage(toId(form.get("id")));
+  // Satu parameter saja: nilai "deleted" sekaligus menyimpan saringan yang sedang dibuka.
+  redirect(`/admin/pesan/?deleted=${messageFilter(form.get("filter"))}`);
 }
