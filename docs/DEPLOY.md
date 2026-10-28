@@ -28,7 +28,7 @@ Isi `.env.production.local`:
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | dari OAuth App (langkah 6), boleh kosong bila hanya login email |
 | `GITHUB_ALLOWED_LOGIN` | `ahmadngiliyun00` |
 | `UPLOAD_DIR` | `/www/wwwroot/ngiliyun-storage/uploads` (di LUAR folder situs dan di luar `public/`) |
-| `CONTACT_IP_SALT` | teks acak panjang, misalnya hasil `openssl rand -hex 32`. Dipakai untuk hash IP form kontak, komentar, dan hitungan pembaca |
+| `CONTACT_IP_SALT` | **wajib**, teks acak panjang, misalnya hasil `openssl rand -hex 32`. Dipakai untuk hash IP form kontak, komentar, dan hitungan pembaca. Bila kosong, dipakai garam bawaan yang tertulis di repo publik |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile (langkah 7), boleh kosong |
 
 ```bash
@@ -48,10 +48,12 @@ npm run admin:create -- --email <email-anda> --name "Ahmad Ngiliyun"
 
 ```bash
 npm run build
-pm2 start npm --name ngiliyun -- start -- -p 3005
+pm2 start npm --name ngiliyun --time -- start -- -H 127.0.0.1 -p 3005
 pm2 save
 pm2 startup               # ikuti perintah yang dicetak agar PM2 hidup lagi setelah reboot
 ```
+
+`-H 127.0.0.1` wajib: tanpa itu Next.js mendengarkan di semua antarmuka, sehingga port 3005 bisa dibuka langsung dari internet tanpa lewat Nginx dan Cloudflare, dan header `X-Real-IP` bisa dipalsukan untuk mengakali pembatas percobaan login.
 
 Jalankan **satu instans saja** (mode fork, bukan cluster). Cache konten disimpan di memori proses dan dibuang setiap kali CMS menyimpan perubahan; dengan beberapa instans, instans lain tidak tahu ada perubahan.
 
@@ -175,6 +177,19 @@ tar czf /www/backup/ngiliyun-uploads-$(date +%F).tar.gz -C /www/wwwroot/ngiliyun
 ```
 
 aaPanel juga punya fitur backup database terjadwal di menu Cron.
+
+## Keamanan server
+
+Aplikasi sudah mengirim header keamanan (CSP, anti clickjacking, HSTS) dan membatasi percobaan login. Bagian berikut ada di luar kode dan wajib diatur di server:
+
+- **Jangan jalankan aplikasi sebagai root.** Buat pengguna khusus, misalnya `adduser --disabled-password ngiliyun`, ubah pemilik folder situs dan `UPLOAD_DIR` ke pengguna itu (`chown -R ngiliyun:ngiliyun ...`), lalu jalankan PM2 dari pengguna itu (`pm2 startup systemd -u ngiliyun --hp /home/ngiliyun`). Bila suatu saat ada celah eksekusi kode, penyerang hanya mendapat hak pengguna itu, bukan seluruh server
+- **`UPLOAD_DIR` di luar folder situs**, dengan izin `700`. Berkas unggahan hanya boleh keluar lewat `/files/<id>/` yang memeriksa izin
+- **IP asli dari Cloudflare hanya dipercaya dari Cloudflare.** `real_ip_header CF-Connecting-IP` harus disertai `set_real_ip_from` untuk setiap rentang di <https://www.cloudflare.com/ips/>, jangan pernah `0.0.0.0/0`. Tanpa batas itu siapa pun bisa mengirim header `CF-Connecting-IP` palsu
+- **Firewall:** port 3005 (Next.js) dan 3306 (database) tertutup dari internet. Bila DNS diproksikan Cloudflare, izinkan port 80 dan 443 hanya dari rentang IP Cloudflare (atau aktifkan Authenticated Origin Pulls) supaya IP asli server tidak bisa dipakai untuk melewati Cloudflare
+- **Database:** pengguna aplikasi hanya diberi hak pada database situs, tidak memakai root
+- **SMTP:** pakai sandi aplikasi khusus (misalnya App Password Gmail), bukan sandi utama akun email. Sandi ini tersimpan di tabel `settings`, jadi berkas cadangan database harus dijaga seketat `.env.production.local`
+- **aaPanel:** aktifkan 2FA, ganti port panel dan security entrance bawaan, batasi akses panel ke IP tertentu bila bisa
+- **Pembaruan:** jalankan `npm audit --omit=dev` dan pantau advisori Next.js (<https://github.com/vercel/next.js/security/advisories>) serta React. Perbarui dengan `npm install next@latest react@latest react-dom@latest`, uji, lalu deploy
 
 ## Lupa kata sandi admin
 
