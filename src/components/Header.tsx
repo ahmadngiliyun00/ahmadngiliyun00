@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Monogram from "@/components/Monogram";
 import type { Lang } from "@/data/profile";
 
+// Lebar minimum menu desktop. Di bawahnya dipakai menu ponsel, karena sepuluh tautan
+// tidak muat satu baris di layar 1024px. Samakan dengan kelas min-[1100px] di bawah.
+const DESKTOP_NAV = 1100;
+
 // href diisi untuk halaman selain beranda, misalnya "/#about". Tanpa href, tautan menuju "#id".
 export type NavItem = { id: string; label: string; href?: string };
 
@@ -77,7 +81,7 @@ export default function Header({
     const previous = root.style.overflow;
     root.style.overflow = "hidden";
     const closeOnWide = () => {
-      if (window.innerWidth >= 1024) setOpen(false);
+      if (window.innerWidth >= DESKTOP_NAV) setOpen(false);
     };
     window.addEventListener("resize", closeOnWide);
     const onKey = (e: KeyboardEvent) => {
@@ -127,12 +131,12 @@ export default function Header({
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-5 py-3.5 sm:px-8">
         <a href={homeHref} className="group flex items-center gap-2.5" aria-label={name}>
           <Monogram className="h-8 w-8 transition-transform duration-300 group-hover:-rotate-6" />
-          <span className="font-display text-[1.05rem] font-bold tracking-tight">{name}</span>
+          <span className="whitespace-nowrap font-display text-[1.05rem] font-bold tracking-tight">{name}</span>
         </a>
 
-        <div className="hidden items-center gap-7 lg:flex">
+        <div className="hidden items-center gap-7 min-[1100px]:flex">
           <nav aria-label={labels.label}>
-            <ul className="flex items-center gap-6 text-sm text-muted">{navLinks()}</ul>
+            <ul className="flex items-center gap-6 whitespace-nowrap text-sm text-muted">{navLinks()}</ul>
           </nav>
           {langSwitch}
         </div>
@@ -140,7 +144,7 @@ export default function Header({
         <button
           ref={menuButtonRef}
           type="button"
-          className="menu-button lg:hidden"
+          className="menu-button min-[1100px]:hidden"
           aria-expanded={open}
           aria-controls="mobile-menu"
           onClick={() => setOpen((v) => !v)}
@@ -155,7 +159,7 @@ export default function Header({
 
       <div
         id="mobile-menu"
-        className={open ? "mobile-menu is-open lg:hidden" : "mobile-menu lg:hidden"}
+        className={open ? "mobile-menu is-open min-[1100px]:hidden" : "mobile-menu min-[1100px]:hidden"}
         hidden={!open}
       >
         <nav aria-label={labels.label} className="px-5 pb-6 pt-2 sm:px-8">
