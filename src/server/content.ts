@@ -5,6 +5,7 @@ import type {
   CollectionData,
   CollectionKey,
   Entry,
+  Lang,
   MetricsSettings,
   ProfileSettings,
   SeoSettings,
@@ -12,6 +13,7 @@ import type {
 } from "@/content/types";
 import { db } from "@/db";
 import { entries, settings } from "@/db/schema";
+import { fillLocalized } from "@/lib/i18n";
 
 // Lapisan baca konten. Situs publik memakai loadSite(), yang menyimpan salinan semua konten
 // public di memori dan dibuang setiap kali CMS menyimpan perubahan (invalidateSite).
@@ -61,6 +63,16 @@ export async function getSettingDoc(key: string): Promise<Doc> {
   return (await getSetting<Doc>(key)) ?? {};
 }
 
+// Bahasa utama isian dua bahasa (Pengaturan, Bahasa). Bawaan Indonesia.
+export async function primaryLang(): Promise<Lang> {
+  try {
+    const saved = await getSetting<{ primary?: string }>("language");
+    return saved?.primary === "en" ? "en" : "id";
+  } catch {
+    return "id";
+  }
+}
+
 // ---------- Snapshot situs publik ----------
 
 export type SiteContent = {
@@ -93,17 +105,24 @@ async function fetchSite(): Promise<SiteContent> {
     .from(entries)
     .where(eq(entries.visibility, "public"))
     .orderBy(asc(entries.position), asc(entries.id));
-  const pick = <K extends CollectionKey>(k: K) => rows.filter((r) => r.collection === k).map((r) => rowToEntry<K>(r));
-  const [profile, metrics, seo] = await Promise.all([
+  const [profile, metrics, seo, primary] = await Promise.all([
     getSetting<ProfileSettings>("profile"),
     getSetting<MetricsSettings>("metrics"),
     getSetting<SeoSettings>("seo"),
+    primaryLang(),
   ]);
   if (profile === undefined || metrics === undefined) {
     throw new Error("Pengaturan profil atau metrik belum ada. Jalankan npm run db:seed.");
   }
+  // Terjemahan yang belum diisi memakai teks bahasa utama. Isi lengkap tulisan (body) tidak,
+  // karena tulisan tanpa terjemahan memang tidak punya halaman di bahasa itu.
+  const pick = <K extends CollectionKey>(k: K) =>
+    rows
+      .filter((r) => r.collection === k)
+      .map((r) => rowToEntry<K>(r))
+      .map((e) => ({ ...e, data: fillLocalized(e.data, primary, ["body"]) }));
   return {
-    profile,
+    profile: fillLocalized(profile, primary),
     metrics,
     seo: seo ?? {},
     achievement: pick("achievement"),

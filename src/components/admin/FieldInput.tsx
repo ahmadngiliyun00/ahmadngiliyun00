@@ -1,5 +1,6 @@
 "use client";
 
+import { LocalizedInputs, type LangModeLabels } from "@/components/admin/LangMode";
 import RichTextPair from "@/components/admin/RichTextPair";
 import type { RichTextLabels } from "@/components/admin/RichTextEditor";
 import type { Field, Option } from "@/content/fields";
@@ -18,6 +19,7 @@ export type FieldLabels = {
   removeFile: string;
   required: string;
   editor: RichTextLabels;
+  langMode: LangModeLabels;
   placeholder: {
     write: string;
     writeId: string;
@@ -141,6 +143,7 @@ export default function FieldInput({
             placeholder={{ id: placeholderFor(field, labels, "id"), en: placeholderFor(field, labels, "en") }}
             langLabels={{ id: labels.id, en: labels.en }}
             labels={labels.editor}
+            langMode={labels.langMode}
             invalid={invalid}
           />
           {foot}
@@ -191,44 +194,22 @@ export default function FieldInput({
     case "localized":
     case "localizedList": {
       const multi = field.type === "localized" ? field.multiline === true : true;
+      const rows = field.type === "localized" ? (field.rows ?? 3) : 5;
       return (
         <fieldset className="admin-field" aria-describedby={describedBy}>
           <legend>{label}</legend>
-          <div className="admin-pair">
-            {(["id", "en"] as const).map((lang) => {
-              const name = `${key}.${lang}`;
-              const v = one(name, pair[lang] ?? "");
-              return (
-                <div key={lang} className="grid gap-1">
-                  <label htmlFor={`${id}-${lang}`} className="admin-sublabel">
-                    {labels[lang]}
-                  </label>
-                  {multi ? (
-                    <textarea
-                      id={`${id}-${lang}`}
-                      name={name}
-                      className="field"
-                      rows={field.type === "localized" ? (field.rows ?? 3) : 5}
-                      defaultValue={v}
-                      placeholder={placeholderFor(field, labels, lang)}
-                      aria-required={required}
-                      aria-invalid={invalid}
-                    />
-                  ) : (
-                    <input
-                      id={`${id}-${lang}`}
-                      name={name}
-                      className="field"
-                      defaultValue={v}
-                      placeholder={placeholderFor(field, labels, lang)}
-                      aria-required={required}
-                      aria-invalid={invalid}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <LocalizedInputs
+            name={key}
+            id={id}
+            value={{ id: one(`${key}.id`, pair.id ?? ""), en: one(`${key}.en`, pair.en ?? "") }}
+            multiline={multi}
+            rows={rows}
+            placeholder={(lang) => placeholderFor(field, labels, lang)}
+            names={{ id: labels.id, en: labels.en }}
+            labels={labels.langMode}
+            required={required}
+            invalid={invalid}
+          />
           {foot}
         </fieldset>
       );

@@ -10,6 +10,7 @@ import { getCollection } from "@/content/collections";
 import type { Achievement, Post } from "@/content/types";
 import { adminCopy as t } from "@/data/admin";
 import { byNewest } from "@/lib/achievements";
+import { translationGaps } from "@/lib/i18n";
 import { byPostDate } from "@/lib/posts";
 import { requireAdmin } from "@/server/auth/session";
 import { listEntries } from "@/server/content";
@@ -94,6 +95,7 @@ export default async function AdminList({ params, searchParams }: Props) {
             const i = pg.from - 1 + idx;
             const data = e.data as Record<string, unknown>;
             const withPage = cfg.hasPage ? cfg.hasPage(data) : true;
+            const gaps = translationGaps(cfg.fields, data);
             const publicHref = cfg.publicPath ? (e.visibility === "public" ? (withPage ? `${cfg.publicPath.id}${e.slug}/` : null) : null) : null;
             return (
               <li key={e.id} className="admin-row">
@@ -107,6 +109,11 @@ export default async function AdminList({ params, searchParams }: Props) {
                       {e.visibility === "public" ? t.list.public : t.list.private}
                     </span>
                     {e.shared ? <span className="admin-badge" data-v="shared">{t.list.shared}</span> : null}
+                    {gaps.length === 0 ? null : (
+                      <span className="admin-badge" data-v="gap" title={t.form.translationGapsTitle.replace("{fields}", gaps.join(", "))}>
+                        {t.form.translationGaps}
+                      </span>
+                    )}
                     {views === null ? null : (
                       <span className="admin-badge">{t.stats.listCount.replace("{n}", String(views.get(e.id) ?? 0))}</span>
                     )}

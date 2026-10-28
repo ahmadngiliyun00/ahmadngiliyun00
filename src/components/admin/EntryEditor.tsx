@@ -10,7 +10,7 @@ import { formValue, type Doc, type Option } from "@/content/fields";
 import type { Entry } from "@/content/types";
 import { adminCopy as t } from "@/data/admin";
 import { site } from "@/data/profile";
-import { listEntries } from "@/server/content";
+import { listEntries, primaryLang } from "@/server/content";
 import { getFileMeta } from "@/server/files";
 import { viewStats } from "@/server/views";
 
@@ -74,6 +74,7 @@ export default async function EntryEditor({
           references={references}
           file={meta ? { url: `/files/${meta.id}/`, name: meta.originalName } : null}
           labels={formLabels}
+          primary={await primaryLang()}
         />
 
         {entry !== null ? (

@@ -8,7 +8,7 @@ import { db } from "@/db";
 import { comments, entries, postViews, settings } from "@/db/schema";
 import { fileIdsIn, htmlToText } from "@/lib/richtext";
 import { sha256 } from "@/server/auth/session";
-import { invalidateSite, rowToEntry } from "@/server/content";
+import { invalidateSite, primaryLang, rowToEntry } from "@/server/content";
 import { deleteEntryFiles, deleteFile, saveUpload, syncInlineFiles } from "@/server/files";
 import { sanitizeRichText } from "@/server/richtext";
 
@@ -116,7 +116,7 @@ export async function saveEntry(
     existing = rows[0].data as Doc;
   }
 
-  const { data, errors } = readFields(cfg.fields, form, existing);
+  const { data, errors } = readFields(cfg.fields, form, existing, await primaryLang());
   // Isi rich text dibersihkan di server; bahasa yang kosong setelah dibersihkan dibuang.
   const richFields = cfg.fields.filter((f) => f.type === "richtext");
   for (const f of richFields) {
@@ -293,7 +293,7 @@ export async function saveSettings(key: string, form: FormData): Promise<SaveRes
   if (cfg === undefined) return { ok: false, errors: {}, message: "Pengaturan tidak dikenal." };
   const rows = await db.select().from(settings).where(eq(settings.key, key)).limit(1);
   const base = (rows[0]?.value ?? {}) as Doc;
-  const { data, errors } = readFields(cfg.fields, form, base);
+  const { data, errors } = readFields(cfg.fields, form, base, await primaryLang());
   if (key === "metrics") {
     for (const f of cfg.fields) {
       if (f.name.endsWith(".asOf")) {

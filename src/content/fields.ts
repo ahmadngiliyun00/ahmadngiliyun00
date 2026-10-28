@@ -1,7 +1,8 @@
 // Definisi field generik untuk formulir CMS dan validasinya.
 // Satu definisi dipakai tiga kali: merender formulir admin, membaca FormData, dan memvalidasi data.
 
-import type { PartialDate } from "@/content/types";
+import type { Lang, PartialDate } from "@/content/types";
+import { isBlank } from "@/lib/i18n";
 import { asHtml, htmlToText } from "@/lib/richtext";
 
 export type Option = { value: string; label: string };
@@ -148,9 +149,7 @@ export function readField(field: Field, form: FormData, errors: FieldErrors): un
       if (id === "") {
         if (en === "") return undefined;
       }
-      if (id === "" || en === "") {
-        errors[field.name] = `${label}: isi versi Indonesia dan Inggris.`;
-      }
+      // Bahasa lain boleh menyusul; aturan bahasa utama diperiksa di readFields.
       checkText(`${id} ${en}`, label, errors, field.name);
       return { id, en };
     }
@@ -267,7 +266,12 @@ export function readField(field: Field, form: FormData, errors: FieldErrors): un
   }
 }
 
-export function readFields(fields: Field[], form: FormData, base: Doc = {}): { data: Doc; errors: FieldErrors } {
+const LANG_NAMES: Record<Lang, string> = { id: "Indonesia", en: "Inggris" };
+const LOCALIZED: Field["type"][] = ["localized", "localizedList", "richtext"];
+
+// primary = bahasa utama (Pengaturan, Bahasa). Isian dua bahasa yang wajib cukup diisi dalam
+// bahasa utama; isian dua bahasa apa pun tidak boleh hanya berisi bahasa lain.
+export function readFields(fields: Field[], form: FormData, base: Doc = {}, primary: Lang = "id"): { data: Doc; errors: FieldErrors } {
   const errors: FieldErrors = {};
   const data: Doc = structuredClone(base);
   for (const field of fields) {
@@ -276,6 +280,17 @@ export function readFields(fields: Field[], form: FormData, base: Doc = {}): { d
       if (value === undefined) continue;
     }
     setPath(data, field.name, value);
+    if (LOCALIZED.includes(field.type)) {
+      const main = value === undefined ? undefined : (value as Record<Lang, unknown>)[primary];
+      if (isBlank(main)) {
+        if (value !== undefined) {
+          errors[field.name] = errors[field.name] ?? `${field.label}: isi versi ${LANG_NAMES[primary]} (bahasa utama) lebih dulu.`;
+        } else if (field.required) {
+          errors[field.name] = errors[field.name] ?? `${field.label}: wajib diisi dalam bahasa ${LANG_NAMES[primary]} (bahasa utama).`;
+        }
+      }
+      continue;
+    }
     if (field.required) {
       const empty = value === undefined || value === null || value === "";
       if (empty) errors[field.name] = errors[field.name] ?? `${field.label} wajib diisi.`;

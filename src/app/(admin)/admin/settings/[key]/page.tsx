@@ -13,7 +13,7 @@ import { site } from "@/data/profile";
 import { archivePath } from "@/lib/achievements";
 import { defaultPageText } from "@/lib/metadata";
 import { requireAdmin } from "@/server/auth/session";
-import { getSettingDoc } from "@/server/content";
+import { getSettingDoc, primaryLang } from "@/server/content";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +44,15 @@ export default async function AdminSettings({ params }: Props) {
         />
       ) : null}
       <div className="mt-8">
-        <EntryForm action={saveSettingsAction} hidden={{ key: cfg.key }} fields={cfg.fields} values={values} meta={null} labels={formLabels} />
+        <EntryForm
+          action={saveSettingsAction}
+          hidden={{ key: cfg.key }}
+          fields={cfg.fields}
+          values={values}
+          meta={null}
+          labels={formLabels}
+          primary={await primaryLang()}
+        />
       </div>
       {cfg.key === "mail" ? <MailTest labels={adminCopy.settings.mail} /> : null}
     </AdminShell>

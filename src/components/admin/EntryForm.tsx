@@ -4,7 +4,11 @@ import { useActionState, useEffect, useRef } from "react";
 import type { FormState } from "@/app/(admin)/admin/actions";
 import { toast } from "@/components/Toaster";
 import FieldInput, { type FieldLabels, type FieldValue } from "@/components/admin/FieldInput";
+import { LangModeProvider } from "@/components/admin/LangMode";
 import { fieldWidth, type Field, type Option } from "@/content/fields";
+import type { Lang } from "@/content/types";
+
+const LOCALIZED: Field["type"][] = ["localized", "localizedList", "richtext"];
 
 export interface EntryFormLabels extends FieldLabels {
   meta: string;
@@ -34,6 +38,7 @@ export default function EntryForm({
   references,
   file,
   labels,
+  primary = "id",
 }: {
   action: (state: FormState, form: FormData) => Promise<FormState>;
   hidden: Record<string, string>;
@@ -43,6 +48,7 @@ export default function EntryForm({
   references?: Record<string, Option[]>;
   file?: { url: string; name: string } | null;
   labels: EntryFormLabels;
+  primary?: Lang;
 }) {
   const [state, formAction, pending] = useActionState<FormState, FormData>(action, undefined);
   const raw = state?.values ? (name: string) => state.values?.[name] : undefined;
@@ -136,21 +142,28 @@ export default function EntryForm({
         </p>
       ) : null}
 
-      <div className="admin-card admin-fields">
-        {fields.map((field) => (
-          <div key={field.name} className="admin-cell" data-w={fieldWidth(field)}>
-            <FieldInput
-              field={field}
-              value={values[field.name] ?? null}
-              raw={raw}
-              error={errors[field.name]}
-              options={field.type === "reference" ? references?.[field.collection] : undefined}
-              file={field.type === "file" ? file : undefined}
-              labels={labels}
-            />
-          </div>
-        ))}
-      </div>
+      <LangModeProvider
+        primary={primary}
+        names={{ id: labels.id, en: labels.en }}
+        labels={labels.langMode}
+        showBar={fields.some((f) => LOCALIZED.includes(f.type))}
+      >
+        <div className="admin-card admin-fields">
+          {fields.map((field) => (
+            <div key={field.name} className="admin-cell" data-w={fieldWidth(field)}>
+              <FieldInput
+                field={field}
+                value={values[field.name] ?? null}
+                raw={raw}
+                error={errors[field.name]}
+                options={field.type === "reference" ? references?.[field.collection] : undefined}
+                file={field.type === "file" ? file : undefined}
+                labels={labels}
+              />
+            </div>
+          ))}
+        </div>
+      </LangModeProvider>
 
       <div className="admin-actions">
         <button type="submit" className="btn btn-solid" disabled={pending}>

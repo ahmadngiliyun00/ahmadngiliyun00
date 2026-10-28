@@ -22,10 +22,11 @@ export type CollectionConfig = {
   hasPage?: (data: Doc) => boolean; // bila ada, hanya data yang lolos fungsi ini punya halaman detail
 };
 
+// Teks dua bahasa untuk judul di CMS: Indonesia, atau Inggris bila Indonesia belum diisi.
 const loc = (v: unknown): string => {
   if (v === null || typeof v !== "object") return "";
-  const o = v as { id?: string };
-  return o.id ?? "";
+  const o = v as { id?: string; en?: string };
+  return o.id || o.en || "";
 };
 const s = (v: unknown): string => (typeof v === "string" ? v : "");
 
@@ -377,7 +378,7 @@ export function getCollection(key: string): CollectionConfig | undefined {
 
 // ---------- Pengaturan tunggal ----------
 
-export type SettingsConfig = { key: "profile" | "metrics" | "seo" | "mail"; label: string; description: string; fields: Field[] };
+export type SettingsConfig = { key: "profile" | "metrics" | "seo" | "mail" | "language"; label: string; description: string; fields: Field[] };
 
 export const settingsConfigs: SettingsConfig[] = [
   {
@@ -493,6 +494,26 @@ export const settingsConfigs: SettingsConfig[] = [
         label: "Google Analytics 4: ID pengukuran",
         type: "text",
         help: "Format G-XXXXXXXXXX. Kunjungan saat Anda masuk CMS tidak dihitung, dan tautan berbagi rahasia tidak dilacak.",
+      },
+    ],
+  },
+  {
+    key: "language",
+    label: "Bahasa",
+    description:
+      "Bahasa utama untuk isian dua bahasa di semua formulir CMS. Isian menampilkan bahasa utama lebih dulu; bahasa lain boleh menyusul lewat tombol globe atau tab bahasa di atas formulir.",
+    fields: [
+      {
+        name: "primary",
+        width: "half",
+        label: "Bahasa utama",
+        type: "select",
+        required: true,
+        options: [
+          { value: "id", label: "Indonesia" },
+          { value: "en", label: "Inggris" },
+        ],
+        help: "Isian wajib cukup diisi dalam bahasa ini. Selama terjemahan belum diisi, situs versi bahasa lain memakai teks bahasa utama. Isi lengkap tulisan tidak ikut: tulisan tanpa terjemahan tidak punya halaman di bahasa itu.",
       },
     ],
   },

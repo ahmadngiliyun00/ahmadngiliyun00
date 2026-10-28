@@ -725,6 +725,128 @@
     font-size: 0.75rem;
   }
 
+  /* Isian dua bahasa gaya OJS: tab bahasa, globe status, kolom berdampingan. */
+  .admin-langbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .admin-langbar-label {
+    margin-right: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .admin-langbar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border-bottom: 2px solid transparent;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .admin-langbar button[aria-pressed="true"] {
+    border-bottom-color: var(--color-sky);
+    color: var(--color-fg);
+  }
+
+  .admin-langbar-tag {
+    padding: 0.05rem 0.45rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+
+  .admin-l10n {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 800px) {
+    .admin-l10n[data-open] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .admin-l10n-cell {
+    display: grid;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .admin-l10n-cell[hidden] {
+    display: none;
+  }
+
+  .admin-l10n-row {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .admin-l10n-row .field {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admin-l10n-row .admin-globe {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .admin-l10n-row .admin-globe + .field {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .admin-globe {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.75rem;
+    min-height: 2.6rem;
+    border: 1px solid var(--color-line);
+    border-right: 0;
+    border-radius: 0.7rem;
+    background: var(--color-surface);
+    font-size: 1.15rem;
+    color: #8592ad;
+    cursor: pointer;
+  }
+
+  .admin-globe-sm {
+    width: 2rem;
+    min-height: 2rem;
+    border-right: 1px solid var(--color-line);
+    font-size: 1rem;
+  }
+
+  .admin-globe[data-status="complete"] {
+    color: var(--color-leaf);
+  }
+
+  .admin-globe[data-status="missing"] {
+    color: #ff7a66;
+  }
+
+  .admin-globe:hover {
+    background: var(--color-raised);
+  }
+
+  .admin-badge[data-v="gap"] {
+    border-color: color-mix(in srgb, #ff9b8a 55%, var(--color-line));
+    color: #ffc2b8;
+  }
+
   /* Editor rich text (isi tulisan). */
   .rte {
     border: 1px solid var(--color-line);
