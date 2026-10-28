@@ -1,0 +1,297 @@
+@import "tailwindcss";
+
+/*
+  Palet diambil dari logo: A hijau dan N biru tua.
+  ink     latar halaman (navy dalam)
+  surface panel yang sedikit terangkat
+  line    garis pemisah
+  leaf    hijau logo, aksen utama
+  sky     biru logo versi terang agar terbaca di atas navy
+  paper   warna ketiga untuk kluster K-Means
+*/
+@theme {
+  --color-ink: #0a1633;
+  --color-surface: #101f44;
+  --color-line: #22376b;
+  --color-fg: #eaf0fb;
+  --color-muted: #a3b3d1;
+  --color-leaf: #3fd35a;
+  --color-sky: #6b97ff;
+  --color-paper: #f2efe6;
+
+  --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  background: var(--color-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-sky);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--color-leaf);
+  color: #06210e;
+}
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0 1.15rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .btn-solid {
+    background: var(--color-leaf);
+    color: #06210e;
+  }
+
+  .btn-solid:hover {
+    background: #5be374;
+  }
+
+  .btn-line {
+    border: 1px solid var(--color-line);
+    color: var(--color-fg);
+  }
+
+  .btn-line:hover {
+    border-color: var(--color-sky);
+  }
+
+  .btn-small {
+    min-height: 2.25rem;
+    padding: 0 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .link {
+    color: var(--color-fg);
+    text-decoration: underline;
+    text-decoration-color: var(--color-line);
+    text-underline-offset: 0.3em;
+    text-decoration-thickness: 1px;
+    transition: text-decoration-color 0.15s ease;
+  }
+
+  .link:hover {
+    text-decoration-color: var(--color-leaf);
+  }
+
+  .link-nav {
+    position: relative;
+    padding-block: 0.25rem;
+    transition: color 0.15s ease;
+  }
+
+  .link-nav::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--color-leaf);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+
+  .link-nav:hover {
+    color: var(--color-fg);
+  }
+
+  .link-nav:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Baris proyek: penanda hijau tumbuh dari atas saat disorot atau difokus. */
+  .project {
+    position: relative;
+  }
+
+  .project::before {
+    content: "";
+    position: absolute;
+    left: -1.1rem;
+    top: 2rem;
+    bottom: 2rem;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--color-leaf);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .project:hover::before,
+  .project:focus-within::before {
+    transform: scaleY(1);
+  }
+
+  .project-link {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.25em;
+    text-decoration-thickness: 2px;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .project:hover .project-link,
+  .project-link:focus-visible {
+    text-decoration-color: var(--color-leaf);
+  }
+}
+
+/* Urutan masuk di hero saat halaman dibuka. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* Muncul saat di-scroll. Atribut diatur oleh komponen Reveal. */
+[data-reveal="hidden"] {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+[data-reveal="shown"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+/* Pita teknologi. */
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 42s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-copy {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  margin: 0;
+  padding: 0 0 0 0;
+  list-style: none;
+}
+
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding-right: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.marquee-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--color-leaf);
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .marquee {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .marquee-track {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+  }
+
+  .marquee-copy {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    padding: 0 1.25rem;
+  }
+
+  .marquee-copy-2 {
+    display: none;
+  }
+
+  .link-nav::after,
+  .project::before {
+    transition: none;
+  }
+}
