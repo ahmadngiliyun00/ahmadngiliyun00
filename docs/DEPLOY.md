@@ -115,7 +115,9 @@ Pembatas per IP membutuhkan IP asli pengunjung, jadi pastikan pengaturan `real_i
 
 ## 8. Search Console dan Analytics
 
-Lakukan setelah situs bisa dibuka di `https://ngiliyun.my.id`. Semua isian ada di CMS, menu Pengaturan, **Search Console dan Analytics**, dan langsung berlaku setelah disimpan tanpa build ulang.
+Lakukan setelah situs bisa dibuka di `https://ngiliyun.my.id`. Semua isian ada di CMS, menu Pengaturan, **SEO dan Search Console**, dan langsung berlaku setelah disimpan tanpa build ulang.
+
+Di halaman yang sama ada isian judul, deskripsi, dan kata kunci untuk beranda dan arsip sertifikat, beserta pratinjau hasil Google. Kosongkan untuk memakai teks bawaan. Setelah mengubahnya, minta perayapan ulang lewat Pemeriksaan URL di Search Console supaya hasil pencarian cepat diperbarui.
 
 **a. Bukti kepemilikan di Google Search Console.** Buka <https://search.google.com/search-console>, Tambahkan properti. Pilih salah satu cara (boleh lebih dari satu sebagai cadangan):
 
@@ -128,7 +130,7 @@ Lakukan setelah situs bisa dibuka di `https://ngiliyun.my.id`. Semua isian ada d
 
 Biarkan isian verifikasi tetap terpasang setelah berhasil, karena Google memeriksa ulang secara berkala.
 
-**b. Sitemap.** Di Search Console, menu Sitemaps, kirim `sitemap.xml`. Sitemap dibuat otomatis dari database: hanya beranda, arsip, dan halaman detail capaian yang **public** (versi Indonesia dan Inggris, dengan tanggal ubah terakhir). Data privat tidak pernah masuk, dan `robots.txt` memblokir `/admin/`, `/s/`, `/en/s/`, serta `/files/`. Tidak perlu mengirim ulang sitemap setiap kali konten berubah.
+**b. Sitemap.** Di Search Console, menu Sitemaps, kirim `sitemap.xml`. Sitemap dibuat otomatis dari database: hanya beranda, arsip, dan halaman detail capaian yang **public** (versi Indonesia dan Inggris, dengan tanggal ubah terakhir). Pasangan bahasa (hreflang) ada di `<head>` setiap halaman, bukan di sitemap, jadi browser menampilkan sitemap sebagai pohon XML biasa. Data privat tidak pernah masuk, dan `robots.txt` memblokir `/admin/`, `/s/`, `/en/s/`, serta `/files/`. Tidak perlu mengirim ulang sitemap setiap kali konten berubah.
 
 **c. Google Analytics 4.** Buka <https://analytics.google.com>, Admin, Buat properti, lalu Aliran data Web dengan URL `https://ngiliyun.my.id`. Salin ID pengukuran (`G-XXXXXXXXXX`) ke CMS. Script hanya dipasang di beranda, arsip, dan detail capaian; tidak di CMS dan tidak di tautan berbagi rahasia, jadi token berbagi tidak terkirim ke Google. Kunjungan saat Mas Ilyun sedang masuk CMS tidak dihitung. Analytics memasang cookie pengunjung, jadi bila nanti dibutuhkan, tambahkan pemberitahuan privasi di situs.
 

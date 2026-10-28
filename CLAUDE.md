@@ -81,6 +81,9 @@ src/
 - Repo terbaru otomatis dari GitHub, atur lewat `recentRepos.exclude` di `profile.ts`
 - Gaya komponen ditulis di `globals.css` (situs) atau `admin.css` (CMS) di dalam `@layer components`
 - Ikon Font Awesome Free hanya untuk CMS (dimuat di layout admin). Situs publik tetap tanpa ikon font dan tanpa emoji
+- Umpan balik aksi di CMS dan situs memakai toast (`toast()` dari `src/components/Toaster.tsx`, atau `FlashToast` setelah redirect), bukan kotak alert di halaman (keputusan Mas Ilyun)
+- Formulir harus tetap terisi setelah disimpan. Server Action simpan memanggil `revalidatePath("/admin", "layout")`; formulir tambah data dialihkan ke halaman ubah
+- Judul, deskripsi, dan kata kunci SEO beranda serta arsip diatur di CMS (Pengaturan, SEO dan Search Console) dan dibaca `src/lib/metadata.ts`; teks di `profile.ts` hanya cadangan
 - Jangan commit `.env.local`, `.env.production.local`, atau folder `storage/`
 - Pesan form kontak (tabel `messages`) selalu privat: hanya tampil di `/admin/pesan/`, tidak pernah di situs, sitemap, atau README
 - Kontak publik hanya lewat email (`ahmad@ngiliyun.my.id`). Jangan menambahkan WhatsApp atau nomor telepon (keputusan Mas Ilyun)

@@ -21,6 +21,8 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 - Bagian "Arah ke depan" di beranda: rencana 2026 sampai 2030, prinsip kerja dengan AI, dan daftar yang sedang didalami, semuanya dikelola lewat CMS
 - CMS: sidebar yang bisa dilipat dengan ikon, formulir grid 12 kolom (isian pendek berbagi baris), placeholder di semua isian, tanda * merah untuk isian wajib, pembagian halaman 10, 25, 50, atau 100 data, dan pencarian yang langsung memperbarui daftar
 - Pengaturan "Email dan SMTP" di CMS dengan tombol kirim email uji, menggantikan variabel SMTP di berkas environment
+- Pengaturan "SEO dan Search Console": judul, deskripsi, dan kata kunci beranda serta arsip sertifikat (ID dan EN, kosong berarti teks bawaan), dengan pratinjau hasil Google yang berubah saat mengetik dan penghitung panjang ideal
+- Notifikasi toast untuk CMS dan situs: muncul sebentar lalu hilang sendiri, berhenti saat disorot atau difokus, dan bisa ditutup. Menggantikan kotak notifikasi di halaman
 
 - Bagian "Sertifikat dan capaian" di beranda: baris indikator bertanggal (sitasi, h-index, skor SINTA, hak cipta, publikasi) dan sorotan dengan saringan sertifikat atau hak cipta
 - Arsip `/sertifikat/` dan `/en/certificates/` dengan pencarian, saringan kategori dan tahun, serta saringan yang tersimpan di URL
@@ -33,11 +35,17 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 ### Diubah
 
 - Situs kini berjalan sebagai server Node.js dan membaca konten dari database, bukan build statis
+- Sitemap tidak lagi memuat pasangan bahasa `xhtml:link` (sudah ada di `<head>` tiap halaman), sehingga browser menampilkannya sebagai pohon XML yang rapi
+- Meta halaman beranda dan arsip kini memuat author dan Twitter card
 
 - Mengajar dipisah per kampus dengan "Semester ini" dan "Pernah diampu", ditambah bidang keahlian mengajar
 - Garis waktu dikoreksi: jalur S1 (STIKOM Poltek Cirebon lalu UNU Cirebon), S2 STMIK LIKMI Bandung, AWATARA Februari 2022, dan Dicoding 2020 sebagai "bergabung"
 - Klaim kelulusan IDCamp 2023 dihapus
 - Peran di bagian Tentang kini mencakup staf IT
+
+### Diperbaiki
+
+- Formulir CMS tidak lagi kosong setelah disimpan; isian menampilkan data yang baru tersimpan
 
 ## [1.0.0] - 2026-10-28
 

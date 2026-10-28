@@ -48,7 +48,7 @@ Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`.
 | Proyek | Proyek unggulan (kode terbuka) dan sistem yang dikembangkan (repo privat) |
 | Mengajar | Kampus, mata kuliah dengan kode semester, semester, bidang keahlian mengajar |
 | Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama, rencana ke depan, prinsip kerja dengan AI, kanal kontak |
-| Pengaturan | Profil (hero, Tentang, email, running text, tema riset), metrik riset bertanggal, Search Console dan Analytics (meta verifikasi Google dan Bing, berkas verifikasi HTML, ID GA4), serta Email dan SMTP untuk meneruskan pesan form kontak |
+| Pengaturan | Profil (hero, Tentang, email, running text, tema riset), metrik riset bertanggal, SEO dan Search Console (judul, deskripsi, dan kata kunci beranda serta arsip dengan pratinjau hasil Google, meta verifikasi Google dan Bing, berkas verifikasi HTML, ID GA4), serta Email dan SMTP untuk meneruskan pesan form kontak |
 
 Setiap data punya status public atau privat, slug (alamat), dan urutan. Tombol **Tampilkan** dan **Sembunyikan** di daftar langsung mengubah situs.
 
@@ -72,6 +72,13 @@ Teks antarmuka (label tombol, judul bagian) tetap di kode: situs di `src/data/pr
 | `src/app/(admin)/admin/` | Halaman dan Server Action CMS |
 
 Setiap halaman dan Server Action admin memanggil `requireAdmin()`. Jangan mengandalkan layout saja untuk pemeriksaan login.
+
+### Notifikasi dan formulir
+
+- Umpan balik aksi (tersimpan, dihapus, gagal) memakai toast, bukan kotak di halaman. Dari komponen client panggil `toast(pesan, "success" | "error" | "info")` dari `src/components/Toaster.tsx`. Dari halaman server setelah redirect (misalnya `?deleted=1`), pasang `<FlashToast message=... clear={["deleted"]} />`; parameternya dibuang dari alamat supaya toast tidak muncul lagi saat dimuat ulang
+- Toast sukses tampil 4 detik dan galat 8 detik, berhenti saat disorot atau difokus. Galat validasi juga tampil di bawah isiannya dan isian pertama yang salah difokus
+- Kondisi yang menetap (misalnya tabel belum dimigrasi atau SMTP belum diatur) tetap ditulis sebagai catatan di halaman, bukan toast
+- Server Action simpan memanggil `revalidatePath("/admin", "layout")` setelah berhasil. React mengosongkan formulir ke nilai awal setelah action berhasil, jadi tanpa ini formulir tampak kosong walau data sudah tersimpan
 
 ### Menambah koleksi atau field
 
