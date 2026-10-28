@@ -263,8 +263,10 @@ export type Copy = {
     past: string;
     focusTitle: string;
     noneCurrent: string;
+    campusesTitle: string;
+    focusIntro: string;
   };
-  journey: { title: string; intro: string };
+  journey: { title: string; intro: string; timelineTitle: string };
   next: {
     title: string;
     intro: string;
@@ -381,11 +383,11 @@ export const copy: Localized<Copy> = {
         intro: "Mata kuliah yang saya ampu di dua kampus, dari semester ini sampai yang pernah diampu, beserta materi terbuka.",
         metaTitle: "Mata kuliah yang diampu Ahmad Ngiliyun",
         metaDescription:
-          "Ahmad Ngiliyun mengajar AI, pemrograman, dan basis data di dua kampus, dengan sebagian materi praktikum yang terbuka di GitHub untuk siapa saja.",
+          "Ahmad Ngiliyun mengajar AI, pemrograman, keamanan data, dan jaringan di dua kampus, dengan sebagian materi praktikum yang terbuka di GitHub.",
       },
       journey: {
         title: "Perjalanan",
-        intro: "Dari repositori pertama pada 2017 sampai ruang kelas, lalu ke mana saya melangkah berikutnya.",
+        intro: "Bagaimana saya sampai di titik ini sejak 2017, dan ke mana saya melangkah berikutnya.",
         metaTitle: "Perjalanan Ahmad Ngiliyun dari web developer ke AI engineer",
         metaDescription:
           "Ahmad Ngiliyun memulai dari kode di GitHub, menyelesaikan Magister Komputer, lalu menjadi dosen tetap. Kini ia menapaki jalan menjadi AI engineer.",
@@ -560,10 +562,13 @@ export const copy: Localized<Copy> = {
       past: "Pernah diampu",
       focusTitle: "Bidang keahlian mengajar",
       noneCurrent: "Tidak ada mata kuliah di semester ini.",
+      campusesTitle: "Mata kuliah per kampus",
+      focusIntro: "Kelompok mata kuliah yang saya kuasai, dari kecerdasan buatan dan keamanan data sampai jaringan dan rekayasa perangkat lunak.",
     },
     journey: {
       title: "Perjalanan",
       intro: "Dari repositori pertama sampai ruang kelas.",
+      timelineTitle: "Garis waktu",
     },
     next: {
       title: "Arah ke depan",
@@ -722,11 +727,11 @@ export const copy: Localized<Copy> = {
         intro: "Courses I teach at two universities, from this semester back to earlier ones, with open course materials.",
         metaTitle: "Courses taught by Ahmad Ngiliyun",
         metaDescription:
-          "Ahmad Ngiliyun teaches AI, programming, and databases at two Indonesian universities, and shares lab material from those courses openly on GitHub.",
+          "Ahmad Ngiliyun teaches AI, programming, data security, and networks at two Indonesian universities, and shares lab material from those courses on GitHub.",
       },
       journey: {
         title: "Journey",
-        intro: "From the first repository in 2017 to the classroom, and where I am heading next.",
+        intro: "How I got here since 2017, and where I am heading next.",
         metaTitle: "Ahmad Ngiliyun's path from web developer to AI engineer",
         metaDescription:
           "Ahmad Ngiliyun started out writing code on GitHub, earned a Master of Computer Science, and became a permanent lecturer, now growing into the role of AI engineer.",
@@ -901,10 +906,13 @@ export const copy: Localized<Copy> = {
       past: "Previously taught",
       focusTitle: "Teaching expertise",
       noneCurrent: "No courses this semester.",
+      campusesTitle: "Courses by university",
+      focusIntro: "The groups of courses I am qualified to teach, from artificial intelligence and data security to networks and software engineering.",
     },
     journey: {
       title: "Journey",
       intro: "From the first repository to the classroom.",
+      timelineTitle: "Timeline",
     },
     next: {
       title: "What comes next",
