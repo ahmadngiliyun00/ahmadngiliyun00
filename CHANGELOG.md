@@ -56,6 +56,18 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 - Formulir CMS tidak lagi kosong setelah disimpan; isian menampilkan data yang baru tersimpan
 
+### Keamanan
+
+- Header keamanan di semua halaman: Content Security Policy, anti clickjacking (`X-Frame-Options`, `frame-ancestors`), HSTS bila https, `nosniff`, `Referrer-Policy`, dan `Permissions-Policy`
+- Pembatas percobaan login, form kontak, komentar, dan hitungan pembaca kini mencatat percobaan secara atomik sebelum memeriksa, sehingga tidak bisa ditembus dengan permintaan serentak
+- JSON-LD dan konfigurasi Analytics di-escape supaya teks berisi `</script>` tidak bisa menyisipkan skrip
+- Akun admin GitHub dikunci ke ID numerik GitHub (migrasi `0003`), bukan hanya nama pengguna yang bisa didaur ulang
+- Form komentar memakai Cloudflare Turnstile seperti form kontak
+- Alamat IP cadangan diambil dari entri terakhir `X-Forwarded-For`, bukan entri pertama yang bisa dipalsukan
+- Halaman login dan moderasi komentar tidak lagi galat 500 karena parameter `?error=` atau `?done=` yang tidak dikenal
+- Versi Node.js minimum 22.23.4 atau 24.22.1 (rilis keamanan Oktober 2026)
+- `docs/DEPLOY.md`: Next.js wajib mendengarkan di `127.0.0.1`, dan bagian baru "Keamanan server"
+
 ## [1.0.0] - 2026-10-28
 
 Rilis pertama situs portofolio [ngiliyun.my.id](https://ngiliyun.my.id) beserta README profil GitHub.
