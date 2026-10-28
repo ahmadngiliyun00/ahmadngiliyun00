@@ -6,3 +6,6 @@ next-env.d.ts
 .env*.local
 .DS_Store
 .vercel
+
+# Konteks privat untuk Claude Code, jangan dipublikasikan
+docs/PROMPT_*.md
