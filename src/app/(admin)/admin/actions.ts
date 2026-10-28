@@ -13,6 +13,7 @@ import { clearFailures, clientIp, isLimited, recordFailure } from "@/server/auth
 import { createSession, destroySession, requireAdmin } from "@/server/auth/session";
 import { saveUpload } from "@/server/files";
 import { sendTestMail } from "@/server/mail";
+import { deleteComment, setCommentReply, setCommentStatus, type CommentStatus } from "@/server/comments";
 import { deleteMessage, setMessageStatus, type MessageStatus } from "@/server/messages";
 import {
   createShare,
@@ -198,4 +199,41 @@ export async function deleteMessageAction(form: FormData) {
   await deleteMessage(toId(form.get("id")));
   // Satu parameter saja: nilai "deleted" sekaligus menyimpan saringan yang sedang dibuka.
   redirect(`/admin/pesan/?deleted=${messageFilter(form.get("filter"))}`);
+}
+
+// ---------- Komentar ----------
+
+const COMMENT_STATUSES: CommentStatus[] = ["pending", "approved", "spam"];
+
+function commentFilter(value: unknown): CommentStatus {
+  const f = String(value ?? "");
+  return f === "approved" ? "approved" : f === "spam" ? "spam" : "pending";
+}
+
+// Setelah aksi, kembali ke saringan yang sama dengan penanda toast (?done=...).
+function backToComments(filter: CommentStatus, done: string): never {
+  redirect(`/admin/komentar/?${new URLSearchParams({ f: filter, done }).toString()}`);
+}
+
+export async function setCommentStatusAction(form: FormData) {
+  await requireAdmin();
+  const status = String(form.get("status")) as CommentStatus;
+  if (!COMMENT_STATUSES.includes(status)) throw new Error("Status komentar tidak dikenal");
+  await setCommentStatus(toId(form.get("id")), status);
+  revalidatePath("/", "layout");
+  backToComments(commentFilter(form.get("filter")), status);
+}
+
+export async function replyCommentAction(form: FormData) {
+  await requireAdmin();
+  await setCommentReply(toId(form.get("id")), String(form.get("reply") ?? "").slice(0, 2000));
+  revalidatePath("/", "layout");
+  backToComments(commentFilter(form.get("filter")), "replied");
+}
+
+export async function deleteCommentAction(form: FormData) {
+  await requireAdmin();
+  await deleteComment(toId(form.get("id")));
+  revalidatePath("/", "layout");
+  backToComments(commentFilter(form.get("filter")), "deleted");
 }

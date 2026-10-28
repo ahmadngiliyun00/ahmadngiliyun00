@@ -904,6 +904,90 @@
     pointer-events: none;
   }
 
+  /* Statistik pembaca tulisan. */
+  .stats-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .stats-tiles > div {
+    padding: 0.6rem 0.7rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.7rem;
+  }
+
+  .stats-tiles dt {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+
+  .stats-tiles dd {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .stats-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 4.5rem;
+    padding-bottom: 1px;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .stats-chart span {
+    flex: 1;
+    min-width: 0;
+    border-radius: 2px 2px 0 0;
+    background: var(--color-leaf);
+  }
+
+  .stats-chart span[data-zero] {
+    background: var(--color-line);
+  }
+
+  .stats-sub {
+    margin-top: 1.1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+
+  .stats-list {
+    margin-top: 0.35rem;
+    font-size: 0.875rem;
+  }
+
+  .stats-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-line) 60%, transparent);
+  }
+
+  /* Komentar */
+  .admin-comment-reply {
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    border-left: 3px solid var(--color-leaf);
+    border-radius: 0 0.6rem 0.6rem 0;
+    background: var(--color-raised);
+  }
+
+  .admin-reply > summary {
+    display: inline-flex;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .admin-reply > summary::-webkit-details-marker {
+    display: none;
+  }
+
   /* Pesan masuk */
   .admin-nav-count {
     display: inline-grid;

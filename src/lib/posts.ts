@@ -5,6 +5,7 @@ import { formatPartialDate } from "@/lib/achievements";
 // Berita dan tulisan untuk situs publik: urutan, alamat, dan pemecah isi lengkap.
 
 export interface PostItem extends Post {
+  id: number;
   slug: string;
   updatedAt: string;
 }
@@ -22,7 +23,7 @@ export function byPostDate(a: Pick<Post, "date">, b: Pick<Post, "date">): number
 export function publicPosts(list: Entry<"post">[]): PostItem[] {
   return list
     .filter((e) => e.visibility === "public")
-    .map((e) => ({ ...e.data, slug: e.slug, updatedAt: e.updatedAt }))
+    .map((e) => ({ ...e.data, id: e.id, slug: e.slug, updatedAt: e.updatedAt }))
     .sort(byPostDate);
 }
 

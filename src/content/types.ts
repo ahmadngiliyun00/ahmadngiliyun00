@@ -143,7 +143,8 @@ export type Post = {
   url?: string; // tautan sumber; tanpa isi lengkap, kartu menaut ke sini
   sourceLang?: Lang; // bahasa artikel sumber, untuk keterangan di situs bahasa lain
   summary?: Localized<string>;
-  body?: Localized<string>; // isi lengkap; bila ada, tulisan punya halaman sendiri di situs
+  body?: Localized<string>; // isi lengkap (HTML); bila ada, tulisan punya halaman sendiri di situs
+  comments?: boolean; // kolom komentar di halaman tulisan
 };
 
 export type Channel = { label: string; handle: string; href: string; note: Localized<string> };

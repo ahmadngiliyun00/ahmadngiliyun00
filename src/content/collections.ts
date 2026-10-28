@@ -137,6 +137,13 @@ export const collections: CollectionConfig[] = [
         type: "richtext",
         help: "Opsional. Bila diisi, tulisan punya halaman sendiri di /kabar/. Gambar bisa diunggah lewat tombol gambar, ditempel, atau diseret; ukurannya diperkecil otomatis. Isi teks alternatif untuk setiap gambar.",
       },
+      {
+        name: "comments",
+        width: "full",
+        label: "Izinkan komentar",
+        type: "boolean",
+        help: "Menampilkan kolom komentar di halaman tulisan. Komentar yang masuk tampil setelah Anda setujui di menu Komentar. Mematikannya menyembunyikan form dan semua komentar.",
+      },
     ],
   },
   {

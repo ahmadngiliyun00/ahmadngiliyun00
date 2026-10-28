@@ -42,6 +42,38 @@ export const recentRepos = {
   ],
 };
 
+export type CommentLabels = {
+  title: string;
+  count: string;
+  countOne: string;
+  empty: string;
+  formTitle: string;
+  name: string;
+  namePlaceholder: string;
+  email: string;
+  emailPlaceholder: string;
+  emailNote: string;
+  body: string;
+  bodyPlaceholder: string;
+  send: string;
+  sending: string;
+  moderation: string;
+  sent: string;
+  replyBy: string;
+  errors: {
+    nameRequired: string;
+    emailRequired: string;
+    emailInvalid: string;
+    bodyRequired: string;
+    bodyTooShort: string;
+    tooLong: string;
+    tooManyLinks: string;
+    tooMany: string;
+    closed: string;
+    failed: string;
+  };
+};
+
 export type Copy = {
   meta: { title: string; description: string; jobTitle: string };
   nav: {
@@ -235,6 +267,11 @@ export type Copy = {
     published: string;
     source: string;
     original: string;
+    readingTime: string;
+    views: string;
+    viewsOne: string;
+    share: { title: string; copy: string; copied: string; copyFailed: string; native: string };
+    comments: CommentLabels;
   };
   contact: {
     marquee: string;
@@ -487,6 +524,47 @@ export const copy: Localized<Copy> = {
       published: "Terbit",
       source: "Sumber",
       original: "Baca versi asli di {outlet}",
+      readingTime: "{n} menit baca",
+      views: "Dibaca {n} kali",
+      viewsOne: "Dibaca 1 kali",
+      share: {
+        title: "Bagikan tulisan ini",
+        copy: "Salin tautan",
+        copied: "Tautan disalin",
+        copyFailed: "Tautan gagal disalin. Salin dari bilah alamat.",
+        native: "Bagikan lewat aplikasi lain",
+      },
+      comments: {
+        title: "Komentar",
+        count: "{n} komentar",
+        countOne: "1 komentar",
+        empty: "Belum ada komentar. Jadilah yang pertama.",
+        formTitle: "Tulis komentar",
+        name: "Nama",
+        namePlaceholder: "Nama Anda",
+        email: "Email",
+        emailPlaceholder: "nama@contoh.id",
+        emailNote: "Tidak ditampilkan. Hanya dipakai bila saya perlu membalas lewat email.",
+        body: "Komentar",
+        bodyPlaceholder: "Tulis tanggapan, pertanyaan, atau masukan",
+        send: "Kirim komentar",
+        sending: "Mengirim...",
+        moderation: "Komentar ditinjau dulu sebelum tampil.",
+        sent: "Terima kasih. Komentar Anda akan tampil setelah disetujui.",
+        replyBy: "Balasan {name}",
+        errors: {
+          nameRequired: "Tulis nama Anda.",
+          emailRequired: "Tulis email Anda.",
+          emailInvalid: "Format email belum benar, misalnya nama@contoh.id.",
+          bodyRequired: "Tulis komentar Anda.",
+          bodyTooShort: "Komentar terlalu pendek.",
+          tooLong: "Isian terlalu panjang.",
+          tooManyLinks: "Terlalu banyak tautan. Maksimal dua.",
+          tooMany: "Terlalu banyak komentar dalam waktu singkat. Coba lagi beberapa menit lagi.",
+          closed: "Komentar untuk tulisan ini sudah ditutup.",
+          failed: "Komentar gagal dikirim. Coba lagi sebentar lagi.",
+        },
+      },
     },
     contact: {
       marquee: "Mari berkolaborasi",
@@ -741,6 +819,47 @@ export const copy: Localized<Copy> = {
       published: "Published",
       source: "Source",
       original: "Read the original on {outlet}",
+      readingTime: "{n} min read",
+      views: "{n} reads",
+      viewsOne: "1 read",
+      share: {
+        title: "Share this post",
+        copy: "Copy link",
+        copied: "Link copied",
+        copyFailed: "Could not copy the link. Copy it from the address bar.",
+        native: "Share with another app",
+      },
+      comments: {
+        title: "Comments",
+        count: "{n} comments",
+        countOne: "1 comment",
+        empty: "No comments yet. Be the first.",
+        formTitle: "Leave a comment",
+        name: "Name",
+        namePlaceholder: "Your name",
+        email: "Email",
+        emailPlaceholder: "name@example.com",
+        emailNote: "Not published. Only used if I need to reply by email.",
+        body: "Comment",
+        bodyPlaceholder: "Share a response, question, or suggestion",
+        send: "Post comment",
+        sending: "Sending...",
+        moderation: "Comments are reviewed before they appear.",
+        sent: "Thank you. Your comment will appear once it is approved.",
+        replyBy: "Reply from {name}",
+        errors: {
+          nameRequired: "Please enter your name.",
+          emailRequired: "Please enter your email.",
+          emailInvalid: "That email does not look right, for example name@example.com.",
+          bodyRequired: "Please write a comment.",
+          bodyTooShort: "That comment is too short.",
+          tooLong: "That is too long.",
+          tooManyLinks: "Too many links. Two at most.",
+          tooMany: "Too many comments in a short time. Try again in a few minutes.",
+          closed: "Comments are closed for this post.",
+          failed: "Your comment could not be sent. Please try again shortly.",
+        },
+      },
     },
     contact: {
       marquee: "Let's work together",

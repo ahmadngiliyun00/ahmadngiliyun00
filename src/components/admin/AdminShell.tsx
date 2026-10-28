@@ -6,6 +6,7 @@ import Monogram from "@/components/Monogram";
 import { collections, settingsConfigs } from "@/content/collections";
 import { adminCopy as t } from "@/data/admin";
 import type { AdminSession } from "@/server/auth/session";
+import { countComments } from "@/server/comments";
 import { countMessages } from "@/server/messages";
 
 const GROUPS = [
@@ -25,6 +26,15 @@ async function unreadMessages(): Promise<number> {
   }
 }
 
+// Jumlah komentar yang menunggu persetujuan. Bila tabel belum dimigrasi, anggap nol.
+async function pendingComments(): Promise<number> {
+  try {
+    return (await countComments()).pending;
+  } catch {
+    return 0;
+  }
+}
+
 // Kerangka halaman admin: navigasi samping, konten, tombol keluar.
 export default async function AdminShell({
   session,
@@ -35,10 +45,12 @@ export default async function AdminShell({
   active: string;
   children: ReactNode;
 }) {
-  const unread = await unreadMessages();
+  const [unread, pending] = await Promise.all([unreadMessages(), pendingComments()]);
   const link = (href: string, label: string, key: string): NavLink => ({ href, label, current: active === key });
   const inbox = link("/admin/pesan/", t.messages.nav, "messages");
   if (unread > 0) inbox.count = { n: unread, label: t.messages.newCount.replace("{n}", String(unread)) };
+  const moderation = link("/admin/komentar/", t.comments.nav, "comments");
+  if (pending > 0) moderation.count = { n: pending, label: t.comments.pendingCount.replace("{n}", String(pending)) };
   const groups: NavGroup[] = [
     ...GROUPS.map((g) => ({
       key: g.key,
@@ -71,6 +83,7 @@ export default async function AdminShell({
         top={[
           { link: link("/admin/", t.nav.dashboard, "dashboard"), icon: "gauge-high" },
           { link: inbox, icon: "inbox" },
+          { link: moderation, icon: "comments" },
         ]}
         groups={groups}
         footer={

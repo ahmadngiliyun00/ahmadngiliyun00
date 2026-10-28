@@ -5,6 +5,8 @@ import { SLUG_PATTERN } from "@/content/fields";
 import { buildPostMetadata } from "@/lib/metadata";
 import { hasPage, publicPosts } from "@/lib/posts";
 import { loadSite } from "@/server/content";
+import { approvedComments } from "@/server/comments";
+import { viewCount } from "@/server/views";
 
 // Hanya berita public yang punya isi lengkap dalam bahasa ini. Liputan tanpa isi menaut ke sumbernya.
 export const dynamic = "force-dynamic";
@@ -25,5 +27,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function NewsPostRoute({ params }: Props) {
   const post = await find((await params).slug);
   if (post === undefined) notFound();
-  return <NewsPostPage lang="id" post={post} />;
+  const [views, comments] = await Promise.all([
+    viewCount(post.id),
+    post.comments ? approvedComments(post.id) : Promise.resolve(null),
+  ]);
+  return <NewsPostPage lang="id" post={post} views={views} comments={comments} />;
 }

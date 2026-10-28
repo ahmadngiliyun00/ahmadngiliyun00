@@ -4,6 +4,7 @@ import { adminCopy as t } from "@/data/admin";
 import { db } from "@/db";
 import { entries } from "@/db/schema";
 import { requireAdmin } from "@/server/auth/session";
+import { countComments } from "@/server/comments";
 import { countMessages } from "@/server/messages";
 import { count, sql } from "drizzle-orm";
 
@@ -17,6 +18,7 @@ export default async function AdminDashboard() {
     .groupBy(entries.collection, entries.visibility)
     .orderBy(sql`1`);
   const inbox = await countMessages().catch(() => ({ new: 0, read: 0, archived: 0 }));
+  const moderation = await countComments().catch(() => ({ pending: 0, approved: 0, spam: 0 }));
   const tally = (key: string, v: string) => rows.find((r) => r.collection === key ? r.visibility === v : false)?.n ?? 0;
 
   return (
@@ -35,6 +37,21 @@ export default async function AdminDashboard() {
               </span>
               <span className="admin-badge">
                 {inbox.archived} {t.messages.tabs.archived.toLowerCase()}
+              </span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/komentar/" className="admin-card admin-tile">
+            <span className="text-sm text-muted">{t.comments.nav}</span>
+            <span className="font-display text-xl font-bold tracking-tight">{t.comments.title}</span>
+            <span className="text-sm text-muted">{t.comments.tile}</span>
+            <span className="admin-tally">
+              <span className="admin-badge" data-v={moderation.pending > 0 ? "new" : undefined}>
+                {t.comments.pendingCount.replace("{n}", String(moderation.pending))}
+              </span>
+              <span className="admin-badge">
+                {moderation.approved} {t.comments.tabs.approved.toLowerCase()}
               </span>
             </span>
           </a>

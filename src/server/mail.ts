@@ -189,3 +189,57 @@ export async function sendContactNotification(msg: ContactMail): Promise<boolean
     return false;
   }
 }
+
+export type CommentMail = { id: number; name: string; email: string; body: string; postTitle: string; postUrl: string };
+
+// Notifikasi komentar baru yang menunggu persetujuan. Reply-To diisi email pengomentar.
+export async function sendCommentNotification(c: CommentMail): Promise<boolean> {
+  const cfg = await config();
+  if (cfg === null) return false;
+  const moderate = `${siteBase()}/admin/komentar/`;
+  const post = `${siteBase()}${c.postUrl}`;
+  const now = wib(new Date());
+  const text = [
+    `Komentar baru di "${c.postTitle}", ${now}. Komentar belum tampil sampai disetujui.`,
+    "",
+    `Nama  : ${c.name}`,
+    `Email : ${c.email}`,
+    "",
+    c.body,
+    "",
+    "--",
+    `Moderasi: ${moderate}`,
+    `Tulisan: ${post}`,
+  ].join("\n");
+  try {
+    await transport(cfg).sendMail({
+      from: cfg.from,
+      to: cfg.to,
+      bcc: cfg.bcc.length === 0 ? undefined : cfg.bcc,
+      replyTo: { name: c.name, address: c.email },
+      subject: `[ngiliyun.my.id] Komentar baru - ${c.postTitle}`,
+      text,
+      html: renderMail({
+        preheader: c.body.slice(0, 120),
+        badge: "Komentar",
+        title: `Komentar baru dari ${c.name}`,
+        intro: `Di tulisan "${c.postTitle}" pada ${now}. Komentar belum tampil di situs sampai Anda setujui.`,
+        rows: [
+          { label: "Nama", value: c.name },
+          { label: "Email", value: c.email, href: `mailto:${c.email}` },
+          { label: "Tulisan", value: c.postTitle, href: post },
+        ],
+        message: { label: "Isi komentar", body: c.body },
+        actions: [
+          { label: "Setujui atau tolak di CMS", href: moderate, primary: true },
+          { label: "Buka tulisan", href: post },
+        ],
+        footer: "Email otomatis dari kolom komentar ngiliyun.my.id. Email pengomentar tidak pernah ditampilkan di situs.",
+      }),
+    });
+    return true;
+  } catch (err) {
+    console.error("[mail] Gagal mengirim notifikasi komentar", c.id, err instanceof Error ? err.message : err);
+    return false;
+  }
+}

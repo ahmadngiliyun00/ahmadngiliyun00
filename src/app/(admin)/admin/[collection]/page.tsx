@@ -13,6 +13,7 @@ import { byNewest } from "@/lib/achievements";
 import { byPostDate } from "@/lib/posts";
 import { requireAdmin } from "@/server/auth/session";
 import { listEntries } from "@/server/content";
+import { viewCounts } from "@/server/views";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,7 @@ export default async function AdminList({ params, searchParams }: Props) {
   const canMove = cfg.order === "position" ? q === "" ? v === "all" : false : false;
   const base = `/admin/${cfg.key}/`;
   const pg = paginate(filtered, sp.page, sp.per);
+  const views = cfg.key === "post" ? await viewCounts(pg.items.map((e) => e.id)) : null;
   const hrefFor = (n: number) => {
     const params = new URLSearchParams();
     if (sp.q) params.set("q", sp.q);
@@ -105,6 +107,9 @@ export default async function AdminList({ params, searchParams }: Props) {
                       {e.visibility === "public" ? t.list.public : t.list.private}
                     </span>
                     {e.shared ? <span className="admin-badge" data-v="shared">{t.list.shared}</span> : null}
+                    {views === null ? null : (
+                      <span className="admin-badge">{t.stats.listCount.replace("{n}", String(views.get(e.id) ?? 0))}</span>
+                    )}
                   </p>
                 </div>
                 <div className="admin-row-actions">

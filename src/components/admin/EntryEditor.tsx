@@ -3,6 +3,7 @@ import ConfirmButton from "@/components/admin/ConfirmButton";
 import EntryForm from "@/components/admin/EntryForm";
 import type { FieldValue } from "@/components/admin/FieldInput";
 import { formLabels } from "@/components/admin/labels";
+import PostStats from "@/components/admin/PostStats";
 import ShareBox from "@/components/admin/ShareBox";
 import type { CollectionConfig } from "@/content/collections";
 import { formValue, type Doc, type Option } from "@/content/fields";
@@ -11,6 +12,7 @@ import { adminCopy as t } from "@/data/admin";
 import { site } from "@/data/profile";
 import { listEntries } from "@/server/content";
 import { getFileMeta } from "@/server/files";
+import { viewStats } from "@/server/views";
 
 // Halaman tambah atau ubah satu data (server component).
 export default async function EntryEditor({
@@ -45,6 +47,7 @@ export default async function EntryEditor({
           : null
         : null
       : null;
+  const stats = entry !== null ? (cfg.key === "post" ? await viewStats(entry.id).catch(() => null) : null) : null;
   const heading = (entry === null ? t.form.newTitle : t.form.editTitle).replace("{name}", cfg.singular);
 
   return (
@@ -75,6 +78,7 @@ export default async function EntryEditor({
 
         {entry !== null ? (
           <aside className="admin-editor-side">
+            {stats === null ? null : <PostStats stats={stats} hasPage={entry.visibility === "public" ? withPage : false} />}
             {cfg.key === "achievement" ? (
               <ShareBox id={entry.id} active={entry.shared} siteUrl={siteUrl} publicUrl={publicUrl} labels={t.share} />
             ) : null}
