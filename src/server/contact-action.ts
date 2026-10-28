@@ -7,7 +7,7 @@ import {
   validateContact,
   type ContactState,
 } from "@/lib/contact";
-import { clientIp, isLimited, recordFailure } from "@/server/auth/rate-limit";
+import { clientIp, consumeAttempt } from "@/server/auth/rate-limit";
 import { sendContactNotification } from "@/server/mail";
 import { createMessage, markNotified } from "@/server/messages";
 import { verifyTurnstile } from "@/server/turnstile";
@@ -39,14 +39,13 @@ export async function sendContactMessage(_prev: ContactState, form: FormData): P
 
   const ip = await clientIp();
   const keys = [`contact:${ip}`];
-  if (await isLimited(keys, LIMIT)) return { status: "error", formError: "tooMany" };
+  if (await consumeAttempt(keys, LIMIT)) return { status: "error", formError: "tooMany" };
 
   const token = String(form.get("cf-turnstile-response") ?? "");
   if (!(await verifyTurnstile(token, ip))) return { status: "error", formError: "captcha" };
 
   try {
     const id = await createMessage(input, lang, ip);
-    await recordFailure(keys, LIMIT);
     if (await sendContactNotification({ id, lang, ...input })) await markNotified(id);
   } catch (err) {
     console.error("[contact] Gagal menyimpan pesan", err instanceof Error ? err.message : err);

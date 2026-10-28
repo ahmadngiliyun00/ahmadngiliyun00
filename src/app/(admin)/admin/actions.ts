@@ -9,7 +9,7 @@ import type { CollectionKey } from "@/content/types";
 import { db } from "@/db";
 import { admins } from "@/db/schema";
 import { DUMMY_HASH, verifyPassword } from "@/server/auth/password";
-import { clearFailures, clientIp, isLimited, recordFailure } from "@/server/auth/rate-limit";
+import { clearFailures, clientIp, consumeAttempt } from "@/server/auth/rate-limit";
 import { createSession, destroySession, requireAdmin } from "@/server/auth/session";
 import { saveUpload } from "@/server/files";
 import { sendTestMail } from "@/server/mail";
@@ -64,17 +64,14 @@ export async function loginWithPassword(_prev: FormState, form: FormData): Promi
 
   const ip = await clientIp();
   const keys = [`ip:${ip}`, `email:${email}`];
-  if (await isLimited(keys)) return { message: "Terlalu banyak percobaan. Coba lagi 15 menit lagi." };
+  if (await consumeAttempt(keys)) return { message: "Terlalu banyak percobaan. Coba lagi 15 menit lagi." };
 
   const rows = await db.select().from(admins).where(eq(admins.email, email)).limit(1);
   const admin = rows[0];
   // Tetap jalankan verifikasi walau email tidak ada, supaya waktu respons tidak membocorkan email terdaftar.
   const ok = await verifyPassword(password, admin?.passwordHash ?? DUMMY_HASH);
   const allowed = admin ? (admin.active ? admin.passwordHash !== null : false) : false;
-  if (!ok || !allowed || admin === undefined) {
-    await recordFailure(keys);
-    return { message: "Email atau kata sandi salah." };
-  }
+  if (!ok || !allowed || admin === undefined) return { message: "Email atau kata sandi salah." };
   await clearFailures(keys);
   await createSession(admin.id, "password");
   redirect("/admin/");

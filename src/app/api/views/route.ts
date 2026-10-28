@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { site } from "@/data/profile";
 import { isBot, viewSource } from "@/lib/views";
 import { getSession } from "@/server/auth/session";
-import { clientIp, isLimited, recordFailure } from "@/server/auth/rate-limit";
+import { clientIp, consumeAttempt } from "@/server/auth/rate-limit";
 import { loadSite } from "@/server/content";
 import { recordView } from "@/server/views";
 
@@ -51,8 +51,7 @@ export async function POST(req: NextRequest) {
 
   const ip = await clientIp();
   const keys = [`view:${ip}`];
-  if (await isLimited(keys, LIMIT)) return done();
-  await recordFailure(keys, LIMIT);
+  if (await consumeAttempt(keys, LIMIT)) return done();
 
   const source = viewSource(
     typeof body.src === "string" ? body.src.slice(0, 40) : "",

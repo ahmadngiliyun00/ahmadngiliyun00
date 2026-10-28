@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { commentTooFast, normalizeComment, validateComment, type CommentState } from "@/lib/comment";
 import { hasPage, postPath } from "@/lib/posts";
-import { clientIp, isLimited, recordFailure } from "@/server/auth/rate-limit";
+import { clientIp, consumeAttempt } from "@/server/auth/rate-limit";
 import { createComment } from "@/server/comments";
 import { loadSite } from "@/server/content";
 import { sendCommentNotification } from "@/server/mail";
@@ -34,11 +34,10 @@ export async function postComment(_prev: CommentState, form: FormData): Promise<
 
   const ip = await clientIp();
   const keys = [`comment:${ip}`];
-  if (await isLimited(keys, LIMIT)) return { status: "error", formError: "tooMany" };
+  if (await consumeAttempt(keys, LIMIT)) return { status: "error", formError: "tooMany" };
 
   try {
     const id = await createComment(entry.id, input, lang, ip);
-    await recordFailure(keys, LIMIT);
     await sendCommentNotification({ id, ...input, postTitle: entry.data.title.id, postUrl: postPath(lang, entry.slug) });
   } catch (err) {
     console.error("[comment] Gagal menyimpan komentar", err instanceof Error ? err.message : err);
