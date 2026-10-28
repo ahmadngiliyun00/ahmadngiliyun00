@@ -9,7 +9,7 @@ Konten situs (profil, proyek, capaian, mengajar, garis waktu) disimpan di databa
 
 ## Menjalankan
 
-Butuh Node.js 20.9 atau lebih baru (lihat `.nvmrc`) dan MySQL 8.
+Butuh Node.js 22.23.4, 24.22.1, atau lebih baru (lihat `.nvmrc` dan `engines` di `package.json`) dan MySQL 8.
 
 ```bash
 npm install

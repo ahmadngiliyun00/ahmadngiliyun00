@@ -4,7 +4,7 @@ Situs dan CMS adalah satu aplikasi Next.js (`next start`) yang membaca MySQL. Pa
 
 ## 1. Siapkan server
 
-- Node.js 22 (lewat NVM atau Node.js Manager di aaPanel) dan PM2 (`npm i -g pm2`)
+- Node.js 22 versi 22.23.4 atau lebih baru (lewat NVM atau Node.js Manager di aaPanel) dan PM2 (`npm i -g pm2`). Versi di bawahnya memuat celah yang ditambal rilis keamanan Node 21 Oktober 2026; Node 20 sudah tidak didukung
 - MySQL 8 dari aaPanel. **Jangan buka port 3306 ke internet**; aplikasi terhubung lewat `127.0.0.1`
 - Buat database dan user khusus di aaPanel (menu Databases), misalnya database `ngiliyun_portfolio` dengan user `portfolio`, charset `utf8mb4`
 
@@ -145,6 +145,21 @@ npm ci
 npm run db:migrate
 npm run build
 pm2 reload ngiliyun
+```
+
+### Memperbarui Node.js
+
+Node.js merilis tambalan keamanan beberapa kali setahun (pengumuman di <https://nodejs.org/en/blog/vulnerability>). Periksa versi dengan `node -v`, lalu perbarui ke patch terbaru di jalur yang sama:
+
+```bash
+nvm install 22 --reinstall-packages-from=current   # memasang 22.x terbaru beserta pm2
+nvm alias default 22
+cd /www/wwwroot/ngiliyun.my.id
+npm ci
+npm run build
+pm2 update                                         # jalankan ulang daemon PM2 dengan Node baru
+pm2 startup                                        # ikuti perintah yang dicetak, supaya systemd memakai Node baru
+pm2 save
 ```
 
 Bila rilis menambah koleksi baru (misalnya rencana ke depan, prinsip kerja dengan AI, serta berita dan tulisan), isi data awalnya sekali dengan `npm run db:seed -- --only=plan,principle,post`. Koleksi yang sudah berisi dilewati, jadi aman dijalankan ulang.
