@@ -1,27 +1,40 @@
 import Monogram from "@/components/Monogram";
+import Wordmark from "@/components/Wordmark";
 import { copy, site, type Lang } from "@/data/profile";
 
 // Footer yang sama untuk beranda, arsip capaian, dan halaman detail.
+// Atas: monogram, nama, dan peran. Dasar: wordmark "ngiliyun" transparan selebar kontainer
+// di atas cahaya biru dan hijau. Rasional ada di docs/logo-options/v2/IDENTITAS_LOGO_v2.md.
 export default function SiteFooter({ lang }: { lang: Lang }) {
   const t = copy[lang];
   return (
     <footer className="footer">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+      <div className="footer-glow" aria-hidden="true">
+        <i className="footer-glow-sky" />
+        <i className="footer-glow-leaf" />
+      </div>
+      <div className="footer-inner mx-auto max-w-6xl px-5 sm:px-8">
         <div className="flex flex-wrap items-end justify-between gap-8">
           <div className="flex items-center gap-4">
             <Monogram className="h-14 w-14" />
             <div>
-              <p className="font-display text-xl font-bold tracking-tight">{site.fullName}</p>
-              <p className="text-sm text-muted">{t.footer.built}</p>
+              <p className="font-display text-2xl font-extrabold tracking-tight">{site.fullName}</p>
+              <p className="max-w-[44ch] text-sm text-muted">{t.footer.jobTitle}</p>
             </div>
           </div>
           <a href="#main" className="btn btn-line btn-small">
             {t.footer.top}
           </a>
         </div>
-        <p className="mt-10 border-t border-line pt-6 text-sm text-muted">
-          © {new Date().getFullYear()} {site.name}. ngiliyun.my.id
-        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-line pt-6 text-sm text-muted">
+          <p>
+            © {new Date().getFullYear()} {site.name} | ngiliyun.my.id
+          </p>
+          <p>{t.footer.built}</p>
+        </div>
+        <div className="footer-wordmark">
+          <Wordmark variant="ghost" />
+        </div>
       </div>
     </footer>
   );
