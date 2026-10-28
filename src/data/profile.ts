@@ -176,6 +176,16 @@ export type Copy = {
     profilesTitle: string;
     publicationCount: string;
     noLink: string;
+    metricsTitle: string;
+    metricsIntro: string;
+    i10Index: string;
+    garudaDocs: string;
+    sintaThreeYears: string;
+    sourceAsOf: string;
+    focusTitle: string;
+    focusIntro: string;
+    reviewerTitle: string;
+    publicationsIntro: string;
   };
   achievements: {
     title: string;
@@ -462,6 +472,16 @@ export const copy: Localized<Copy> = {
       profilesTitle: "Profil riset",
       publicationCount: "{n} publikasi",
       noLink: "Tautan artikel tersedia lewat profil Google Scholar dan Garuda.",
+      metricsTitle: "Angka sitasi",
+      metricsIntro: "Diambil dari profil riset resmi. Setiap angka bertanggal, jadi bisa dicek ulang ke sumbernya.",
+      i10Index: "i10-index",
+      garudaDocs: "dokumen di Garuda",
+      sintaThreeYears: "skor SINTA tiga tahun",
+      sourceAsOf: "{source} per {date}",
+      focusTitle: "Tema dan hibah",
+      focusIntro: "Bidang yang saya teliti, hibah yang sedang berjalan, dan peran sebagai reviewer jurnal.",
+      reviewerTitle: "Reviewer jurnal",
+      publicationsIntro: "Artikel di jurnal nasional, terbaru di atas, dengan posisi saya di daftar penulis.",
     },
     achievements: {
       title: "Sertifikat dan capaian",
@@ -793,6 +813,16 @@ export const copy: Localized<Copy> = {
       profilesTitle: "Research profiles",
       publicationCount: "{n} publications",
       noLink: "Article links are available through the Google Scholar and Garuda profiles.",
+      metricsTitle: "Citation figures",
+      metricsIntro: "Taken from official research profiles. Every figure carries a date, so it can be checked against its source.",
+      i10Index: "i10-index",
+      garudaDocs: "documents on Garuda",
+      sintaThreeYears: "three-year SINTA score",
+      sourceAsOf: "{source} as of {date}",
+      focusTitle: "Themes and grants",
+      focusIntro: "What I research, the grant currently running, and my role as a journal reviewer.",
+      reviewerTitle: "Journal reviewer",
+      publicationsIntro: "Articles in Indonesian journals, newest first, with my position in the author list.",
     },
     achievements: {
       title: "Credentials and achievements",
