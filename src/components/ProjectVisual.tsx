@@ -119,18 +119,69 @@ function SentimentVisual({ label, names }: { label: string; names: [string, stri
   );
 }
 
+// Uang kertas di dalam bingkai pindai, dengan batang peluang tiap kelas. Hanya ilustrasi.
+function VisionVisual({ label, other }: { label: string; other: string }) {
+  const rows = [
+    { name: "Rp50.000", value: 0.86, color: "var(--color-leaf)" },
+    { name: "Rp20.000", value: 0.09, color: "var(--color-sky)" },
+    { name: other, value: 0.05, color: "var(--color-paper)" },
+  ];
+
+  return (
+    <svg viewBox="0 0 320 240" role="img" aria-label={label} className="project-visual-svg">
+      <g className="pv-note">
+        <rect x="70" y="22" width="180" height="92" rx="10" fill="var(--color-sky)" fillOpacity="0.14" />
+        <rect x="70" y="22" width="180" height="92" rx="10" fill="none" stroke="var(--color-sky)" strokeOpacity="0.7" />
+        <circle cx="112" cy="68" r="24" fill="none" stroke="var(--color-sky)" strokeOpacity="0.6" strokeWidth="2" />
+        <circle cx="112" cy="68" r="12" fill="var(--color-sky)" fillOpacity="0.35" />
+        <rect x="150" y="44" width="80" height="8" rx="4" fill="var(--color-muted)" fillOpacity="0.55" />
+        <rect x="150" y="60" width="56" height="8" rx="4" fill="var(--color-muted)" fillOpacity="0.35" />
+        <rect x="150" y="84" width="72" height="14" rx="7" fill="var(--color-leaf)" fillOpacity="0.85" />
+      </g>
+      <g className="pv-scan" fill="none" stroke="var(--color-leaf)" strokeWidth="3" strokeLinecap="round">
+        <path d="M58 30v-18h18" />
+        <path d="M244 12h18v18" />
+        <path d="M262 106v18h-18" />
+        <path d="M76 124h-18v-18" />
+      </g>
+      {rows.map((r, i) => {
+        const y = 146 + i * 30;
+        const w = 172 * r.value;
+        return (
+          <g key={r.name}>
+            <text x="28" y={y + 13} fill="var(--color-muted)" fontSize="12" fontFamily="var(--font-sans)">
+              {r.name}
+            </text>
+            <rect x="120" y={y} width="172" height="18" rx="9" fill="var(--color-line)" fillOpacity="0.6" />
+            <rect
+              className="pv-bar"
+              x="120"
+              y={y}
+              width={Math.max(18, w)}
+              height="18"
+              rx="9"
+              fill={r.color}
+              style={{ transitionDelay: `${i * 90}ms` }}
+            />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 export default function ProjectVisual({
   kind,
   label,
   sentimentNames,
+  visionOther,
 }: {
-  kind: "cluster" | "sentiment";
+  kind: "cluster" | "sentiment" | "vision";
   label: string;
   sentimentNames: [string, string, string];
+  visionOther: string;
 }) {
-  return kind === "cluster" ? (
-    <ClusterVisual label={label} />
-  ) : (
-    <SentimentVisual label={label} names={sentimentNames} />
-  );
+  if (kind === "cluster") return <ClusterVisual label={label} />;
+  if (kind === "vision") return <VisionVisual label={label} other={visionOther} />;
+  return <SentimentVisual label={label} names={sentimentNames} />;
 }

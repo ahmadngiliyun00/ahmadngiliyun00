@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Monogram from "@/components/Monogram";
 import type { Lang } from "@/data/profile";
 
-export type NavItem = { id: string; label: string };
+// href diisi untuk halaman selain beranda, misalnya "/#about". Tanpa href, tautan menuju "#id".
+export type NavItem = { id: string; label: string; href?: string };
 
 export default function Header({
   lang,
@@ -97,7 +98,7 @@ export default function Header({
     items.map((item) => (
       <li key={item.id}>
         <a
-          href={`#${item.id}`}
+          href={item.href ?? `#${item.id}`}
           className="nav-link"
           aria-current={active === item.id ? "true" : undefined}
           onClick={onClick}

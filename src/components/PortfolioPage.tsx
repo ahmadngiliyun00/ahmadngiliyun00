@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import AchievementHighlights from "@/components/AchievementHighlights";
 import AreaIcon from "@/components/AreaIcon";
 import ContactPanel from "@/components/ContactPanel";
 import ContributionGraph from "@/components/ContributionGraph";
@@ -8,27 +9,48 @@ import Header from "@/components/Header";
 import KMeans from "@/components/KMeans";
 import LiveClock from "@/components/LiveClock";
 import Marquee from "@/components/Marquee";
-import Monogram from "@/components/Monogram";
 import ProjectVisual from "@/components/ProjectVisual";
 import Reveal from "@/components/Reveal";
+import SiteFooter from "@/components/SiteFooter";
 import Spotlight from "@/components/Spotlight";
 import Timeline from "@/components/Timeline";
+import { authorshipLabels } from "@/data/achievements";
+import { scholar, sinta } from "@/data/metrics";
 import {
   areas,
   channels,
   collabs,
   contributions,
   copy,
+  credentialProfiles,
+  currentTerm,
   featured,
   journey,
   links,
+  programs,
+  researchProfiles,
+  researchThemes,
   site,
   skills,
   status,
+  systems,
   teaching,
+  teachingFocus,
+  terms,
   topics,
+  type Course,
   type Lang,
 } from "@/data/profile";
+import {
+  archivePath,
+  countKind,
+  detailPath,
+  homeCopyrights,
+  homeFeatured,
+  publicAchievements,
+  publicationsByYear,
+  toCards,
+} from "@/lib/achievements";
 import {
   formatDate,
   formatMonthYear,
@@ -38,6 +60,7 @@ import {
   getRecentRepos,
   languageColors,
 } from "@/lib/github";
+import { navItems } from "@/lib/nav";
 
 function d(ms: number): CSSProperties {
   return { "--d": `${ms}ms` } as CSSProperties;
@@ -83,6 +106,18 @@ function Letters({ text, start, className }: { text: string; start: number; clas
   );
 }
 
+// Tahun akademik unik dari daftar kode semester, misalnya "2024/2025, 2025/2026".
+function termYears(course: Course, lang: Lang): string {
+  const labels = course.terms
+    .filter((code) => code !== currentTerm)
+    .map((code) => terms[code]?.[lang] ?? code);
+  return [...new Set(labels)].sort().join(", ");
+}
+
+function programNames(course: Course, lang: Lang): string {
+  return course.programs.map((p) => programs[p][lang]).join(", ");
+}
+
 export default function PortfolioPage({ lang }: { lang: Lang }) {
   const t = copy[lang];
   const home = lang === "id" ? "/" : "/en/";
@@ -91,15 +126,11 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
   const gh = getGithubMeta();
   const recent = getRecentRepos();
   const dateLocale = lang === "id" ? "id-ID" : "en-GB";
-
-  const navItems = [
-    { id: "about", label: t.nav.about },
-    { id: "projects", label: t.nav.projects },
-    { id: "activity", label: t.nav.activity },
-    { id: "teaching", label: t.nav.teaching },
-    { id: "journey", label: t.nav.journey },
-    { id: "contact", label: t.nav.contact },
-  ];
+  const cardLabels = { verify: t.achievements.verify, details: t.achievements.details, newTab: t.newTab };
+  const shownSystems = systems.filter((s) => s.visibility === "public");
+  const grants = publicAchievements().filter((a) => a.kind === "hibah");
+  const pubYears = publicationsByYear();
+  const totalPublic = publicAchievements().length;
 
   const personJsonLd = {
     "@context": "https://schema.org",
@@ -120,6 +151,19 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
     { value: contrib.busiest.count, label: t.activity.busiestDay },
   ];
 
+  const indicators = [
+    { value: scholar.citations, label: t.achievements.citations },
+    { value: scholar.hIndex, label: t.achievements.hIndex },
+    { value: sinta.scoreOverall, label: t.achievements.sinta },
+    { value: countKind("hki"), label: t.achievements.copyrights },
+    { value: countKind("publikasi"), label: t.achievements.publications },
+  ];
+
+  const highlightGroups = [
+    { key: "sertifikat", label: t.achievements.certificatesTab, items: toCards(homeFeatured(), lang) },
+    { key: "hki", label: t.achievements.copyrightsTab, items: toCards(homeCopyrights(), lang) },
+  ].filter((g) => g.items.length > 0);
+
   return (
     <>
       <script
@@ -132,7 +176,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
 
       <Header
         lang={lang}
-        items={navItems}
+        items={navItems(lang, true)}
         labels={t.nav}
         homeHref={home}
         otherHref={otherHome}
@@ -253,8 +297,15 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
                   <div className="feature-visual">
                     <ProjectVisual
                       kind={project.visual}
-                      label={project.visual === "cluster" ? t.projects.visualCluster : t.projects.visualSentiment}
+                      label={
+                        project.visual === "cluster"
+                          ? t.projects.visualCluster
+                          : project.visual === "vision"
+                            ? t.projects.visualVision
+                            : t.projects.visualSentiment
+                      }
                       sentimentNames={t.projects.sentimentLabels}
+                      visionOther={t.projects.visionOther}
                     />
                   </div>
                   <div className="feature-body">
@@ -264,6 +315,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
                         {project.stack}
                       </span>
                       {project.copyright ? <span className="badge">{t.projects.copyright}</span> : null}
+                      {project.badge ? <span className="badge badge-sky">{project.badge[lang]}</span> : null}
                     </div>
                     <h3 className="mt-4 font-display text-[clamp(2rem,4vw,2.9rem)] font-bold leading-none tracking-tight">
                       {project.name}
@@ -289,6 +341,45 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
               </Reveal>
             ))}
           </Spotlight>
+
+          {shownSystems.length === 0 ? null : (
+            <div className="mt-20">
+              <Reveal>
+                <h3 className="sub-title">{t.projects.systemsTitle}</h3>
+                <p className="mt-2 max-w-[60ch] text-sm text-muted">{t.projects.systemsIntro}</p>
+              </Reveal>
+              <Spotlight className="systems mt-8">
+                {shownSystems.map((sys, i) => (
+                  <Reveal key={sys.name} delay={i * 80} className="h-full">
+                    <article className="system" data-spot>
+                      <p className="cred-meta">
+                        <span>{sys.period[lang]}</span>
+                        {sys.repo ? null : <span className="system-private">{t.projects.privateRepo}</span>}
+                      </p>
+                      <h4 className="mt-3 font-display text-2xl font-bold tracking-tight">{sys.name}</h4>
+                      {sys.full ? <p className="text-sm text-muted">{sys.full}</p> : null}
+                      <p className="mt-4 text-muted">{sys.summary[lang]}</p>
+                      <p className="mt-4 text-sm">
+                        <span className="text-muted">{sys.role[lang]}</span>
+                      </p>
+                      <ul className="tags mt-4">
+                        {sys.stack.map((s) => (
+                          <li key={s}>{s}</li>
+                        ))}
+                      </ul>
+                      {sys.repo ? (
+                        <p className="mt-5">
+                          <ExternalLink href={sys.repo} newTab={t.newTab} className="link text-sm">
+                            {t.projects.code}
+                          </ExternalLink>
+                        </p>
+                      ) : null}
+                    </article>
+                  </Reveal>
+                ))}
+              </Spotlight>
+            </div>
+          )}
 
           {recent.length === 0 ? null : (
             <div className="mt-20">
@@ -391,9 +482,15 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
                     <p className="mt-2 text-muted">{c.body[lang]}</p>
                     {c.href ? (
                       <p className="mt-4">
-                        <ExternalLink href={c.href} newTab={t.newTab} className="link text-sm">
-                          {t.activity.open} ORCID
-                        </ExternalLink>
+                        {c.href.startsWith("#") ? (
+                          <a href={c.href} className="link text-sm">
+                            {c.linkLabel ? c.linkLabel[lang] : t.activity.open}
+                          </a>
+                        ) : (
+                          <ExternalLink href={c.href} newTab={t.newTab} className="link text-sm">
+                            {c.linkLabel ? c.linkLabel[lang] : t.activity.open}
+                          </ExternalLink>
+                        )}
                       </p>
                     ) : null}
                   </div>
@@ -403,30 +500,214 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
           </ul>
         </Section>
 
+        {/* Sertifikat dan capaian */}
+        <Section id="achievements" title={t.achievements.title} intro={t.achievements.intro}>
+          <Reveal className="mt-12">
+            <div className="stats stats-5">
+              {indicators.map((s) => (
+                <div key={s.label} className="stat">
+                  <CountUp value={s.value} lang={lang} className="stat-value" />
+                  <span className="stat-label">{s.label}</span>
+                </div>
+              ))}
+            </div>
+            <p className="indicator-foot">
+              <span>{t.achievements.asOf.replace("{date}", formatDate(scholar.source.asOf, lang))}</span>
+              <span className="flex flex-wrap gap-x-4 gap-y-1">
+                <ExternalLink href={scholar.source.url} newTab={t.newTab} className="link">
+                  {scholar.source.name}
+                </ExternalLink>
+                <ExternalLink href={sinta.source.url} newTab={t.newTab} className="link">
+                  {sinta.source.name}
+                </ExternalLink>
+              </span>
+            </p>
+          </Reveal>
+
+          <Reveal className="mt-12" delay={80}>
+            <AchievementHighlights groups={highlightGroups} filterLabel={t.achievements.filterLabel} labels={cardLabels} />
+          </Reveal>
+
+          <Reveal className="mt-10 flex flex-wrap items-center justify-between gap-4">
+            <a href={archivePath(lang)} className="btn btn-solid">
+              {t.achievements.viewAll.replace("{n}", String(totalPublic))}
+            </a>
+            <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+              <span>{t.achievements.allCredentials}</span>
+              {credentialProfiles.map((p) => (
+                <ExternalLink key={p.label} href={p.href} newTab={t.newTab} className="link">
+                  {p.label}
+                </ExternalLink>
+              ))}
+            </p>
+          </Reveal>
+        </Section>
+
+        {/* Riset */}
+        <Section id="research" title={t.research.title} intro={t.research.intro}>
+          <div className="mt-12 grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
+            <div className="grid content-start gap-10">
+              <Reveal>
+                <h3 className="sub-title">{t.research.themesTitle}</h3>
+                <ul className="tags mt-5">
+                  {researchThemes[lang].map((theme) => (
+                    <li key={theme}>{theme}</li>
+                  ))}
+                </ul>
+              </Reveal>
+
+              {grants.length === 0 ? null : (
+                <Reveal delay={80}>
+                  <h3 className="sub-title">{t.research.grantTitle}</h3>
+                  {grants.map((g) => (
+                    <div key={g.id} className="grant mt-5" data-spot>
+                      <p className="cred-meta">
+                        <span>{g.issuer}</span>
+                        <span>{g.issued ? g.issued.year : ""}</span>
+                      </p>
+                      <h4 className="mt-3 font-display text-xl font-bold tracking-tight">
+                        <a href={detailPath(lang, g.id)} className="cred-link">
+                          {g.title[lang]}
+                        </a>
+                      </h4>
+                      {g.summary ? <p className="mt-3 text-sm text-muted">{g.summary[lang]}</p> : null}
+                    </div>
+                  ))}
+                </Reveal>
+              )}
+
+              <Reveal delay={120}>
+                <h3 className="sub-title">{t.research.profilesTitle}</h3>
+                <ul className="profile-links mt-5">
+                  {researchProfiles.map((p) => (
+                    <li key={p.label}>
+                      <ExternalLink href={p.href} newTab={t.newTab} className="btn btn-line btn-small">
+                        {p.label}
+                      </ExternalLink>
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+            </div>
+
+            <div>
+              <Reveal className="flex flex-wrap items-end justify-between gap-3">
+                <h3 className="sub-title">{t.research.publicationsTitle}</h3>
+                <p className="text-sm text-muted">
+                  {t.research.publicationCount.replace("{n}", String(countKind("publikasi")))}
+                </p>
+              </Reveal>
+              <div className="pubs mt-6">
+                {pubYears.map((group) => (
+                  <Reveal key={group.year} className="pub-year">
+                    <h4 className="pub-year-label">{group.year}</h4>
+                    <ul className="pub-list">
+                      {group.items.map((pub) => (
+                        <li key={pub.id} className="pub">
+                          <a href={detailPath(lang, pub.id)} className="pub-title">
+                            {pub.title[lang]}
+                          </a>
+                          <p className="pub-meta">
+                            <span>{pub.issuer}</span>
+                            {pub.authorship ? (
+                              <span className="pub-badge" data-pos={pub.authorship}>
+                                {authorshipLabels[pub.authorship][lang]}
+                              </span>
+                            ) : null}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Section>
+
         {/* Mengajar */}
         <Section id="teaching" title={t.teaching.title} intro={t.teaching.intro}>
-          <div className="mt-12 grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
-            {teaching.map((inst, i) => (
-              <Reveal key={inst.name} delay={i * 120}>
-                <div>
-                  <h3 className="font-display text-2xl font-bold tracking-tight">{inst.name}</h3>
-                  <p className="mt-1 text-muted">{inst.role[lang]}</p>
-                  <ul className="courses mt-6">
-                    {inst.courses.map((course) => (
-                      <li key={course.name.id} className="course">
-                        <span className="course-name">{course.name[lang]}</span>
-                        {course.repo ? (
-                          <ExternalLink href={course.repo} newTab={t.newTab} className="course-link">
-                            {t.teaching.materials}
-                          </ExternalLink>
-                        ) : null}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Reveal>
-            ))}
+          <div className="mt-12 grid gap-14 lg:grid-cols-2 lg:gap-16">
+            {teaching.map((inst, i) => {
+              const now = inst.courses.filter((c) => c.terms.includes(currentTerm));
+              const past = inst.courses.filter((c) => !c.terms.includes(currentTerm));
+              return (
+                <Reveal key={inst.name} delay={i * 120}>
+                  <div>
+                    <h3 className="font-display text-2xl font-bold tracking-tight">{inst.name}</h3>
+                    <p className="mt-1 text-muted">{inst.role[lang]}</p>
+                    <p className="mt-3 max-w-[56ch] text-sm text-muted">{inst.note[lang]}</p>
+
+                    <h4 className="term-title mt-8">
+                      {t.teaching.current}
+                      <span className="term-label">{terms[currentTerm][lang]}</span>
+                    </h4>
+                    {now.length === 0 ? (
+                      <p className="mt-3 text-sm text-muted">{t.teaching.noneCurrent}</p>
+                    ) : (
+                      <ul className="courses mt-4">
+                        {now.map((course) => (
+                          <li key={course.name.id} className="course">
+                            <span className="min-w-0">
+                              <span className="course-name">{course.name[lang]}</span>
+                              <span className="course-program">{programNames(course, lang)}</span>
+                            </span>
+                            {course.repo ? (
+                              <ExternalLink href={course.repo} newTab={t.newTab} className="course-link">
+                                {t.teaching.materials}
+                              </ExternalLink>
+                            ) : null}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {past.length === 0 ? null : (
+                      <>
+                        <h4 className="term-title mt-10">{t.teaching.past}</h4>
+                        <ul className="past-courses mt-4">
+                          {past.map((course) => (
+                            <li key={course.name.id} className="past-course">
+                              <span className="past-name">
+                                {course.name[lang]}
+                                {course.repo ? (
+                                  <>
+                                    {" "}
+                                    <ExternalLink href={course.repo} newTab={t.newTab} className="course-link">
+                                      {t.teaching.materials}
+                                    </ExternalLink>
+                                  </>
+                                ) : null}
+                              </span>
+                              <span className="past-meta">
+                                {programNames(course, lang)}, {termYears(course, lang)}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
+
+          <Reveal className="mt-20">
+            <h3 className="sub-title">{t.teaching.focusTitle}</h3>
+          </Reveal>
+          <ul className="beyond focus-grid mt-6">
+            {teachingFocus.map((f, i) => (
+              <li key={f.title.id}>
+                <Reveal delay={i * 70} className="h-full">
+                  <div className="beyond-item">
+                    <h4 className="font-display text-lg font-bold tracking-tight">{f.title[lang]}</h4>
+                    <p className="mt-2 text-sm text-muted">{f.courses[lang]}</p>
+                  </div>
+                </Reveal>
+              </li>
+            ))}
+          </ul>
         </Section>
 
         {/* Perjalanan */}
@@ -499,25 +780,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
         </Section>
       </main>
 
-      <footer className="footer">
-        <div className="mx-auto max-w-6xl px-5 sm:px-8">
-          <div className="flex flex-wrap items-end justify-between gap-8">
-            <div className="flex items-center gap-4">
-              <Monogram className="h-14 w-14" />
-              <div>
-                <p className="font-display text-xl font-bold tracking-tight">{site.fullName}</p>
-                <p className="text-sm text-muted">{t.footer.built}</p>
-              </div>
-            </div>
-            <a href="#main" className="btn btn-line btn-small">
-              {t.footer.top}
-            </a>
-          </div>
-          <p className="mt-10 border-t border-line pt-6 text-sm text-muted">
-            © {new Date().getFullYear()} {site.name}. ngiliyun.my.id
-          </p>
-        </div>
-      </footer>
+      <SiteFooter lang={lang} />
     </>
   );
 }
