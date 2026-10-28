@@ -13,7 +13,8 @@ type Props = { searchParams: Promise<{ error?: string }> };
 export default async function LoginPage({ searchParams }: Props) {
   if ((await getSession()) !== null) redirect("/admin/");
   const { error } = await searchParams;
-  const message = error ? t.login.errors[error] : undefined;
+  // Hanya kode yang dikenal. Kunci bawaan objek (constructor, __proto__) bukan pesan dan membuat render gagal.
+  const message = error ? (Object.hasOwn(t.login.errors, error) ? t.login.errors[error] : undefined) : undefined;
   const github = githubConfig().enabled;
 
   return (

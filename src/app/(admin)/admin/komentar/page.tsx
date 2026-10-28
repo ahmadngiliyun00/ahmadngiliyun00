@@ -63,7 +63,7 @@ export default async function AdminComments({ searchParams }: Props) {
     if (n > 1) params.set("page", String(n));
     return `/admin/komentar/?${params.toString()}`;
   };
-  const flash = sp.done ? t.flash[sp.done] : undefined;
+  const flash = sp.done ? (Object.hasOwn(t.flash, sp.done) ? t.flash[sp.done] : undefined) : undefined;
 
   return (
     <AdminShell session={session} active="comments">
