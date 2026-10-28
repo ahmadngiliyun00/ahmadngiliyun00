@@ -1,40 +1,99 @@
+import ExternalLink from "@/components/ExternalLink";
 import Monogram from "@/components/Monogram";
-import Wordmark from "@/components/Wordmark";
+import WordmarkSpotlight from "@/components/WordmarkSpotlight";
 import { copy, site, type Lang } from "@/data/profile";
+import { archivePath } from "@/lib/achievements";
+import { homePath } from "@/lib/nav";
+import { loadSite } from "@/server/content";
 
-// Footer yang sama untuk beranda, arsip capaian, dan halaman detail.
-// Atas: monogram, nama, dan peran. Dasar: wordmark "ngiliyun" transparan selebar kontainer
-// di atas cahaya biru dan hijau. Rasional ada di docs/logo-options/v2/IDENTITAS_LOGO_v2.md.
-export default function SiteFooter({ lang }: { lang: Lang }) {
+// Profil yang tampil di kolom Profil, diambil dari kanal kontak dan profil riset di CMS.
+const PROFILE_LABELS = ["GitHub", "LinkedIn", "Google Scholar", "SINTA"];
+
+// Footer yang sama untuk beranda, arsip capaian, dan halaman detail (versi 3, "Sorot").
+// Atas: monogram, nama, peran, dan tiga kolom tautan. Dasar: wordmark "ngiliyun" bergaris tepi
+// yang terisi gradasi hijau ke biru di sekitar kursor. Rasional ada di docs/logo-options/v2/.
+// otherHref adalah halaman yang sama dalam bahasa lain.
+export default async function SiteFooter({ lang, otherHref }: { lang: Lang; otherHref?: string }) {
   const t = copy[lang];
+  const home = homePath(lang);
+  const other: Lang = lang === "id" ? "en" : "id";
+  const content = await loadSite();
+  const known = [
+    ...content.channel.map((c) => ({ label: c.data.label, href: c.data.href })),
+    ...content.profile.researchProfiles,
+  ];
+  const profiles = PROFILE_LABELS.map((label) => known.find((k) => k.label === label)).filter((k) => k !== undefined);
+
+  const explore = [
+    { label: t.archive.home, href: home },
+    { label: t.nav.projects, href: `${home}#projects` },
+    { label: t.archive.title, href: archivePath(lang) },
+    { label: t.nav.research, href: `${home}#research` },
+    { label: t.nav.teaching, href: `${home}#teaching` },
+  ];
+  const own = [
+    { label: t.footer.otherLang, href: otherHref ?? homePath(other), lang: other },
+    { label: t.nav.contact, href: `${home}#contact` },
+    { label: t.footer.top, href: "#main" },
+  ];
+
   return (
     <footer className="footer">
-      <div className="footer-glow" aria-hidden="true">
-        <i className="footer-glow-sky" />
-        <i className="footer-glow-leaf" />
-      </div>
       <div className="footer-inner mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="flex flex-wrap items-end justify-between gap-8">
-          <div className="flex items-center gap-4">
-            <Monogram className="h-14 w-14" />
-            <div>
+        <div className="footer-top">
+          <div>
+            <div className="flex items-center gap-4">
+              <Monogram className="h-14 w-14" />
               <p className="font-display text-2xl font-extrabold tracking-tight">{site.fullName}</p>
-              <p className="max-w-[44ch] text-sm text-muted">{t.footer.jobTitle}</p>
             </div>
+            <p className="mt-4 max-w-[40ch] text-muted">{t.footer.jobTitle}</p>
           </div>
-          <a href="#main" className="btn btn-line btn-small">
-            {t.footer.top}
-          </a>
+          <nav className="footer-cols" aria-label={t.footer.linksLabel}>
+            <div>
+              <h2 className="footer-col-title">{t.footer.explore}</h2>
+              <ul>
+                {explore.map((l) => (
+                  <li key={l.href}>
+                    <a href={l.href} className="footer-link">
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h2 className="footer-col-title">{t.footer.profiles}</h2>
+              <ul>
+                {profiles.map((l) => (
+                  <li key={l.href}>
+                    <ExternalLink href={l.href} newTab={t.newTab} className="footer-link">
+                      {l.label}
+                    </ExternalLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h2 className="footer-col-title">{t.footer.site}</h2>
+              <ul>
+                {own.map((l) => (
+                  <li key={l.href}>
+                    <a href={l.href} className="footer-link" hrefLang={l.lang} lang={l.lang}>
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </nav>
         </div>
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-line pt-6 text-sm text-muted">
+        <div className="footer-legal">
           <p>
             © {new Date().getFullYear()} {site.name} | ngiliyun.my.id
           </p>
           <p>{t.footer.built}</p>
         </div>
-        <div className="footer-wordmark">
-          <Wordmark variant="ghost" />
-        </div>
+        <WordmarkSpotlight />
       </div>
     </footer>
   );

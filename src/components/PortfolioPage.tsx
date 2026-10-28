@@ -774,7 +774,7 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
         </Section>
       </main>
 
-      <SiteFooter lang={lang} />
+      <SiteFooter lang={lang} otherHref={otherHome} />
       <Analytics />
     </>
   );

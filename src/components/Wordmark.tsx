@@ -7,16 +7,22 @@ const PATH_BODY =
 const PATH_BAR = "M1107.0 -640.0 L1269.0 -640.0 L1269.0 -566.0 L1107.0 -566.0 Z";
 const PATH_TIP = "M1535.0 -716.0 L1697.0 -716.0 L1697.0 -566.0 Z";
 
-// variant "ghost": badan huruf berupa gradasi putih transparan (untuk footer di atas cahaya),
-// titik i tetap hijau dan biru. variant "solid": badan huruf putih penuh.
+// variant "solid": badan huruf putih penuh. "outline": hanya garis tepi (lapisan dasar footer).
+// "gradient": isi gradasi hijau ke biru (lapisan yang disorot kursor di footer).
+// Titik huruf i selalu hijau dan biru seperti di Monogram.
 export default function Wordmark({
   className,
   variant = "solid",
 }: {
   className?: string;
-  variant?: "solid" | "ghost";
+  variant?: "solid" | "outline" | "gradient";
 }) {
-  const ghost = variant === "ghost";
+  const body =
+    variant === "outline" ? (
+      <path d={PATH_BODY} className="wordmark-outline" vectorEffect="non-scaling-stroke" />
+    ) : (
+      <path d={PATH_BODY} fill={variant === "gradient" ? "url(#wordmark-gradient)" : "var(--color-fg)"} />
+    );
   return (
     <svg
       viewBox="-10 -730 3351 920"
@@ -24,15 +30,15 @@ export default function Wordmark({
       preserveAspectRatio="xMidYMax meet"
       aria-hidden="true"
     >
-      {ghost ? (
+      {variant === "gradient" ? (
         <defs>
-          <linearGradient id="wordmark-ghost" gradientUnits="userSpaceOnUse" x1="0" y1="-730" x2="0" y2="190">
-            <stop offset="0" stopColor="var(--color-fg)" stopOpacity="0.3" />
-            <stop offset="1" stopColor="var(--color-fg)" stopOpacity="0.06" />
+          <linearGradient id="wordmark-gradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="3331" y2="0">
+            <stop offset="0" stopColor="var(--color-leaf)" />
+            <stop offset="1" stopColor="var(--color-sky)" />
           </linearGradient>
         </defs>
       ) : null}
-      <path d={PATH_BODY} fill={ghost ? "url(#wordmark-ghost)" : "var(--color-fg)"} />
+      {body}
       <path d={PATH_BAR} fill="var(--color-leaf)" />
       <path d={PATH_TIP} fill="var(--color-sky)" />
     </svg>
