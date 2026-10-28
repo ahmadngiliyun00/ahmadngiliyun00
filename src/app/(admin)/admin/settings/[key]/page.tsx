@@ -3,12 +3,15 @@ import { saveSettingsAction } from "@/app/(admin)/admin/actions";
 import AdminShell from "@/components/admin/AdminShell";
 import EntryForm from "@/components/admin/EntryForm";
 import MailTest from "@/components/admin/MailTest";
+import SeoPreview from "@/components/admin/SeoPreview";
 import type { FieldValue } from "@/components/admin/FieldInput";
 import { formLabels } from "@/components/admin/labels";
 import { getSettingsConfig } from "@/content/collections";
 import { formValue } from "@/content/fields";
 import { adminCopy } from "@/data/admin";
 import { site } from "@/data/profile";
+import { archivePath } from "@/lib/achievements";
+import { defaultPageText } from "@/lib/metadata";
 import { requireAdmin } from "@/server/auth/session";
 import { getSettingDoc } from "@/server/content";
 
@@ -28,6 +31,18 @@ export default async function AdminSettings({ params }: Props) {
       <h1 className="admin-title">{cfg.label}</h1>
       <p className="admin-intro">{cfg.description}</p>
       {cfg.key === "seo" ? <SeoLinks htmlFile={typeof doc.googleHtmlFile === "string" ? doc.googleHtmlFile : undefined} /> : null}
+      {cfg.key === "seo" ? (
+        <SeoPreview
+          siteUrl={site.url}
+          siteName={site.name}
+          paths={{ home: { id: "/", en: "/en/" }, archive: { id: archivePath("id"), en: archivePath("en") } }}
+          defaults={{
+            home: { id: defaultPageText("id", "home"), en: defaultPageText("en", "home") },
+            archive: { id: defaultPageText("id", "archive"), en: defaultPageText("en", "archive") },
+          }}
+          labels={adminCopy.settings.seo.preview}
+        />
+      ) : null}
       <div className="mt-8">
         <EntryForm action={saveSettingsAction} hidden={{ key: cfg.key }} fields={cfg.fields} values={values} meta={null} labels={formLabels} />
       </div>

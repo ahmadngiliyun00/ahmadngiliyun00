@@ -167,8 +167,14 @@ export type MetricsSettings = {
   };
 };
 
-// Verifikasi kepemilikan situs dan analitik. Semua opsional; kosong berarti tidak dipasang.
+// Judul dan deskripsi satu halaman di hasil pencarian. Kosong berarti memakai teks bawaan di profile.ts.
+export type PageSeo = { title?: Localized<string>; description?: Localized<string> };
+
+// SEO, verifikasi kepemilikan situs, dan analitik. Semua opsional; kosong berarti tidak dipasang.
 export type SeoSettings = {
+  home?: PageSeo; // beranda / dan /en/
+  archive?: PageSeo; // arsip /sertifikat/ dan /en/certificates/
+  keywords?: Localized<string[]>;
   googleVerification?: string; // isi content dari meta google-site-verification
   googleHtmlFile?: string; // nama berkas verifikasi HTML, misalnya google1a2b3c4d5e6f7a8b.html
   bingVerification?: string; // isi content dari meta msvalidate.01

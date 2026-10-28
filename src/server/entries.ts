@@ -275,7 +275,32 @@ function metaContent(value: string): string {
   return (m ? m[1] : value).trim();
 }
 
+// Batas keras supaya isian tidak berlebihan. Panjang ideal hanya diperingatkan di pratinjau.
+const SEO_LIMITS = { title: 90, description: 320, keyword: 60, keywords: 15 };
+
 function checkSeo(data: Doc, errors: FieldErrors) {
+  for (const page of ["home", "archive"] as const) {
+    const doc = data[page] as { title?: Record<string, string>; description?: Record<string, string> } | undefined;
+    const label = page === "home" ? "Beranda" : "Arsip sertifikat";
+    for (const lang of ["id", "en"]) {
+      const title = doc?.title?.[lang] ?? "";
+      const description = doc?.description?.[lang] ?? "";
+      if (title.length > SEO_LIMITS.title) {
+        errors[`${page}.title`] = `${label}: judul maksimal ${SEO_LIMITS.title} karakter.`;
+      }
+      if (description.length > SEO_LIMITS.description) {
+        errors[`${page}.description`] = `${label}: deskripsi maksimal ${SEO_LIMITS.description} karakter.`;
+      }
+    }
+  }
+  const keywords = data.keywords as Record<string, string[]> | undefined;
+  for (const list of [keywords?.id ?? [], keywords?.en ?? []]) {
+    if (list.length > SEO_LIMITS.keywords) errors.keywords = `Kata kunci: maksimal ${SEO_LIMITS.keywords} per bahasa.`;
+    if (list.some((k) => k.length > SEO_LIMITS.keyword)) {
+      errors.keywords = `Kata kunci: tiap baris maksimal ${SEO_LIMITS.keyword} karakter.`;
+    }
+  }
+
   const meta = (name: "googleVerification" | "bingVerification", label: string) => {
     const v = data[name];
     if (typeof v !== "string") return;

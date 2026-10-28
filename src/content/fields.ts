@@ -10,7 +10,7 @@ interface Base {
   label: string;
   help?: string;
   required?: boolean;
-  placeholder?: string; // bila kosong, FieldInput membuat placeholder dari jenis dan label field
+  placeholder?: string | { id: string; en: string }; // bila kosong, FieldInput membuat placeholder dari jenis dan label field
   width?: FieldWidth; // lebar di desktop; bila kosong, ditentukan oleh fieldWidth()
 }
 interface PlainField extends Base {

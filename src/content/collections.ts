@@ -3,6 +3,7 @@
 
 import type { Field, Option } from "@/content/fields";
 import { kindLabels, programLabels, type AchievementKind, type CollectionKey, type Program } from "@/content/types";
+import { copy } from "@/data/profile";
 
 type Doc = Record<string, unknown>;
 
@@ -366,10 +367,49 @@ export const settingsConfigs: SettingsConfig[] = [
   },
   {
     key: "seo",
-    label: "Search Console dan Analytics",
+    label: "SEO dan Search Console",
     description:
-      "Bukti kepemilikan ngiliyun.my.id untuk Google Search Console dan Bing, serta Google Analytics. Semua isian opsional dan langsung berlaku setelah disimpan.",
+      "Judul, deskripsi, dan kata kunci di hasil pencarian, bukti kepemilikan ngiliyun.my.id untuk Google Search Console dan Bing, serta Google Analytics. Semua isian opsional dan langsung berlaku setelah disimpan.",
     fields: [
+      {
+        name: "home.title",
+        label: "Beranda: judul",
+        type: "localized",
+        placeholder: { id: copy.id.meta.title, en: copy.en.meta.title },
+        help: "Judul biru di hasil Google dan judul tab browser. Kosongkan untuk memakai judul bawaan (teks samar). Ideal 50 sampai 60 karakter.",
+      },
+      {
+        name: "home.description",
+        label: "Beranda: deskripsi",
+        type: "localized",
+        multiline: true,
+        placeholder: { id: copy.id.meta.description, en: copy.en.meta.description },
+        help: "Teks di bawah judul hasil Google. Ideal 120 sampai 160 karakter. Google kadang memakai potongan isi halaman bila dianggap lebih cocok dengan pencarian.",
+      },
+      {
+        name: "archive.title",
+        label: "Arsip sertifikat: judul",
+        type: "localized",
+        placeholder: { id: copy.id.archive.metaTitle, en: copy.en.archive.metaTitle },
+        help: "Halaman /sertifikat/ dan /en/certificates/. Halaman detail tiap capaian memakai judul capaiannya sendiri.",
+      },
+      {
+        name: "archive.description",
+        label: "Arsip sertifikat: deskripsi",
+        type: "localized",
+        multiline: true,
+        placeholder: { id: copy.id.archive.metaDescription, en: copy.en.archive.metaDescription },
+      },
+      {
+        name: "keywords",
+        label: "Kata kunci",
+        type: "localizedList",
+        placeholder: {
+          id: "AI engineer\nDosen informatika Cirebon\nMachine learning",
+          en: "AI engineer\nInformatics lecturer\nMachine learning",
+        },
+        help: "Satu kata kunci per baris, maksimal 15. Dipasang sebagai meta keywords di beranda dan arsip. Google tidak memakai meta keywords untuk peringkat; yang berpengaruh adalah judul, deskripsi, dan isi halaman.",
+      },
       {
         name: "googleVerification",
         placeholder: "<meta name=\"google-site-verification\" content=\"...\" />",

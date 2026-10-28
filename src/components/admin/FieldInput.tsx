@@ -43,10 +43,12 @@ function inSentence(label: string): string {
 function placeholderFor(field: Field, labels: FieldLabels, part?: "id" | "en"): string {
   const ph = labels.placeholder;
   const name = inSentence(field.label);
+  const own = field.placeholder;
+  if (typeof own === "object") return own[part ?? "id"];
   if (part === undefined) {
-    if (field.placeholder) return field.placeholder;
-  } else if (field.placeholder) {
-    return part === "id" ? field.placeholder : `${field.placeholder} (English)`;
+    if (own) return own;
+  } else if (own) {
+    return part === "id" ? own : `${own} (English)`;
   }
   switch (field.type) {
     case "url":

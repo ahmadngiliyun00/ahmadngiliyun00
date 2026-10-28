@@ -2,10 +2,11 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import RootShell from "@/components/RootShell";
 import { buildMetadata } from "@/lib/metadata";
-import { siteVerification } from "@/server/seo";
+import { seoSettings, siteVerification } from "@/server/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { ...buildMetadata("en"), verification: await siteVerification() };
+  const seo = await seoSettings();
+  return { ...buildMetadata("en", seo), verification: siteVerification(seo) };
 }
 
 export const viewport: Viewport = { themeColor: "#0A1633", colorScheme: "dark" };
