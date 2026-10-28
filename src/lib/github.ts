@@ -1,5 +1,5 @@
 import raw from "@/data/github.json";
-import { featured, recentRepos, type Lang } from "@/data/profile";
+import { recentRepos, type Lang } from "@/data/profile";
 
 type RawRepo = {
   name: string;
@@ -169,8 +169,9 @@ function tidy(text: string) {
   return text.replace(EM_DASH, " - ").replace(AMPERSAND, " dan ").trim();
 }
 
-export function getRecentRepos(): RecentRepo[] {
-  const featuredRepos = new Set(featured.map((p) => p.repo.toLowerCase()));
+// featuredRepoUrls: repositori proyek unggulan, tidak diulang di daftar terbaru.
+export function getRecentRepos(featuredRepoUrls: string[]): RecentRepo[] {
+  const featuredRepos = new Set(featuredRepoUrls.map((u) => u.toLowerCase()));
   const excluded = new Set(recentRepos.exclude.map((n) => n.toLowerCase()));
 
   return data.repos

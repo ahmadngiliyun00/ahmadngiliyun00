@@ -1,11 +1,13 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/data/profile";
-import { archivePath, detailPath, publicAchievements } from "@/lib/achievements";
+import { archivePath, detailPath, publicItems } from "@/lib/achievements";
+import { loadSite } from "@/server/content";
 
-export const dynamic = "force-static";
+// Dibaca dari database saat diminta. Hanya item public yang masuk sitemap.
+export const dynamic = "force-dynamic";
 
-// Hanya item public yang masuk sitemap.
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const content = await loadSite();
   const lastModified = new Date();
   const pair = (id: string, en: string) => {
     const languages = { id: `${site.url}${id}`, en: `${site.url}${en}` };
@@ -18,6 +20,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...pair("/", "/en/"),
     ...pair(archivePath("id"), archivePath("en")),
-    ...publicAchievements().flatMap((a) => pair(detailPath("id", a.id), detailPath("en", a.id))),
+    ...publicItems(content.achievement).flatMap((a) => pair(detailPath("id", a.id), detailPath("en", a.id))),
   ];
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import type { Achievement } from "@/data/achievements";
 import { copy, site, type Lang } from "@/data/profile";
-import { archivePath, detailPath, formatPartialDate, kindName } from "@/lib/achievements";
+import { type AchievementItem, archivePath, detailPath, formatPartialDate, kindName } from "@/lib/achievements";
 
 export function buildMetadata(lang: Lang): Metadata {
   const t = copy[lang].meta;
@@ -51,7 +50,7 @@ export function buildArchiveMetadata(lang: Lang): Metadata {
   };
 }
 
-export function buildDetailMetadata(lang: Lang, item: Achievement): Metadata {
+export function buildDetailMetadata(lang: Lang, item: AchievementItem): Metadata {
   const title = `${item.title[lang]} - ${site.name}`;
   const when = item.issued ? `, ${formatPartialDate(item.issued, lang)}` : "";
   const fallback = `${kindName(item.kind, lang)}, ${item.issuer}${when}.`;

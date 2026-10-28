@@ -8,7 +8,7 @@
 //
 // Berkas ini hanya boleh memuat "import type" karena juga diuji dengan node --test.
 
-import type { PartialDate } from "@/data/achievements";
+import type { PartialDate } from "@/content/types";
 
 export const LINKEDIN_ADD_URL = "https://www.linkedin.com/profile/add";
 

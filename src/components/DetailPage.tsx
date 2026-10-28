@@ -1,9 +1,10 @@
 import CopyButton from "@/components/CopyButton";
 import ExternalLink from "@/components/ExternalLink";
 import SubpageShell from "@/components/SubpageShell";
-import { authorshipLabels, type Achievement, type PartialDate } from "@/data/achievements";
-import { copy, researchProfiles, site, type Lang } from "@/data/profile";
+import { authorshipLabels, type ProfileLink, type PartialDate } from "@/content/types";
+import { copy, site, type Lang } from "@/data/profile";
 import {
+  type AchievementItem,
   archivePath,
   detailPath,
   detailUrl,
@@ -12,7 +13,6 @@ import {
   kindName,
   linkedInUrl,
 } from "@/lib/achievements";
-import { thumbnailFor } from "@/lib/files";
 import { formatPasteText } from "@/lib/linkedin";
 import { homePath } from "@/lib/nav";
 
@@ -28,7 +28,7 @@ function isoDate(d: PartialDate): string {
 const CREDENTIAL_KINDS = ["sertifikat", "pelatihan", "beasiswa", "keanggotaan"];
 
 // Data terstruktur schema.org sesuai jenis capaian.
-function jsonLd(item: Achievement, lang: Lang) {
+function jsonLd(item: AchievementItem, lang: Lang) {
   const url = detailUrl(lang, item.id);
   const person = { "@type": "Person", name: site.name, url: site.url };
   const summary = item.summary ? item.summary[lang] : undefined;
@@ -72,15 +72,34 @@ function jsonLd(item: Achievement, lang: Lang) {
   return null;
 }
 
-export default function DetailPage({ lang, item }: { lang: Lang; item: Achievement }) {
+export type DetailFile = { url: string; mime: string };
+
+// mode "shared": dibuka lewat tautan berbagi rahasia (item bisa privat). Tidak ada JSON-LD,
+// tombol LinkedIn, atau tautan ke arsip, karena halaman ini tidak untuk mesin pencari.
+export default function DetailPage({
+  lang,
+  item,
+  file,
+  researchProfiles,
+  mode = "public",
+  otherHref,
+}: {
+  lang: Lang;
+  item: AchievementItem;
+  file?: DetailFile;
+  researchProfiles: ProfileLink[];
+  mode?: "public" | "shared";
+  otherHref?: string;
+}) {
+  const shared = mode === "shared";
   const t = copy[lang];
   const other: Lang = lang === "id" ? "en" : "id";
   const kind = kindName(item.kind, lang);
   const title = item.title[lang];
   const summary = item.summary ? item.summary[lang] : "";
   const issued = item.issued ? formatPartialDate(item.issued, lang) : "";
-  const linkedin = linkedInUrl(item);
-  const structured = jsonLd(item, lang);
+  const linkedin = shared ? null : linkedInUrl(item);
+  const structured = shared ? null : jsonLd(item, lang);
 
   const pasteText = formatPasteText({
     title,
@@ -89,7 +108,7 @@ export default function DetailPage({ lang, item }: { lang: Lang; item: Achieveme
     date: issued === "" ? undefined : issued,
     credentialId: item.credentialId,
     summary: summary === "" ? undefined : summary,
-    url: item.verifyUrl ?? detailUrl(lang, item.id),
+    url: item.verifyUrl ?? (shared ? undefined : detailUrl(lang, item.id)),
     labels: t.detail.paste,
   });
 
@@ -101,12 +120,11 @@ export default function DetailPage({ lang, item }: { lang: Lang; item: Achieveme
   if (item.reference) facts.push({ label: t.detail.reference, value: item.reference });
   if (item.authorship) facts.push({ label: t.detail.authorship, value: authorshipLabels[item.authorship][lang] });
 
-  const isPdf = item.file ? item.file.toLowerCase().endsWith(".pdf") : false;
-  const fileHref = item.file ? `/${item.file}` : "";
-  const thumb = item.file ? thumbnailFor(item.file) : null;
+  const isPdf = file ? file.mime === "application/pdf" : false;
+  const fileHref = file ? file.url : "";
 
   return (
-    <SubpageShell lang={lang} otherHref={detailPath(other, item.id)}>
+    <SubpageShell lang={lang} otherHref={otherHref ?? detailPath(other, item.id)}>
       {structured === null ? null : (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured) }} />
       )}
@@ -119,11 +137,13 @@ export default function DetailPage({ lang, item }: { lang: Lang; item: Achieveme
                   {t.archive.home}
                 </a>
               </li>
-              <li>
-                <a href={archivePath(lang)} className="link">
-                  {t.archive.title}
-                </a>
-              </li>
+              {shared ? null : (
+                <li>
+                  <a href={archivePath(lang)} className="link">
+                    {t.archive.title}
+                  </a>
+                </li>
+              )}
               <li aria-current="page">{kind}</li>
             </ol>
           </nav>
@@ -156,14 +176,11 @@ export default function DetailPage({ lang, item }: { lang: Lang; item: Achieveme
                 </div>
               ) : null}
 
-              {item.file ? (
+              {file ? (
                 <div className="mt-12">
                   <h2 className="sub-title">{t.detail.file}</h2>
                   <div className="file-preview mt-5">
-                    {thumb !== null ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={thumb} alt={`${t.detail.file}: ${title}`} loading="lazy" />
-                    ) : isPdf ? (
+                    {isPdf ? (
                       <object data={fileHref} type="application/pdf" aria-label={`${t.detail.file}: ${title}`}>
                         <p className="p-6 text-muted">{t.detail.fileFallback}</p>
                       </object>
@@ -255,11 +272,13 @@ export default function DetailPage({ lang, item }: { lang: Lang; item: Achieveme
             </aside>
           </div>
 
-          <p className="mt-16">
-            <a href={archivePath(lang)} className="btn btn-line btn-small">
-              {t.detail.back}
-            </a>
-          </p>
+          {shared ? null : (
+            <p className="mt-16">
+              <a href={archivePath(lang)} className="btn btn-line btn-small">
+                {t.detail.back}
+              </a>
+            </p>
+          )}
         </div>
       </article>
     </SubpageShell>

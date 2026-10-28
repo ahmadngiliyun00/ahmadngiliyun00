@@ -2,16 +2,20 @@ import AchievementArchive from "@/components/AchievementArchive";
 import ExternalLink from "@/components/ExternalLink";
 import Reveal from "@/components/Reveal";
 import SubpageShell from "@/components/SubpageShell";
-import { msLearn } from "@/data/metrics";
-import { copy, credentialProfiles, researchProfiles, type Lang } from "@/data/profile";
-import { archivePath, kindFilters, publicAchievements, publicYears, toCards } from "@/lib/achievements";
+import { copy, type Lang } from "@/data/profile";
+import { archivePath, itemYears, kindFilters, publicItems, toCards } from "@/lib/achievements";
 import { formatDate, formatNumber } from "@/lib/github";
 import { homePath } from "@/lib/nav";
+import { loadSite } from "@/server/content";
 
-export default function ArchivePage({ lang }: { lang: Lang }) {
+export default async function ArchivePage({ lang }: { lang: Lang }) {
   const t = copy[lang];
   const other: Lang = lang === "id" ? "en" : "id";
-  const items = toCards(publicAchievements(), lang);
+  const content = await loadSite();
+  const { msLearn } = content.metrics;
+  const { credentialProfiles, researchProfiles } = content.profile;
+  const all = publicItems(content.achievement);
+  const items = toCards(all, lang);
   const hours = Math.floor(msLearn.learningMinutes / 60);
   const minutes = msLearn.learningMinutes % 60;
   const msLine = t.archive.msLearnLine
@@ -46,8 +50,8 @@ export default function ArchivePage({ lang }: { lang: Lang }) {
 
           <AchievementArchive
             items={items}
-            kinds={kindFilters(lang)}
-            years={publicYears()}
+            kinds={kindFilters(all, lang)}
+            years={itemYears(all)}
             labels={t.archive}
             cardLabels={{ verify: t.achievements.verify, details: t.achievements.details, newTab: t.newTab }}
           />

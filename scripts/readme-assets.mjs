@@ -460,5 +460,7 @@ export async function renderReadmeAssets(data) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const { loadEnvQuiet } = await import("./db/env.mjs");
+  loadEnvQuiet();
   await renderReadmeAssets();
 }

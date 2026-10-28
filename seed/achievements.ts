@@ -1,92 +1,13 @@
-// Sumber tunggal untuk sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, reviewer, dan keanggotaan.
-// Dipakai oleh beranda, halaman arsip /sertifikat/ dan /en/certificates/, halaman detail, sitemap, dan README.
+// Data awal (seed) capaian. Dipakai sekali oleh "npm run db:seed" untuk mengisi database.
+// Setelah database terisi, ubah capaian lewat CMS di /admin, bukan di berkas ini.
 //
-// Aturan:
-// - visibility "draft" tidak dirender, tidak masuk sitemap, dan tidak masuk README
-// - featured true = tampil di sorotan beranda (maksimal 6, diperiksa validator)
-// - showOnHome true = HKI yang tampil di beranda (maksimal 5, diperiksa validator)
-// - Jangan mengarang nomor, tanggal, atau ID. Kolom yang belum diketahui dikosongkan
-// - Tanpa em dash dan tanpa simbol ampersand. Validator menolak keduanya
-// - Berkas ini hanya boleh memuat "import type", karena juga dibaca skrip Node (scripts/lib/load-ts.mjs)
-//
-// Periksa dengan: npm run check:achievements
+// Aturan yang sama tetap berlaku: jangan mengarang nomor, tanggal, atau ID; tanpa em dash
+// dan tanpa simbol ampersand. Item yang belum pasti boleh tampil ditandai "private".
+// Berkas ini hanya boleh memuat "import type" karena dibaca skrip Node.
 
-import type { Localized } from "./profile";
+import type { Achievement, Localized, Visibility } from "../src/content/types";
 
-export type AchievementKind =
-  | "sertifikat"
-  | "pelatihan"
-  | "beasiswa"
-  | "hki"
-  | "buku"
-  | "hibah"
-  | "publikasi"
-  | "reviewer"
-  | "keanggotaan"
-  | "penghargaan";
-
-export type PartialDate = { year: number; month?: number; day?: number };
-
-// Posisi nama Mas Ilyun di daftar penulis.
-export type Authorship = "sole" | "first" | "second" | "co";
-
-export type RelatedLink = { label: Localized<string>; href: string };
-
-export type Achievement = {
-  id: string; // slug unik, dipakai di URL
-  kind: AchievementKind;
-  title: Localized<string>; // title.id dipakai sebagai nama resmi di LinkedIn
-  issuer: string; // penerbit, lembaga, atau terbitan
-  summary?: Localized<string>; // satu sampai dua kalimat, wajib kecuali publikasi
-  issued: PartialDate | null; // null bila tanggal belum diketahui
-  expires?: PartialDate;
-  ongoing?: boolean; // peran yang masih berjalan, misalnya reviewer
-  credentialId?: string; // ID kredensial atau nomor pencatatan
-  reference?: string; // nomor surat atau sertifikat tambahan yang tercetak
-  verifyUrl?: string; // URL verifikasi RESMI penerbit
-  file?: string; // path relatif dari public/, misalnya "sertifikat/pekerti-batch-30.pdf"
-  skills?: string[];
-  authorship?: Authorship; // khusus publikasi
-  related?: RelatedLink[]; // tautan pendukung, misalnya repositori proyek akhir
-  featured: boolean;
-  showOnHome?: boolean; // khusus HKI
-  visibility: "public" | "draft";
-  linkedin?: boolean; // true = tombol Tambahkan ke LinkedIn
-};
-
-export const kindLabels: Record<AchievementKind, Localized<string>> = {
-  sertifikat: { id: "Sertifikat", en: "Certificates" },
-  pelatihan: { id: "Pelatihan", en: "Training" },
-  beasiswa: { id: "Beasiswa", en: "Scholarships" },
-  hki: { id: "Hak cipta", en: "Copyrights" },
-  buku: { id: "Buku", en: "Books" },
-  hibah: { id: "Hibah", en: "Grants" },
-  publikasi: { id: "Publikasi", en: "Publications" },
-  reviewer: { id: "Reviewer", en: "Reviewing" },
-  keanggotaan: { id: "Keanggotaan", en: "Memberships" },
-  penghargaan: { id: "Penghargaan", en: "Awards" },
-};
-
-// Label satuan untuk satu item (dipakai di kartu dan halaman detail).
-export const kindSingular: Record<AchievementKind, Localized<string>> = {
-  sertifikat: { id: "Sertifikat", en: "Certificate" },
-  pelatihan: { id: "Pelatihan", en: "Training" },
-  beasiswa: { id: "Beasiswa", en: "Scholarship" },
-  hki: { id: "Hak cipta", en: "Copyright" },
-  buku: { id: "Buku", en: "Book" },
-  hibah: { id: "Hibah penelitian", en: "Research grant" },
-  publikasi: { id: "Publikasi", en: "Publication" },
-  reviewer: { id: "Reviewer", en: "Reviewer" },
-  keanggotaan: { id: "Keanggotaan", en: "Membership" },
-  penghargaan: { id: "Penghargaan", en: "Award" },
-};
-
-export const authorshipLabels: Record<Authorship, Localized<string>> = {
-  sole: { id: "Penulis tunggal", en: "Sole author" },
-  first: { id: "Penulis pertama", en: "First author" },
-  second: { id: "Penulis kedua", en: "Second author" },
-  co: { id: "Penulis pendamping", en: "Co-author" },
-};
+export type SeedAchievement = Achievement & { id: string; visibility: Visibility };
 
 // ---------- Pembantu untuk sertifikat Dicoding ----------
 // Sertifikat Dicoding berlaku tiga tahun sejak terbit dan punya halaman verifikasi resmi.
@@ -100,8 +21,8 @@ function dicoding(
   credentialId: string,
   summary: Localized<string>,
   skills: string[],
-  extra: Partial<Achievement> = {},
-): Achievement {
+  extra: Partial<SeedAchievement> = {},
+): SeedAchievement {
   const [year, month, day] = issued;
   return {
     id,
@@ -125,7 +46,7 @@ const sameTitle = (text: string): Localized<string> => ({ id: text, en: text });
 
 // ---------- Data ----------
 
-export const achievements: Achievement[] = [
+export const achievements: SeedAchievement[] = [
   // ----- Program dan pelatihan utama -----
   {
     id: "pijak-ai-engineer",
@@ -277,7 +198,7 @@ export const achievements: Achievement[] = [
       en: "First issue, superseded by the 18 February 2026 issue.",
     },
     ["Machine learning"],
-    { visibility: "draft", linkedin: false },
+    { visibility: "private", linkedin: false },
   ),
   dicoding(
     "data-science-microsoft-fabric",
@@ -536,7 +457,7 @@ export const achievements: Achievement[] = [
     issued: { year: 2026, month: 1, day: 29 },
     verifyUrl: "https://learn.microsoft.com/api/achievements/share/id-id/ahmadngiliyun00/NMJCB4ZF?sharingId=2655CA85F0EF937B",
     featured: false,
-    visibility: "draft",
+    visibility: "private",
   },
   // Tanggal belum diketahui.
   {
@@ -551,7 +472,7 @@ export const achievements: Achievement[] = [
     issued: null,
     verifyUrl: "https://learn.microsoft.com/api/achievements/share/id-id/ahmadngiliyun00/7KSE2VJZ?sharingId=2655CA85F0EF937B",
     featured: false,
-    visibility: "draft",
+    visibility: "private",
   },
 
   // ----- Sertifikat lain dari folder (draft sampai dipilih Mas Ilyun) -----
@@ -568,7 +489,7 @@ export const achievements: Achievement[] = [
     credentialId: "JVC2605-DPB9-75DH",
     verifyUrl: "https://goo.gle/jvc-cert-verifier",
     featured: false,
-    visibility: "draft",
+    visibility: "private",
     linkedin: true,
   },
   {
@@ -582,7 +503,7 @@ export const achievements: Achievement[] = [
     },
     issued: { year: 2026, month: 4, day: 25 },
     featured: false,
-    visibility: "draft",
+    visibility: "private",
   },
   {
     id: "ibm-skillsbuild-ai",
@@ -598,7 +519,7 @@ export const achievements: Achievement[] = [
     },
     issued: { year: 2025 },
     featured: false,
-    visibility: "draft",
+    visibility: "private",
   },
   {
     id: "lam-infokom-instrumen-2",
@@ -614,7 +535,7 @@ export const achievements: Achievement[] = [
     },
     issued: { year: 2025, month: 6 },
     featured: false,
-    visibility: "draft",
+    visibility: "private",
   },
   {
     id: "petugas-it-lokal",
@@ -630,7 +551,7 @@ export const achievements: Achievement[] = [
     },
     issued: { year: 2026, month: 6 },
     featured: false,
-    visibility: "draft",
+    visibility: "private",
   },
 
   // ----- Hak cipta program komputer (DJKI) -----
@@ -832,7 +753,7 @@ export const achievements: Achievement[] = [
     issued: { year: 2025 },
     expires: { year: 2027 },
     featured: false,
-    visibility: "draft",
+    visibility: "private",
   },
 
   // ----- Publikasi (Google Scholar, SINTA, Garuda) -----

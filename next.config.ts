@@ -1,12 +1,17 @@
 import type { NextConfig } from "next";
 
-// Static export: hasilnya folder `out/` berisi HTML statis.
-// Bisa di-host di Vercel, Cloudflare Pages, atau Nginx di VPS tanpa perubahan kode.
+// Situs dan CMS berjalan sebagai server Node.js (next start), konten dibaca dari MySQL.
+// Deploy: lihat docs/DEPLOY.md (VPS aaPanel, PM2, Nginx).
 const nextConfig: NextConfig = {
-  output: "export",
   trailingSlash: true,
   images: { unoptimized: true },
   reactStrictMode: true,
+  poweredByHeader: false,
+  serverExternalPackages: ["mysql2"],
+  experimental: {
+    // Unggah berkas sertifikat lewat Server Action, maksimal 5 MB per berkas.
+    serverActions: { bodySizeLimit: "6mb" },
+  },
 };
 
 export default nextConfig;

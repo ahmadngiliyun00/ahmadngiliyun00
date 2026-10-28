@@ -1,16 +1,18 @@
-// Membangkitkan bagian README.md dari data situs, supaya data cukup ditulis sekali:
-//   proyek      dari featured dan systems di src/data/profile.ts
-//   capaian     dari src/data/achievements.ts (hanya public) dan src/data/metrics.ts
-//   mengajar    dari teaching, terms, dan teachingFocus di src/data/profile.ts
-//   perjalanan  dari journey di src/data/profile.ts
+// Membangkitkan bagian README.md dari konten PUBLIC di database CMS, supaya data cukup ditulis sekali:
+//   proyek      dari koleksi project dan system
+//   capaian     dari koleksi achievement dan pengaturan metrics
+//   mengajar    dari koleksi institution, course, term, dan focus
+//   perjalanan  dari koleksi milestone
 //
 // Setiap bagian berada di antara penanda komentar di README.md, misalnya
 //   <!-- capaian:mulai --> ... <!-- capaian:selesai -->
 // Teks di luar penanda ditulis manual dan tidak disentuh skrip ini.
 // Jalankan: npm run readme  (otomatis juga dijalankan oleh npm run data dan prebuild)
+// Butuh DATABASE_URL. Tanpa database, README dibiarkan apa adanya.
 
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
+import { loadPublicContent } from "./db/content.mjs";
 import { importTs } from "./lib/load-ts.mjs";
 
 const ROOT = new URL("../", import.meta.url);
@@ -52,8 +54,8 @@ function verifyLabel(url) {
   return host;
 }
 
-function proyek(profile) {
-  const rows = profile.featured.map((p) => {
+function proyek(c, copy) {
+  const rows = c.projects.map((p) => {
     const notes = [p.stack];
     if (p.copyright) notes.push("hak cipta terdaftar");
     if (p.badge) notes.push(p.badge.id);
@@ -63,9 +65,7 @@ function proyek(profile) {
     return `| **[${p.name}](${p.repo})**<br><sub>${cell(notes.join(", "))}</sub> | ${cell(p.summary.id)} | ${links.join("<br>")} |`;
   });
 
-  const systems = profile.systems
-    .filter((s) => s.visibility === "public")
-    .map((s) => {
+  const systems = c.systems.map((s) => {
       const name = s.full ? `**${s.name}** (${s.full})` : `**${s.name}**`;
       const code = s.repo ? `, [kode](${s.repo})` : "";
       return `- ${name}, ${s.period.id}. ${firstSentence(s.summary.id)} <sub>${s.stack.join(", ")}${code}</sub>`;
@@ -78,14 +78,13 @@ function proyek(profile) {
     "| :-- | :-- | :-- |",
     ...rows,
     "",
-    `**${profile.copy.id.projects.systemsTitle}** <sub>(${profile.copy.id.projects.privateRepo.toLowerCase()})</sub>`,
+    `**${copy.id.projects.systemsTitle}** <sub>(${copy.id.projects.privateRepo.toLowerCase()})</sub>`,
     "",
     ...systems,
   ].join("\n");
 }
 
-function capaian(achievements, metrics) {
-  const pub = achievements.filter((a) => a.visibility === "public");
+function capaian(pub, metrics) {
   const newest = (a, b) => dateKey(b.issued) - dateKey(a.issued);
   const featured = pub.filter((a) => a.featured === true).sort(newest).slice(0, LIMIT_FEATURED);
   const hki = pub.filter((a) => a.kind === "hki");
@@ -121,8 +120,8 @@ function capaian(achievements, metrics) {
   ].join("\n");
 }
 
-function mengajar(profile) {
-  const { teaching, terms, currentTerm, programs, teachingFocus, copy } = profile;
+function mengajar(c, copy, programs) {
+  const { teaching, terms, currentTerm, teachingFocus } = c;
   const t = copy.id.teaching;
   const cols = teaching.map((inst, i) => {
     const now = inst.courses.filter((c) => c.terms.includes(currentTerm));
@@ -163,8 +162,8 @@ function mengajar(profile) {
   ].join("\n");
 }
 
-function perjalanan(profile) {
-  const rows = profile.journey.map((m) => `| **${m.when.id}** | ${cell(m.title.id)}. ${cell(m.body.id)} |`);
+function perjalanan(c) {
+  const rows = c.journey.map((m) => `| **${m.when.id}** | ${cell(m.title.id)}. ${cell(m.body.id)} |`);
   return ["### Perjalanan", "", "| Waktu | Peristiwa |", "| :-- | :-- |", ...rows].join("\n");
 }
 
@@ -180,15 +179,34 @@ function replaceBlock(text, name, body) {
 }
 
 export async function renderReadmeSections() {
-  const profile = await importTs(new URL("src/data/profile.ts", ROOT));
-  const { achievements } = await importTs(new URL("src/data/achievements.ts", ROOT));
-  const metrics = await importTs(new URL("src/data/metrics.ts", ROOT));
+  if (!process.env.DATABASE_URL) {
+    console.warn("[readme] DATABASE_URL belum diatur, bagian teks README dilewati");
+    return;
+  }
+  const { copy } = await importTs(new URL("src/data/profile.ts", ROOT));
+  const { programLabels } = await importTs(new URL("src/content/types.ts", ROOT));
+  const { by, metrics } = await loadPublicContent();
+  const data = (k) => (by[k] ?? []).map((e) => e.data);
+  const terms = Object.fromEntries(data("term").map((t) => [t.code, t.label]));
+  const c = {
+    projects: data("project"),
+    systems: data("system"),
+    achievements: (by.achievement ?? []).map((e) => ({ ...e.data, id: e.slug })),
+    teaching: (by.institution ?? []).map((i) => ({
+      ...i.data,
+      courses: data("course").filter((x) => x.institution === i.slug),
+    })),
+    terms,
+    currentTerm: data("term").find((t) => t.current)?.code ?? "",
+    teachingFocus: data("focus"),
+    journey: data("milestone"),
+  };
 
   let text = await readFile(README, "utf8");
-  text = replaceBlock(text, "proyek", proyek(profile));
-  text = replaceBlock(text, "capaian", capaian(achievements, metrics));
-  text = replaceBlock(text, "mengajar", mengajar(profile));
-  text = replaceBlock(text, "perjalanan", perjalanan(profile));
+  text = replaceBlock(text, "proyek", proyek(c, copy));
+  text = replaceBlock(text, "capaian", capaian(c.achievements, metrics));
+  text = replaceBlock(text, "mengajar", mengajar(c, copy, programLabels));
+  text = replaceBlock(text, "perjalanan", perjalanan(c));
 
   const emDash = String.fromCharCode(0x2014);
   if (text.includes(emDash)) throw new Error("README.md memuat em dash setelah dibangkitkan");
@@ -198,5 +216,7 @@ export async function renderReadmeSections() {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const { loadEnvQuiet } = await import("./db/env.mjs");
+  loadEnvQuiet();
   await renderReadmeSections();
 }

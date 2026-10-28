@@ -4,28 +4,34 @@
   "description": "Portofolio pribadi Ahmad Ngiliyun (ngiliyun.my.id)",
   "scripts": {
     "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/linkedin.test.mjs",
     "data": "node scripts/fetch-github.mjs",
     "readme": "node scripts/readme-assets.mjs",
-    "check:achievements": "node scripts/check-achievements.mjs",
-    "thumbs": "node scripts/thumbnails.mjs",
-    "test": "node --test tests/linkedin.test.mjs",
-    "prebuild": "node scripts/prebuild.mjs",
-    "build": "next build",
-    "typecheck": "tsc --noEmit",
-    "preview": "npx --yes serve out"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node scripts/db/migrate.mjs",
+    "db:seed": "node scripts/db/seed.mjs",
+    "admin:create": "node scripts/db/create-admin.mjs",
+    "prebuild": "node scripts/prebuild.mjs"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
     "@fontsource-variable/instrument-sans": "^5.3.0",
+    "drizzle-orm": "^0.45.4",
+    "mysql2": "^3.24.6",
     "next": "^16.4.3",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "drizzle-kit": "^0.31.11",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3"
   },

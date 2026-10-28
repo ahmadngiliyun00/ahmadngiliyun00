@@ -14,40 +14,15 @@ import Reveal from "@/components/Reveal";
 import SiteFooter from "@/components/SiteFooter";
 import Spotlight from "@/components/Spotlight";
 import Timeline from "@/components/Timeline";
-import { authorshipLabels } from "@/data/achievements";
-import { scholar, sinta } from "@/data/metrics";
-import {
-  areas,
-  channels,
-  collabs,
-  contributions,
-  copy,
-  credentialProfiles,
-  currentTerm,
-  featured,
-  journey,
-  links,
-  programs,
-  researchProfiles,
-  researchThemes,
-  site,
-  skills,
-  status,
-  systems,
-  teaching,
-  teachingFocus,
-  terms,
-  topics,
-  type Course,
-  type Lang,
-} from "@/data/profile";
+import { authorshipLabels, programLabels, type Course, type Lang } from "@/content/types";
+import { copy, site } from "@/data/profile";
 import {
   archivePath,
   countKind,
   detailPath,
   homeCopyrights,
   homeFeatured,
-  publicAchievements,
+  publicItems,
   publicationsByYear,
   toCards,
 } from "@/lib/achievements";
@@ -61,6 +36,7 @@ import {
   languageColors,
 } from "@/lib/github";
 import { navItems } from "@/lib/nav";
+import { loadSite } from "@/server/content";
 
 function d(ms: number): CSSProperties {
   return { "--d": `${ms}ms` } as CSSProperties;
@@ -107,30 +83,47 @@ function Letters({ text, start, className }: { text: string; start: number; clas
 }
 
 // Tahun akademik unik dari daftar kode semester, misalnya "2024/2025, 2025/2026".
-function termYears(course: Course, lang: Lang): string {
+function termYears(course: Course, lang: Lang, currentTerm: string, terms: Map<string, { id: string; en: string }>): string {
   const labels = course.terms
     .filter((code) => code !== currentTerm)
-    .map((code) => terms[code]?.[lang] ?? code);
+    .map((code) => terms.get(code)?.[lang] ?? code);
   return [...new Set(labels)].sort().join(", ");
 }
 
 function programNames(course: Course, lang: Lang): string {
-  return course.programs.map((p) => programs[p][lang]).join(", ");
+  return course.programs.map((p) => programLabels[p][lang]).join(", ");
 }
 
-export default function PortfolioPage({ lang }: { lang: Lang }) {
+export default async function PortfolioPage({ lang }: { lang: Lang }) {
   const t = copy[lang];
+  const content = await loadSite();
+  const profile = content.profile;
+  const { scholar, sinta } = content.metrics;
+  const areas = content.area.map((e) => e.data);
+  const channels = content.channel.map((e) => e.data);
+  const collabs = content.collab.map((e) => e.data);
+  const contributions = content.contribution.map((e) => e.data);
+  const featured = content.project.map((e) => e.data);
+  const journey = content.milestone.map((e) => e.data);
+  const teachingFocus = content.focus.map((e) => e.data);
+  const termMap = new Map(content.term.map((e) => [e.data.code, e.data.label]));
+  const currentTerm = content.term.find((e) => e.data.current)?.data.code ?? "";
+  const teaching = content.institution.map((inst) => ({
+    ...inst.data,
+    courses: content.course.filter((c) => c.data.institution === inst.slug).map((c) => c.data),
+  }));
+  const achievements = publicItems(content.achievement);
   const home = lang === "id" ? "/" : "/en/";
   const otherHome = lang === "id" ? "/en/" : "/";
   const contrib = getContributionModel(lang);
   const gh = getGithubMeta();
-  const recent = getRecentRepos();
+  const recent = getRecentRepos(featured.map((p) => p.repo));
   const dateLocale = lang === "id" ? "id-ID" : "en-GB";
   const cardLabels = { verify: t.achievements.verify, details: t.achievements.details, newTab: t.newTab };
-  const shownSystems = systems.filter((s) => s.visibility === "public");
-  const grants = publicAchievements().filter((a) => a.kind === "hibah");
-  const pubYears = publicationsByYear();
-  const totalPublic = publicAchievements().length;
+  const shownSystems = content.system.map((e) => e.data);
+  const grants = achievements.filter((a) => a.kind === "hibah");
+  const pubYears = publicationsByYear(achievements);
+  const totalPublic = achievements.length;
 
   const personJsonLd = {
     "@context": "https://schema.org",
@@ -141,7 +134,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
     jobTitle: t.meta.jobTitle,
     worksFor: { "@type": "CollegeOrUniversity", name: "Universitas Insan Mahardika" },
     address: { "@type": "PostalAddress", addressLocality: "Cirebon", addressCountry: "ID" },
-    sameAs: Object.values(links),
+    sameAs: profile.sameAs,
   };
 
   const stats = [
@@ -155,13 +148,13 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
     { value: scholar.citations, label: t.achievements.citations },
     { value: scholar.hIndex, label: t.achievements.hIndex },
     { value: sinta.scoreOverall, label: t.achievements.sinta },
-    { value: countKind("hki"), label: t.achievements.copyrights },
-    { value: countKind("publikasi"), label: t.achievements.publications },
+    { value: countKind(achievements, "hki"), label: t.achievements.copyrights },
+    { value: countKind(achievements, "publikasi"), label: t.achievements.publications },
   ];
 
   const highlightGroups = [
-    { key: "sertifikat", label: t.achievements.certificatesTab, items: toCards(homeFeatured(), lang) },
-    { key: "hki", label: t.achievements.copyrightsTab, items: toCards(homeCopyrights(), lang) },
+    { key: "sertifikat", label: t.achievements.certificatesTab, items: toCards(homeFeatured(achievements), lang) },
+    { key: "hki", label: t.achievements.copyrightsTab, items: toCards(homeCopyrights(achievements), lang) },
   ].filter((g) => g.items.length > 0);
 
   return (
@@ -191,7 +184,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
             <div className="hero-copy">
               <p className="status rise" style={d(0)}>
                 <span className="pulse-dot" aria-hidden="true" />
-                {status[lang]}
+                {profile.status[lang]}
               </p>
 
               <h1 id="hero-title" className="name">
@@ -201,10 +194,10 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
               </h1>
 
               <p className="hero-statement rise" style={d(620)}>
-                {t.hero.statement}
+                {profile.heroStatement[lang]}
               </p>
               <p className="rise mt-5 max-w-[50ch] text-lg text-muted" style={d(720)}>
-                {t.hero.lead}
+                {profile.heroLead[lang]}
               </p>
               <div className="rise mt-8 flex flex-wrap gap-3" style={d(820)}>
                 <a href="#projects" className="btn btn-solid">
@@ -243,19 +236,19 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
 
         {/* Running text */}
         <div className="marquee-band">
-          <Marquee items={skills} label={t.marqueeLabel.skills} seconds={46} />
-          <Marquee items={topics[lang]} label={t.marqueeLabel.topics} reverse variant="outline" seconds={58} />
+          <Marquee items={profile.skills} label={t.marqueeLabel.skills} seconds={46} />
+          <Marquee items={profile.topics[lang]} label={t.marqueeLabel.topics} reverse variant="outline" seconds={58} />
         </div>
 
         {/* Tentang */}
         <Section id="about" title={t.about.title}>
           <div className="grid gap-12 lg:grid-cols-[1.35fr_1fr] lg:gap-16">
             <Reveal>
-              <p className="about-statement">{t.about.statement}</p>
+              <p className="about-statement">{profile.aboutStatement[lang]}</p>
             </Reveal>
             <Reveal delay={120}>
               <dl className="facts">
-                {t.about.facts.map((fact) => (
+                {profile.facts[lang].map((fact) => (
                   <div key={fact.label}>
                     <dt>{fact.label}</dt>
                     <dd>{fact.value}</dd>
@@ -534,7 +527,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
             </a>
             <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
               <span>{t.achievements.allCredentials}</span>
-              {credentialProfiles.map((p) => (
+              {profile.credentialProfiles.map((p) => (
                 <ExternalLink key={p.label} href={p.href} newTab={t.newTab} className="link">
                   {p.label}
                 </ExternalLink>
@@ -550,7 +543,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
               <Reveal>
                 <h3 className="sub-title">{t.research.themesTitle}</h3>
                 <ul className="tags mt-5">
-                  {researchThemes[lang].map((theme) => (
+                  {profile.researchThemes[lang].map((theme) => (
                     <li key={theme}>{theme}</li>
                   ))}
                 </ul>
@@ -579,7 +572,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
               <Reveal delay={120}>
                 <h3 className="sub-title">{t.research.profilesTitle}</h3>
                 <ul className="profile-links mt-5">
-                  {researchProfiles.map((p) => (
+                  {profile.researchProfiles.map((p) => (
                     <li key={p.label}>
                       <ExternalLink href={p.href} newTab={t.newTab} className="btn btn-line btn-small">
                         {p.label}
@@ -594,7 +587,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
               <Reveal className="flex flex-wrap items-end justify-between gap-3">
                 <h3 className="sub-title">{t.research.publicationsTitle}</h3>
                 <p className="text-sm text-muted">
-                  {t.research.publicationCount.replace("{n}", String(countKind("publikasi")))}
+                  {t.research.publicationCount.replace("{n}", String(countKind(achievements, "publikasi")))}
                 </p>
               </Reveal>
               <div className="pubs mt-6">
@@ -640,7 +633,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
 
                     <h4 className="term-title mt-8">
                       {t.teaching.current}
-                      <span className="term-label">{terms[currentTerm][lang]}</span>
+                      <span className="term-label">{termMap.get(currentTerm)?.[lang] ?? currentTerm}</span>
                     </h4>
                     {now.length === 0 ? (
                       <p className="mt-3 text-sm text-muted">{t.teaching.noneCurrent}</p>
@@ -680,7 +673,7 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
                                 ) : null}
                               </span>
                               <span className="past-meta">
-                                {programNames(course, lang)}, {termYears(course, lang)}
+                                {programNames(course, lang)}, {termYears(course, lang, currentTerm, termMap)}
                               </span>
                             </li>
                           ))}
@@ -747,12 +740,12 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
           </Spotlight>
 
           <div className="mt-14 grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
-            {site.email.user === "" ? null : (
+            {profile.email.user === "" ? null : (
               <Reveal>
                 <ContactPanel
                   lang={lang}
-                  user={site.email.user}
-                  domain={site.email.domain}
+                  user={profile.email.user}
+                  domain={profile.email.domain}
                   topics={collabs.map((c) => c.title[lang])}
                   labels={t.contact}
                   timeZone={site.timeZone}
