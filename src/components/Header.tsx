@@ -4,12 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import Monogram from "@/components/Monogram";
 import type { Lang } from "@/data/profile";
 
-// Lebar minimum menu desktop. Di bawahnya dipakai menu ponsel, karena sepuluh tautan
-// tidak muat satu baris di layar 1024px. Samakan dengan kelas min-[1100px] di bawah.
-const DESKTOP_NAV = 1100;
+// Lebar minimum menu desktop. Di bawahnya dipakai menu ponsel. Samakan dengan kelas lg: di bawah.
+const DESKTOP_NAV = 1024;
 
-// href diisi untuk halaman selain beranda, misalnya "/#about". Tanpa href, tautan menuju "#id".
-export type NavItem = { id: string; label: string; href?: string };
+// href diawali "#" untuk bagian di halaman yang sama (ditandai saat digulir).
+// current menandai halaman yang sedang dibuka.
+export type NavItem = { id: string; label: string; href: string; current?: boolean };
 
 export default function Header({
   lang,
@@ -57,10 +57,11 @@ export default function Header({
     };
   }, []);
 
-  // Menandai bagian yang sedang dibaca.
+  // Menandai bagian beranda yang sedang dibaca (hanya tautan "#id").
   useEffect(() => {
     const sections = items
-      .map((i) => document.getElementById(i.id))
+      .filter((i) => i.href.startsWith("#"))
+      .map((i) => document.getElementById(i.href.slice(1)))
       .filter((el): el is HTMLElement => el !== null);
     const io = new IntersectionObserver(
       (entries) => {
@@ -74,9 +75,10 @@ export default function Header({
     return () => io.disconnect();
   }, [items]);
 
-  // Menu ponsel: tutup dengan Escape dan kembalikan fokus ke tombol.
+  // Menu ponsel: fokus ke tautan pertama saat dibuka, tutup dengan Escape dan kembalikan fokus ke tombol.
   useEffect(() => {
     if (!open) return;
+    document.querySelector<HTMLAnchorElement>("#mobile-menu a")?.focus();
     const root = document.documentElement;
     const previous = root.style.overflow;
     root.style.overflow = "hidden";
@@ -102,9 +104,9 @@ export default function Header({
     items.map((item) => (
       <li key={item.id}>
         <a
-          href={item.href ?? `#${item.id}`}
+          href={item.href}
           className="nav-link"
-          aria-current={active === item.id ? "true" : undefined}
+          aria-current={item.current ? "page" : item.href === `#${active}` ? "true" : undefined}
           onClick={onClick}
         >
           {item.label}
@@ -134,7 +136,7 @@ export default function Header({
           <span className="whitespace-nowrap font-display text-[1.05rem] font-bold tracking-tight">{name}</span>
         </a>
 
-        <div className="hidden items-center gap-7 min-[1100px]:flex">
+        <div className="hidden items-center gap-7 lg:flex">
           <nav aria-label={labels.label}>
             <ul className="flex items-center gap-6 whitespace-nowrap text-sm text-muted">{navLinks()}</ul>
           </nav>
@@ -144,7 +146,7 @@ export default function Header({
         <button
           ref={menuButtonRef}
           type="button"
-          className="menu-button min-[1100px]:hidden"
+          className="menu-button lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-menu"
           onClick={() => setOpen((v) => !v)}
@@ -159,7 +161,7 @@ export default function Header({
 
       <div
         id="mobile-menu"
-        className={open ? "mobile-menu is-open min-[1100px]:hidden" : "mobile-menu min-[1100px]:hidden"}
+        className={open ? "mobile-menu is-open lg:hidden" : "mobile-menu lg:hidden"}
         hidden={!open}
       >
         <nav aria-label={labels.label} className="px-5 pb-6 pt-2 sm:px-8">

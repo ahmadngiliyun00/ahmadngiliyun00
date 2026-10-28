@@ -66,7 +66,7 @@ export default function NewsPostPage({
   };
 
   return (
-    <SubpageShell lang={lang} otherHref={otherHref}>
+    <SubpageShell lang={lang} current="news" otherHref={otherHref}>
       <Analytics />
       <ViewBeacon slug={post.slug} lang={lang} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonForScript(structured) }} />

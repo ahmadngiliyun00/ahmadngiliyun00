@@ -126,7 +126,7 @@ export default function DetailPage({
   const fileHref = file ? file.url : "";
 
   return (
-    <SubpageShell lang={lang} otherHref={otherHref ?? detailPath(other, item.id)}>
+    <SubpageShell lang={lang} current="certificates" otherHref={otherHref ?? detailPath(other, item.id)}>
       {shared ? null : <Analytics />}
       {structured === null ? null : (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonForScript(structured) }} />

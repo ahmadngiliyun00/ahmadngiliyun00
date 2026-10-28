@@ -188,7 +188,7 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
 
       <Header
         lang={lang}
-        items={navItems(lang, true)}
+        items={navItems(lang, "home")}
         labels={t.nav}
         homeHref={home}
         otherHref={otherHome}

@@ -1,12 +1,11 @@
 import AchievementArchive from "@/components/AchievementArchive";
 import Analytics from "@/components/Analytics";
 import ExternalLink from "@/components/ExternalLink";
-import Reveal from "@/components/Reveal";
+import PageHead from "@/components/PageHead";
 import SubpageShell from "@/components/SubpageShell";
 import { copy, type Lang } from "@/data/profile";
 import { archivePath, itemYears, kindFilters, publicItems, toCards } from "@/lib/achievements";
 import { formatDate, formatNumber } from "@/lib/github";
-import { homePath } from "@/lib/nav";
 import { loadSite } from "@/server/content";
 
 export default async function ArchivePage({ lang }: { lang: Lang }) {
@@ -29,26 +28,11 @@ export default async function ArchivePage({ lang }: { lang: Lang }) {
     .replace("{date}", formatDate(msLearn.source.asOf, lang));
 
   return (
-    <SubpageShell lang={lang} otherHref={archivePath(other)}>
+    <SubpageShell lang={lang} current="certificates" backHome otherHref={archivePath(other)}>
       <Analytics />
       <section aria-labelledby="archive-title" className="section subpage-section">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
-          <nav aria-label={t.archive.crumbs} className="crumbs">
-            <ol>
-              <li>
-                <a href={homePath(lang)} className="link">
-                  {t.archive.home}
-                </a>
-              </li>
-              <li aria-current="page">{t.archive.title}</li>
-            </ol>
-          </nav>
-          <Reveal className="section-head max-w-3xl">
-            <h1 id="archive-title" className="section-title">
-              {t.archive.title}
-            </h1>
-            <p className="section-intro">{t.archive.intro}</p>
-          </Reveal>
+          <PageHead lang={lang} id="archive-title" title={t.archive.title} intro={t.archive.intro} path={archivePath(lang)} />
 
           <AchievementArchive
             items={items}

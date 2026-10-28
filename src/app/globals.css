@@ -277,12 +277,14 @@ body::after {
 }
 
 .nav-link:hover,
-.nav-link[aria-current="true"] {
+.nav-link[aria-current="true"],
+.nav-link[aria-current="page"] {
   color: var(--color-fg);
 }
 
 .nav-link:hover::after,
-.nav-link[aria-current="true"]::after {
+.nav-link[aria-current="true"]::after,
+.nav-link[aria-current="page"]::after {
   transform: scaleX(1);
 }
 
@@ -754,6 +756,14 @@ body::after {
 
 .section-head + * {
   margin-top: 3rem;
+}
+
+.section-head-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
 }
 
 .sub-title {
@@ -2015,7 +2025,23 @@ body::after {
   border-top-color: var(--color-muted);
 }
 
-/* ---------- Halaman arsip dan detail ---------- */
+/* ---------- Halaman dalam, arsip, dan detail ---------- */
+
+.page-head {
+  padding-top: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.subpage .section {
+  padding-block: clamp(3.5rem, 7vw, 5.5rem);
+}
+
+.subpage .section h2.section-title {
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+}
+
+.page-head + .section {
+  border-top: 0;
+}
 
 .subpage-section {
   border-top: 0;
@@ -2183,6 +2209,19 @@ select.field {
 .footer-inner {
   position: relative;
   z-index: 1;
+}
+
+.footer-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
+  margin-top: 2.5rem;
+  font-size: 0.95rem;
+  color: var(--color-muted);
+}
+
+.back-home {
+  padding-block: 1rem clamp(4rem, 8vw, 6rem);
 }
 
 .footer-legal {

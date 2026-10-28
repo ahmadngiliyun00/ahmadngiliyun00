@@ -1,9 +1,10 @@
 import Monogram from "@/components/Monogram";
 import WordmarkSpotlight from "@/components/WordmarkSpotlight";
 import { copy, site, type Lang } from "@/data/profile";
+import { footerLinks } from "@/lib/nav";
 
-// Footer yang sama untuk beranda, arsip capaian, dan halaman detail.
-// Atas: monogram, nama, dan peran. Dasar: wordmark "ngiliyun" bergaris tepi yang terisi
+// Footer yang sama untuk beranda dan semua halaman dalam.
+// Atas: monogram, nama, peran, dan tautan ke semua halaman. Dasar: wordmark "ngiliyun" bergaris tepi yang terisi
 // gradasi hijau ke biru di sekitar kursor (versi 3, "Sorot", di docs/logo-options/v2/).
 export default function SiteFooter({ lang }: { lang: Lang }) {
   const t = copy[lang];
@@ -22,6 +23,17 @@ export default function SiteFooter({ lang }: { lang: Lang }) {
             {t.footer.top}
           </a>
         </div>
+        <nav aria-label={t.nav.footerLabel} className="footer-nav">
+          <ul>
+            {footerLinks(lang).map((l) => (
+              <li key={l.href}>
+                <a href={l.href} className="nav-link">
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <div className="footer-legal">
           <p>
             © {new Date().getFullYear()} {site.name} | ngiliyun.my.id

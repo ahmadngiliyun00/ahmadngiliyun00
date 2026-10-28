@@ -78,22 +78,27 @@ export type CommentLabels = {
 export type Copy = {
   meta: { title: string; description: string; jobTitle: string };
   nav: {
-    about: string;
+    home: string;
     projects: string;
-    activity: string;
     research: string;
-    achievements: string;
     teaching: string;
     journey: string;
-    next: string;
+    certificates: string;
     news: string;
     contact: string;
     skip: string;
     label: string;
+    footerLabel: string;
     switchLabel: string;
     menu: string;
     close: string;
+    backHome: string;
   };
+  // Halaman dalam: judul, kalimat pembuka, serta judul dan deskripsi bawaan untuk mesin pencari.
+  pages: Record<
+    "projects" | "research" | "teaching" | "journey",
+    { title: string; intro: string; metaTitle: string; metaDescription: string }
+  >;
   hero: {
     primary: string;
     secondary: string;
@@ -325,21 +330,51 @@ export const copy: Localized<Copy> = {
       jobTitle: "AI Engineer dan dosen informatika",
     },
     nav: {
-      about: "Tentang",
+      home: "Beranda",
       projects: "Proyek",
-      activity: "Kontribusi",
       research: "Riset",
-      achievements: "Capaian",
       teaching: "Mengajar",
       journey: "Perjalanan",
-      next: "Ke depan",
+      certificates: "Sertifikat",
       news: "Kabar",
       contact: "Kontak",
       skip: "Lompat ke konten",
       label: "Navigasi utama",
+      footerLabel: "Semua halaman",
       switchLabel: "Bahasa",
       menu: "Menu",
       close: "Tutup",
+      backHome: "Kembali ke beranda",
+    },
+    pages: {
+      projects: {
+        title: "Proyek",
+        intro: "Aplikasi AI dan sistem yang saya bangun, repositori terbaru di GitHub, dan jejak kontribusi setahun terakhir.",
+        metaTitle: "Proyek AI dan aplikasi web karya Ahmad Ngiliyun",
+        metaDescription:
+          "Ahmad Ngiliyun membangun aplikasi machine learning seperti RupiahVision, ClusterMind, dan DataCraft, serta sistem kampus yang dipakai setiap hari.",
+      },
+      research: {
+        title: "Riset dan Publikasi",
+        intro: "Tema riset, hibah, publikasi per tahun, dan angka sitasi dari profil riset resmi.",
+        metaTitle: "Riset dan publikasi machine learning Ahmad Ngiliyun",
+        metaDescription:
+          "Ahmad Ngiliyun meneliti machine learning untuk klasifikasi, analisis sentimen, dan keamanan data, dengan publikasi di jurnal nasional terindeks SINTA.",
+      },
+      teaching: {
+        title: "Mengajar",
+        intro: "Mata kuliah yang saya ampu di dua kampus, dari semester ini sampai yang pernah diampu, beserta materi terbuka.",
+        metaTitle: "Mata kuliah yang diampu Ahmad Ngiliyun",
+        metaDescription:
+          "Ahmad Ngiliyun mengajar AI, pemrograman, dan basis data di dua kampus, dengan sebagian materi praktikum yang terbuka di GitHub untuk siapa saja.",
+      },
+      journey: {
+        title: "Perjalanan",
+        intro: "Dari repositori pertama pada 2017 sampai ruang kelas, lalu ke mana saya melangkah berikutnya.",
+        metaTitle: "Perjalanan Ahmad Ngiliyun dari web developer ke AI engineer",
+        metaDescription:
+          "Ahmad Ngiliyun memulai dari kode di GitHub, menyelesaikan Magister Komputer, lalu menjadi dosen tetap. Kini ia menapaki jalan menjadi AI engineer.",
+      },
     },
     hero: {
       primary: "Lihat proyek",
@@ -621,21 +656,51 @@ export const copy: Localized<Copy> = {
       jobTitle: "AI engineer and informatics lecturer",
     },
     nav: {
-      about: "About",
+      home: "Home",
       projects: "Projects",
-      activity: "Activity",
       research: "Research",
-      achievements: "Credentials",
       teaching: "Teaching",
       journey: "Journey",
-      next: "Next",
+      certificates: "Certificates",
       news: "News",
       contact: "Contact",
       skip: "Skip to content",
       label: "Main navigation",
+      footerLabel: "All pages",
       switchLabel: "Language",
       menu: "Menu",
       close: "Close",
+      backHome: "Back to home",
+    },
+    pages: {
+      projects: {
+        title: "Projects",
+        intro: "AI apps and systems I have built, my latest repositories on GitHub, and a year of contributions.",
+        metaTitle: "AI projects and web apps built by Ahmad Ngiliyun",
+        metaDescription:
+          "Ahmad Ngiliyun builds machine learning apps such as RupiahVision, ClusterMind, and DataCraft, along with university systems that people use every day.",
+      },
+      research: {
+        title: "Research and Publications",
+        intro: "Research themes, grants, publications by year, and citation figures from official research profiles.",
+        metaTitle: "Machine learning research by Ahmad Ngiliyun",
+        metaDescription:
+          "Ahmad Ngiliyun researches machine learning for classification, sentiment analysis, and data security, publishing in SINTA indexed Indonesian journals.",
+      },
+      teaching: {
+        title: "Teaching",
+        intro: "Courses I teach at two universities, from this semester back to earlier ones, with open course materials.",
+        metaTitle: "Courses taught by Ahmad Ngiliyun",
+        metaDescription:
+          "Ahmad Ngiliyun teaches AI, programming, and databases at two Indonesian universities, and shares lab material from those courses openly on GitHub.",
+      },
+      journey: {
+        title: "Journey",
+        intro: "From the first repository in 2017 to the classroom, and where I am heading next.",
+        metaTitle: "Ahmad Ngiliyun's path from web developer to AI engineer",
+        metaDescription:
+          "Ahmad Ngiliyun started out writing code on GitHub, earned a Master of Computer Science, and became a permanent lecturer, now growing into the role of AI engineer.",
+      },
     },
     hero: {
       primary: "See projects",
