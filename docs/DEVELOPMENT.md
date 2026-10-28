@@ -30,7 +30,7 @@ Buka <http://localhost:3000> untuk situs dan <http://localhost:3000/admin/> untu
 | `npm run build` | Ambil data GitHub, perbarui README, lalu build produksi |
 | `npm start` | Jalankan hasil build (produksi) |
 | `npm run typecheck` | Pemeriksaan TypeScript |
-| `npm test` | Unit test URL LinkedIn, form kontak, template email, rich text, hitungan pembaca, komentar, isian dua bahasa, dan JSON-LD |
+| `npm test` | Unit test URL LinkedIn, form kontak, template email, rich text, hitungan pembaca, komentar, isian dua bahasa, JSON-LD, aturan beranda, dan teks SEO bawaan |
 | `npm run data` | Ambil data GitHub ke `src/data/github.json`, lalu buat ulang gambar dan teks README |
 | `npm run readme` | Buat ulang gambar README dan bagian teks README dari database |
 | `npm run db:generate` | Buat berkas migrasi baru setelah mengubah `src/db/schema.ts` |
@@ -39,6 +39,25 @@ Buka <http://localhost:3000> untuk situs dan <http://localhost:3000/admin/> untu
 | `npm run admin:create` | Buat akun admin atau ganti kata sandinya |
 
 Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`. Opsional: set `GITHUB_TOKEN` agar batas rate limit API lebih longgar.
+
+## Halaman situs
+
+Beranda sengaja ringkas: tujuh bagian yang menjawab siapa, keahlian apa, bukti terbaik apa, dan cara menghubungi. Isi yang lebih dalam ada satu klik dari beranda.
+
+| Halaman | Indonesia | Inggris | Isi |
+| --- | --- | --- | --- |
+| Beranda | `/` | `/en/` | Hero dengan plot K-Means, Tentang singkat (empat bidang kerja, alat utama), Jelajahi, tiga proyek unggulan, sorotan capaian, dua kabar terbaru, Kontak |
+| Proyek | `/proyek/` | `/en/projects/` | Proyek unggulan lengkap, sistem yang dikembangkan, terbaru di GitHub, kontribusi dan di luar kode, teknologi dan topik |
+| Riset dan Publikasi | `/riset/` | `/en/research/` | Angka sitasi bertanggal, tema, profil riset, hibah, reviewer jurnal, publikasi per tahun |
+| Mengajar | `/mengajar/` | `/en/teaching/` | Dua kampus, mata kuliah semester ini dan yang pernah diampu, materi, bidang keahlian mengajar |
+| Perjalanan | `/perjalanan/` | `/en/journey/` | Garis waktu, lalu Arah ke depan (rencana lima tahun, cara bekerja dengan AI, sedang didalami) |
+| Sertifikat | `/sertifikat/` | `/en/certificates/` | Arsip capaian dengan pencarian dan saringan, halaman detail per capaian |
+| Kabar | `/kabar/` | `/en/news/` | Arsip liputan, tulisan, dan kabar |
+
+- Halaman dalam memakai `SubpageShell` (header, tautan kembali ke beranda, footer) dan `PageHead` (breadcrumb "Beranda / Judul", satu h1, kalimat pembuka, data terstruktur BreadcrumbList)
+- Alamat halaman, menu header, dan tautan footer diatur di `src/lib/nav.ts`. Menu desktop tampil mulai lebar 1024px; di bawahnya menu ponsel yang ditutup dengan Escape
+- Jangkar beranda lama (`/#research`, `/#teaching`, `/#journey`, `/#next`, `/#activity`) dialihkan ke halaman barunya oleh `LegacyAnchors`. Tautan berawalan `#` di koleksi Di luar kode diarahkan dengan `sectionHref`
+- Di ponsel, kartu proyek, sorotan, dan kabar di beranda menjadi baris geser (kelas `snap-row`) supaya beranda tidak memanjang
 
 ## CMS
 
@@ -49,8 +68,8 @@ Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`.
 | Komentar | Moderasi komentar tulisan di `/admin/komentar/`: menunggu, disetujui, spam. Membalas sekaligus menyetujui |
 | Proyek | Proyek unggulan (kode terbuka) dan sistem yang dikembangkan (repo privat) |
 | Mengajar | Kampus, mata kuliah dengan kode semester, semester, bidang keahlian mengajar |
-| Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama, rencana ke depan, prinsip kerja dengan AI, kanal kontak |
-| Pengaturan | Profil (hero, Tentang, email, running text, tema riset), metrik riset bertanggal, Bahasa (bahasa utama isian dua bahasa), SEO dan Search Console (judul, deskripsi, dan kata kunci beranda serta arsip dengan pratinjau hasil Google, meta verifikasi Google dan Bing, berkas verifikasi HTML, ID GA4), serta Email dan SMTP untuk meneruskan pesan form kontak |
+| Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama (judulnya menjadi topik formulir, keterangannya tampil saat dipilih), rencana ke depan, prinsip kerja dengan AI, kanal kontak (tanda "Tampil di kontak beranda", bawaan LinkedIn, GitHub, ORCID, YouTube) |
+| Pengaturan | Profil (hero, Tentang, email, daftar teknologi, alat utama di beranda, topik, tema riset), metrik riset bertanggal, Bahasa (bahasa utama isian dua bahasa), SEO dan Search Console (judul, deskripsi, dan kata kunci beranda, arsip, Proyek, Riset, Mengajar, dan Perjalanan dengan pratinjau hasil Google, meta verifikasi Google dan Bing, berkas verifikasi HTML, ID GA4), serta Email dan SMTP untuk meneruskan pesan form kontak |
 
 Setiap data punya status public atau privat, slug (alamat), dan urutan. Tombol **Tampilkan** dan **Sembunyikan** di daftar langsung mengubah situs.
 
@@ -110,7 +129,7 @@ Diperiksa saat menyimpan di CMS:
 
 - Judul dan ringkasan wajib dalam bahasa utama (ringkasan boleh kosong untuk publikasi); terjemahannya boleh menyusul
 - Item public wajib punya tanggal terbit, kecuali reviewer yang masih berjalan dan keanggotaan. Jangan menebak tanggal
-- Maksimal 6 sorotan beranda dan 5 HKI di tab Hak cipta beranda
+- Maksimal 6 sorotan beranda dan 5 HKI di tab Hak cipta beranda. Beranda menampilkan tiga terbaru dari masing-masing
 - Tombol LinkedIn hanya untuk sertifikat dan pelatihan; posisi penulis hanya untuk publikasi
 - URL harus https. Teks tidak boleh memuat em dash atau simbol ampersand (tulis "dan" atau "and")
 
@@ -166,7 +185,7 @@ Lihat [docs/DEPLOY.md](./DEPLOY.md) (VPS aaPanel, PM2, Nginx, cadangan).
 
 ## Aksesibilitas
 
-Tautan lompat ke konten, fokus keyboard terlihat, atribut `lang` per halaman, label untuk grafik dan plot, saringan dengan `aria-pressed`, jumlah hasil yang diumumkan ke pembaca layar, tautan tab baru yang dijelaskan, formulir CMS dengan label, pesan galat yang terhubung ke field, dan semua animasi (termasuk gambar README) mengikuti pengaturan "kurangi gerakan" di perangkat.
+Tautan lompat ke konten, breadcrumb di halaman dalam, satu h1 per halaman, menu ponsel yang bisa dibuka dan ditutup dengan keyboard, fokus keyboard terlihat, atribut `lang` per halaman, label untuk grafik dan plot, saringan dengan `aria-pressed`, jumlah hasil yang diumumkan ke pembaca layar, tautan tab baru yang dijelaskan, formulir CMS dengan label, pesan galat yang terhubung ke field, dan semua animasi (termasuk gambar README) mengikuti pengaturan "kurangi gerakan" di perangkat.
 
 ## Rilis
 

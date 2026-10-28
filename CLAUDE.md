@@ -20,6 +20,7 @@ Repo ini adalah `ahmadngiliyun00/ahmadngiliyun00`, jadi `README.md` di akar repo
 - Hosting: VPS aaPanel, PM2 satu instans, Nginx reverse proxy (keputusan Mas Ilyun, 28 Okt 2026)
 - Font dari paket `@fontsource-variable/*`: Bricolage Grotesque (judul), Instrument Sans (isi)
 - Dua bahasa lewat dua route: `/` (Indonesia) dan `/en/` (Inggris)
+- Beranda ringkas tujuh bagian (hero, tentang, jelajahi, proyek unggulan, sorotan capaian, kabar terbaru, kontak). Isi lengkap di halaman dalam: `/proyek/`, `/riset/`, `/mengajar/`, `/perjalanan/` dan padanannya `/en/projects/`, `/en/research/`, `/en/teaching/`, `/en/journey/`
 
 ## Struktur
 
@@ -44,14 +45,19 @@ tests/views.test.mjs             unit test aturan hitungan pembaca (npm test)
 tests/comment.test.mjs           unit test validasi komentar (npm test)
 tests/i18n.test.mjs              unit test isian dua bahasa dan isi cadangan (npm test)
 tests/json-script.test.mjs       unit test JSON di dalam <script> (JSON-LD) tidak bisa menutup tag (npm test)
+tests/home.test.mjs              unit test aturan beranda: alat utama, tahun awal, kanal kontak (npm test)
+tests/seo-text.test.mjs          unit test panjang dan gaya judul serta deskripsi SEO bawaan (npm test)
 src/
   app/
-    (id)/, (en)/en/              situs publik ID dan EN: beranda, sertifikat atau certificates, kabar atau news, s/[token]
+    (id)/, (en)/en/              situs publik ID dan EN: beranda, proyek, riset, mengajar, perjalanan,
+                                 sertifikat, kabar, s/[token] (EN: projects, research, teaching, journey, certificates, news)
     (admin)/admin/               CMS: login, ringkasan, [collection], settings/[key], actions.ts
     files/[id]/route.ts          sajikan berkas unggahan dengan pemeriksaan izin
     globals.css                  token warna, tekstur, animasi, gaya semua komponen situs
     robots.ts, sitemap.ts
-  components/                    komponen situs (PortfolioPage, ArchivePage, DetailPage, dan lainnya)
+  components/                    komponen situs (PortfolioPage, ProjectsPage, ResearchPage, TeachingPage, JourneyPage,
+                                 ArchivePage, DetailPage, dan lainnya). Bersama: SubpageShell, PageHead, Section
+  components/LegacyAnchors.tsx   alihkan jangkar beranda lama (#research, #teaching, #journey, #next, #activity)
   components/admin/              komponen CMS (AdminShell, EntryForm, FieldInput, ShareBox)
   content/
     types.ts                     tipe semua konten dan label kategori
@@ -70,7 +76,8 @@ src/
     profile.ts                   identitas situs dan teks antarmuka situs ID/EN
     admin.ts                     teks antarmuka CMS
     github.json                  data GitHub hasil skrip (jangan diedit manual)
-  lib/                           achievements, posts, linkedin, github, metadata, nav, mail-template
+  lib/                           achievements, posts, linkedin, github, metadata, nav, home, mail-template
+  lib/nav.ts                     alamat halaman dalam (pagePath), menu header dan footer, peta jangkar lama
 ```
 
 ## Aturan kerja
@@ -90,12 +97,17 @@ src/
 - Bagian README di antara penanda `<!-- ...:mulai -->` dibangkitkan skrip, jangan diedit manual
 - `src/data/profile.ts`, `src/content/types.ts`, `src/lib/linkedin.ts`, dan `seed/` hanya boleh `import type` (dibaca skrip Node)
 - Repo terbaru otomatis dari GitHub, atur lewat `recentRepos.exclude` di `profile.ts`
+- Beranda paling banyak tujuh bagian, tiap bagian berjudul dengan satu kalimat pengantar, paling banyak 3 sampai 4 item, dan satu tautan "Lihat semua". Isi yang lebih dalam masuk ke halaman dalam, bukan ke beranda
+- Halaman dalam baru: tambah kunci di `PageKey` dan `PAGE_SLUGS` (`src/lib/nav.ts`), teks di `copy.pages` (`profile.ts`), komponen dengan `SubpageShell` dan `PageHead` (breadcrumb, satu h1, BreadcrumbList), rute ID dan EN dengan `buildPageMetadata`. Sitemap, menu header, footer, dan isian SEO CMS mengikuti `PAGE_KEYS`
+- Jangkar beranda yang dipindah ke halaman dalam dicatat di `LEGACY_ANCHORS` (`src/lib/nav.ts`) supaya tautan lama tetap bekerja
+- Judul SEO bawaan paling banyak 60 karakter, deskripsi 120 sampai 160, kalimat naratif tanpa titik dua, tanpa strip pemisah, tanpa nama kota (diuji `tests/seo-text.test.mjs`)
+- Kanal kontak di beranda hanya yang bertanda "Tampil di kontak beranda" (bawaan LinkedIn, GitHub, ORCID, YouTube)
 - Header keamanan dan CSP ada di `next.config.ts`. Skrip, gambar, iframe, atau `fetch` ke domain pihak ketiga baru wajib ditambahkan ke CSP, kalau tidak peramban memblokirnya
 - Gaya komponen ditulis di `globals.css` (situs) atau `admin.css` (CMS) di dalam `@layer components`
 - Ikon Font Awesome Free hanya untuk CMS (dimuat di layout admin). Situs publik tetap tanpa ikon font dan tanpa emoji
 - Umpan balik aksi di CMS dan situs memakai toast (`toast()` dari `src/components/Toaster.tsx`, atau `FlashToast` setelah redirect), bukan kotak alert di halaman (keputusan Mas Ilyun)
 - Formulir harus tetap terisi setelah disimpan. Server Action simpan memanggil `revalidatePath("/admin", "layout")`; formulir tambah data dialihkan ke halaman ubah
-- Judul, deskripsi, dan kata kunci SEO beranda serta arsip diatur di CMS (Pengaturan, SEO dan Search Console) dan dibaca `src/lib/metadata.ts`; teks di `profile.ts` hanya cadangan
+- Judul, deskripsi, dan kata kunci SEO beranda, arsip, dan empat halaman dalam diatur di CMS (Pengaturan, SEO dan Search Console) dan dibaca `src/lib/metadata.ts`; teks di `profile.ts` hanya cadangan
 - Jangan commit `.env.local`, `.env.production.local`, atau folder `storage/`
 - Pesan form kontak (tabel `messages`) selalu privat: hanya tampil di `/admin/pesan/`, tidak pernah di situs, sitemap, atau README
 - Kontak publik hanya lewat email (`ahmad@ngiliyun.my.id`). Jangan menambahkan WhatsApp atau nomor telepon (keputusan Mas Ilyun)
@@ -103,8 +115,8 @@ src/
 ## Desain
 
 - Palet dari logo: A hijau (`leaf` #3FD35A), N biru (`sky` #6B97FF), latar navy (`ink` #0A1633), krem (`paper`)
-- Elemen utama: nama besar dua warna dan plot K-Means. Elemen lain tenang dan rata kiri
-- Animasi: urutan masuk hero (huruf nama naik), running text dua arah dan running text raksasa, muncul saat scroll, heatmap bergelombang, angka menghitung naik, garis waktu terisi saat scroll, sorot kursor, scrollspy
+- Elemen utama: nama besar dua warna dan plot K-Means (lebih pendek di ponsel). Elemen lain tenang dan rata kiri
+- Animasi: urutan masuk hero (huruf nama naik), running text raksasa sebelum Kontak, muncul saat scroll, heatmap bergelombang, angka menghitung naik, garis waktu terisi saat scroll, sorot kursor, scrollspy
 - Semua animasi wajib menghormati `prefers-reduced-motion`
 - Hindari: label huruf kapital di atas judul, penomoran yang bukan urutan, teks outline (font variabel menampilkan kontur bertumpuk)
 - Kualitas minimum: responsif sampai 360px, tanpa scroll horizontal, fokus keyboard terlihat, kontras AA
@@ -131,7 +143,7 @@ npm run admin:create -- --email anda@contoh.id --name "Nama"
 npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
-npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD
+npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build

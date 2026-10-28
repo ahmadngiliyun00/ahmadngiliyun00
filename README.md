@@ -16,6 +16,8 @@ Dosen tetap, Sekretaris Program Studi Informatika, dan staf IT di **Universitas 
 
 Saya percaya cara terbaik mengajar teknologi adalah dengan ikut membangunnya: materi kuliah lahir dari proyek nyata, dan proyek nyata menjadi bahan riset.
 
+Jelajahi situs: [Proyek](https://ngiliyun.my.id/proyek/), [Riset dan Publikasi](https://ngiliyun.my.id/riset/), [Mengajar](https://ngiliyun.my.id/mengajar/), [Perjalanan](https://ngiliyun.my.id/perjalanan/), dan [Sertifikat](https://ngiliyun.my.id/sertifikat/).
+
 <details>
 <summary><b>In English</b></summary>
 <br>
@@ -52,7 +54,7 @@ I'm a permanent informatics lecturer, Study Program Secretary, and IT staff memb
 
 **Terbaru di GitHub:** [Q-Gen](https://github.com/ahmadngiliyun00/Q-Gen), asisten AI untuk dosen dan guru yang mengubah materi pembelajaran menjadi soal ([demo](https://q-gen-150840590811.asia-southeast1.run.app)), dan [ChromaCode](https://github.com/ahmadngiliyun00/ChromaCode), aplikasi Android konverter warna RGB dan HEX dua arah ([rilis v1.1.0](https://github.com/ahmadngiliyun00/ChromaCode/releases/tag/v1.1.0)).
 
-<a href="https://ngiliyun.my.id/#activity">
+<a href="https://ngiliyun.my.id/proyek/#activity">
   <img src="./profile/stats.svg" alt="Statistik kontribusi GitHub setahun terakhir" width="100%">
 </a>
 

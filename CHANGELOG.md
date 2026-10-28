@@ -8,6 +8,12 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Ditambahkan
 
+- Halaman dalam dua bahasa: Proyek (`/proyek/`, `/en/projects/`), Riset dan Publikasi (`/riset/`, `/en/research/`), Mengajar (`/mengajar/`, `/en/teaching/`), dan Perjalanan dengan Arah ke depan (`/perjalanan/`, `/en/journey/`), masing-masing dengan breadcrumb, data terstruktur BreadcrumbList, metadata, canonical, hreflang, dan entri sitemap
+- Bagian "Jelajahi" di beranda: tiga kartu menuju Riset, Mengajar, dan Perjalanan, masing-masing dengan satu angka ringkas
+- Isian SEO di CMS untuk judul dan deskripsi empat halaman baru, dengan pratinjau hasil Google untuk keenam halaman
+- Isian CMS "Alat utama di beranda" (Pengaturan, Profil) dan tanda "Tampil di kontak beranda" di kanal kontak
+- Footer berisi tautan ke semua halaman, dan tautan "Kembali ke beranda" di halaman dalam
+- Unit test aturan beranda (`tests/home.test.mjs`) dan teks SEO bawaan (`tests/seo-text.test.mjs`)
 - CMS di `/admin` untuk semua konten situs: capaian, proyek, mengajar, perjalanan, profil, dan metrik, dengan status public atau privat
 - Database MySQL (Drizzle ORM) dengan migrasi, seed dari data lama, dan pembuat akun admin
 - Login email dan kata sandi (scrypt) atau GitHub OAuth, sesi di database, pembatas percobaan login
@@ -42,6 +48,13 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- Beranda ditata ulang dari 11 bagian menjadi 7: hero, Tentang singkat (empat bidang kerja dan alat utama), Jelajahi, tiga proyek unggulan ringkas, sorotan capaian (indikator dan tiga kartu per tab), dua kabar terbaru, dan Kontak. Tinggi beranda di layar 375px turun dari sekitar 31.200 px menjadi sekitar 8.400 px. Isi lain pindah ke halaman dalam tanpa ada yang dihapus
+- Dua pita teks berjalan (teknologi dan topik) diganti daftar di halaman Proyek, bagian Teknologi dan topik
+- Kontak tanpa empat kartu topik: keterangan topik tampil di bawah pilihan topik formulir, dan kanal sosial di beranda dibatasi empat
+- Header menaut ke halaman Proyek, Riset, Mengajar, Perjalanan, Sertifikat, dan Kontak; menu desktop tampil mulai 1024px
+- Jangkar beranda lama seperti `/#research` dan `/#teaching` dialihkan ke halaman barunya
+- Di ponsel, plot K-Means lebih pendek dan kartu proyek, sorotan, serta kabar di beranda menjadi baris geser
+- Judul dan deskripsi SEO bawaan ditulis ulang sebagai kalimat naratif tanpa titik dua, strip pemisah, atau nama kota
 - Situs kini berjalan sebagai server Node.js dan membaca konten dari database, bukan build statis
 - Sitemap tidak lagi memuat pasangan bahasa `xhtml:link` (sudah ada di `<head>` tiap halaman), sehingga browser menampilkannya sebagai pohon XML yang rapi
 - Meta halaman beranda dan arsip kini memuat author dan Twitter card
