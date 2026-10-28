@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   serverExternalPackages: ["mysql2"],
+  // Berkas verifikasi Google Search Console (metode File HTML), isinya diatur lewat CMS.
+  async rewrites() {
+    return [{ source: "/:file(google[a-z0-9]+\\.html)", destination: "/site-verification/:file" }];
+  },
   experimental: {
     // Unggah berkas sertifikat lewat Server Action, maksimal 5 MB per berkas.
     serverActions: { bodySizeLimit: "6mb" },

@@ -98,6 +98,13 @@ export const adminCopy = {
   },
   settings: {
     title: "Pengaturan",
+    seo: {
+      title: "Alamat untuk Search Console",
+      sitemap: "Sitemap, kirim di menu Sitemaps",
+      robots: "robots.txt",
+      htmlFile: "Berkas verifikasi HTML",
+      note: "Sitemap dibuat otomatis dari data public. Data privat, CMS, tautan berbagi, dan berkas unggahan diblokir di robots.txt. Langkah lengkap ada di docs/DEPLOY.md bagian Search Console dan Analytics.",
+    },
   },
   messages: {
     nav: "Pesan masuk",

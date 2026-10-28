@@ -155,6 +155,14 @@ export type MetricsSettings = {
   };
 };
 
+// Verifikasi kepemilikan situs dan analitik. Semua opsional; kosong berarti tidak dipasang.
+export type SeoSettings = {
+  googleVerification?: string; // isi content dari meta google-site-verification
+  googleHtmlFile?: string; // nama berkas verifikasi HTML, misalnya google1a2b3c4d5e6f7a8b.html
+  bingVerification?: string; // isi content dari meta msvalidate.01
+  gaMeasurementId?: string; // ID pengukuran Google Analytics 4, misalnya G-ABC123XYZ9
+};
+
 // Peta koleksi ke tipe datanya.
 export type CollectionData = {
   achievement: Achievement;

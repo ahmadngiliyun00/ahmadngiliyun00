@@ -7,6 +7,7 @@ import type {
   Entry,
   MetricsSettings,
   ProfileSettings,
+  SeoSettings,
   Visibility,
 } from "@/content/types";
 import { db } from "@/db";
@@ -65,6 +66,7 @@ export async function getSettingDoc(key: string): Promise<Doc> {
 export type SiteContent = {
   profile: ProfileSettings;
   metrics: MetricsSettings;
+  seo: SeoSettings;
   achievement: Entry<"achievement">[];
   project: Entry<"project">[];
   system: Entry<"system">[];
@@ -89,9 +91,10 @@ async function fetchSite(): Promise<SiteContent> {
     .where(eq(entries.visibility, "public"))
     .orderBy(asc(entries.position), asc(entries.id));
   const pick = <K extends CollectionKey>(k: K) => rows.filter((r) => r.collection === k).map((r) => rowToEntry<K>(r));
-  const [profile, metrics] = await Promise.all([
+  const [profile, metrics, seo] = await Promise.all([
     getSetting<ProfileSettings>("profile"),
     getSetting<MetricsSettings>("metrics"),
+    getSetting<SeoSettings>("seo"),
   ]);
   if (profile === undefined || metrics === undefined) {
     throw new Error("Pengaturan profil atau metrik belum ada. Jalankan npm run db:seed.");
@@ -99,6 +102,7 @@ async function fetchSite(): Promise<SiteContent> {
   return {
     profile,
     metrics,
+    seo: seo ?? {},
     achievement: pick("achievement"),
     project: pick("project"),
     system: pick("system"),

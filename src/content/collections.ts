@@ -292,7 +292,7 @@ export function getCollection(key: string): CollectionConfig | undefined {
 
 // ---------- Pengaturan tunggal ----------
 
-export type SettingsConfig = { key: "profile" | "metrics"; label: string; description: string; fields: Field[] };
+export type SettingsConfig = { key: "profile" | "metrics" | "seo"; label: string; description: string; fields: Field[] };
 
 export const settingsConfigs: SettingsConfig[] = [
   {
@@ -333,6 +333,38 @@ export const settingsConfigs: SettingsConfig[] = [
       { name: "msLearn.paths", label: "Microsoft Learn: jalur pembelajaran", type: "number", min: 0, required: true },
       { name: "msLearn.learningMinutes", label: "Microsoft Learn: total menit belajar", type: "number", min: 0, required: true },
       { name: "msLearn.source.asOf", label: "Microsoft Learn: tanggal data (YYYY-MM-DD)", type: "text", required: true },
+    ],
+  },
+  {
+    key: "seo",
+    label: "Search Console dan Analytics",
+    description:
+      "Bukti kepemilikan ngiliyun.my.id untuk Google Search Console dan Bing, serta Google Analytics. Semua isian opsional dan langsung berlaku setelah disimpan.",
+    fields: [
+      {
+        name: "googleVerification",
+        label: "Google Search Console: tag HTML",
+        type: "text",
+        help: "Metode Tag HTML. Tempel seluruh tag <meta name=\"google-site-verification\" ...> atau isi content-nya saja.",
+      },
+      {
+        name: "googleHtmlFile",
+        label: "Google Search Console: nama berkas HTML",
+        type: "text",
+        help: "Metode File HTML. Isi nama berkas yang diberikan Google, misalnya google1a2b3c4d5e6f7a8b.html. Tidak perlu mengunggah berkasnya.",
+      },
+      {
+        name: "bingVerification",
+        label: "Bing Webmaster: tag HTML",
+        type: "text",
+        help: "Tempel seluruh tag <meta name=\"msvalidate.01\" ...> atau isi content-nya saja. Bing juga bisa mengimpor situs dari Search Console.",
+      },
+      {
+        name: "gaMeasurementId",
+        label: "Google Analytics 4: ID pengukuran",
+        type: "text",
+        help: "Format G-XXXXXXXXXX. Kunjungan saat Anda masuk CMS tidak dihitung, dan tautan berbagi rahasia tidak dilacak.",
+      },
     ],
   },
 ];

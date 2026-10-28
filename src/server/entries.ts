@@ -258,10 +258,46 @@ export async function saveSettings(key: string, form: FormData): Promise<SaveRes
       }
     }
   }
+  if (key === "seo") checkSeo(data, errors);
   if (Object.keys(errors).length > 0) return { ok: false, errors, message: "Periksa kembali isian yang ditandai." };
   const now = new Date();
   if (rows.length === 0) await db.insert(settings).values({ key, value: data, updatedAt: now });
   else await db.update(settings).set({ value: data, updatedAt: now }).where(eq(settings.key, key));
   invalidateSite();
   return { ok: true, id: 0 };
+}
+
+// Isian SEO boleh ditempel utuh dari Search Console atau Bing; simpan nilai intinya saja.
+// Pola dibatasi ketat karena nilainya dicetak ke <head> dan ke script Analytics.
+function metaContent(value: string): string {
+  const m = value.match(/content\s*=\s*["']([^"']*)["']/i);
+  return (m ? m[1] : value).trim();
+}
+
+function checkSeo(data: Doc, errors: FieldErrors) {
+  const meta = (name: "googleVerification" | "bingVerification", label: string) => {
+    const v = data[name];
+    if (typeof v !== "string") return;
+    const clean = metaContent(v);
+    data[name] = clean;
+    if (!/^[A-Za-z0-9_-]{8,100}$/.test(clean)) errors[name] = `${label}: kode verifikasi tidak dikenali.`;
+  };
+  meta("googleVerification", "Google Search Console: tag HTML");
+  meta("bingVerification", "Bing Webmaster: tag HTML");
+
+  const file = data.googleHtmlFile;
+  if (typeof file === "string") {
+    const clean = file.trim().split("/").pop() ?? "";
+    data.googleHtmlFile = clean;
+    if (!/^google[a-z0-9]{6,64}\.html$/.test(clean)) {
+      errors.googleHtmlFile = "Google Search Console: nama berkas harus seperti google1a2b3c4d5e6f7a8b.html.";
+    }
+  }
+
+  const ga = data.gaMeasurementId;
+  if (typeof ga === "string") {
+    const clean = ga.trim().toUpperCase();
+    data.gaMeasurementId = clean;
+    if (!/^G-[A-Z0-9]{4,20}$/.test(clean)) errors.gaMeasurementId = "Google Analytics 4: ID harus berformat G-XXXXXXXXXX.";
+  }
 }
