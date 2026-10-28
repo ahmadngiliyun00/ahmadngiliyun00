@@ -145,6 +145,8 @@ npm run build
 pm2 reload ngiliyun
 ```
 
+Bila rilis menambah koleksi baru (misalnya rencana ke depan dan prinsip kerja dengan AI), isi data awalnya sekali dengan `npm run db:seed -- --only=plan,principle`. Koleksi yang sudah berisi dilewati, jadi aman dijalankan ulang.
+
 ## Cadangan
 
 Konten dan berkas tidak ada di repo, jadi wajib dicadangkan:

@@ -72,7 +72,7 @@ src/
 - Konten (profil, proyek, capaian, mengajar, garis waktu) diubah lewat CMS, bukan di kode. Teks antarmuka di `src/data/profile.ts` (situs) dan `src/data/admin.ts` (CMS)
 - Hanya data `public` yang dirender, masuk sitemap, dan masuk README. Data `private` hanya terlihat di CMS dan lewat tautan berbagi
 - Setiap halaman dan Server Action admin wajib memanggil `requireAdmin()`. Server Action bisa dipanggil langsung tanpa halaman
-- Field baru: tambah di `src/content/collections.ts` (formulir dan validasi ikut otomatis). Kolom tabel baru: `src/db/schema.ts` lalu `npm run db:generate`
+- Field baru: tambah di `src/content/collections.ts` (formulir dan validasi ikut otomatis). Urutkan supaya isian pendek berpasangan di grid 12 kolom; atur `width` bila lebar bawaan `fieldWidth()` tidak pas. Kolom tabel baru: `src/db/schema.ts` lalu `npm run db:generate`
 - Aturan capaian (maksimal 6 sorotan, 5 HKI beranda, LinkedIn hanya sertifikat dan pelatihan) ada di `src/server/entries.ts`
 - Metrik riset wajib bertanggal (`asOf`) dan bersumber
 - Berkas unggahan disimpan di `UPLOAD_DIR` (di luar repo dan `public/`), disajikan lewat `/files/<id>/`
@@ -80,6 +80,7 @@ src/
 - `src/data/profile.ts`, `src/content/types.ts`, `src/lib/linkedin.ts`, dan `seed/` hanya boleh `import type` (dibaca skrip Node)
 - Repo terbaru otomatis dari GitHub, atur lewat `recentRepos.exclude` di `profile.ts`
 - Gaya komponen ditulis di `globals.css` (situs) atau `admin.css` (CMS) di dalam `@layer components`
+- Ikon Font Awesome Free hanya untuk CMS (dimuat di layout admin). Situs publik tetap tanpa ikon font dan tanpa emoji
 - Jangan commit `.env.local`, `.env.production.local`, atau folder `storage/`
 - Pesan form kontak (tabel `messages`) selalu privat: hanya tampil di `/admin/pesan/`, tidak pernah di situs, sitemap, atau README
 - Kontak publik hanya lewat email (`ahmad@ngiliyun.my.id`). Jangan menambahkan WhatsApp atau nomor telepon (keputusan Mas Ilyun)

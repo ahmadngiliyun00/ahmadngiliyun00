@@ -35,7 +35,7 @@ Buka <http://localhost:3000> untuk situs dan <http://localhost:3000/admin/> untu
 | `npm run readme` | Buat ulang gambar README dan bagian teks README dari database |
 | `npm run db:generate` | Buat berkas migrasi baru setelah mengubah `src/db/schema.ts` |
 | `npm run db:migrate` | Terapkan migrasi di folder `drizzle/` |
-| `npm run db:seed` | Isi database dari `seed/` (berhenti bila sudah berisi; `-- --force` menghapus dan mengisi ulang) |
+| `npm run db:seed` | Isi database dari `seed/` (berhenti bila sudah berisi; `-- --force` menghapus dan mengisi ulang; `-- --only=plan,principle` mengisi koleksi tertentu yang masih kosong) |
 | `npm run admin:create` | Buat akun admin atau ganti kata sandinya |
 
 Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`. Opsional: set `GITHUB_TOKEN` agar batas rate limit API lebih longgar.
@@ -47,8 +47,8 @@ Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`.
 | Capaian | Sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, reviewer, keanggotaan |
 | Proyek | Proyek unggulan (kode terbuka) dan sistem yang dikembangkan (repo privat) |
 | Mengajar | Kampus, mata kuliah dengan kode semester, semester, bidang keahlian mengajar |
-| Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama, kanal kontak |
-| Pengaturan | Profil (hero, Tentang, email, running text, tema riset), metrik riset bertanggal, serta Search Console dan Analytics (meta verifikasi Google dan Bing, berkas verifikasi HTML, ID GA4) |
+| Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama, rencana ke depan, prinsip kerja dengan AI, kanal kontak |
+| Pengaturan | Profil (hero, Tentang, email, running text, tema riset), metrik riset bertanggal, Search Console dan Analytics (meta verifikasi Google dan Bing, berkas verifikasi HTML, ID GA4), serta Email dan SMTP untuk meneruskan pesan form kontak |
 
 Setiap data punya status public atau privat, slug (alamat), dan urutan. Tombol **Tampilkan** dan **Sembunyikan** di daftar langsung mengubah situs.
 
@@ -76,7 +76,7 @@ Setiap halaman dan Server Action admin memanggil `requireAdmin()`. Jangan mengan
 ### Menambah koleksi atau field
 
 1. Tambahkan tipe di `src/content/types.ts` dan kunci koleksinya di `CollectionData`
-2. Tambahkan konfigurasi di `src/content/collections.ts`. Formulir dan validasinya ikut otomatis
+2. Tambahkan konfigurasi di `src/content/collections.ts`. Formulir dan validasinya ikut otomatis. Formulir memakai grid 12 kolom di desktop: lebar bawaan ditentukan `fieldWidth()` di `src/content/fields.ts` (teks pendek setengah, angka seperempat, centang sepertiga, teks panjang penuh) dan bisa diubah dengan `width`. Urutkan field supaya isian pendek berpasangan. Placeholder dibuat otomatis dari jenis dan label, atau tulis sendiri dengan `placeholder`
 3. Pakai datanya di komponen lewat `loadSite()`
 4. Bila butuh kolom tabel baru (jarang, karena konten disimpan sebagai JSON), ubah `src/db/schema.ts` lalu `npm run db:generate` dan `npm run db:migrate`
 
@@ -109,7 +109,7 @@ Di halaman ubah capaian, **Buat tautan berbagi** menghasilkan alamat `/s/<token>
 
 ## Data awal (seed)
 
-Folder `seed/` berisi konten awal yang dimasukkan sekali dengan `npm run db:seed`. Setelah database terisi, ubah konten lewat CMS, bukan lewat berkas ini. `npm run db:seed -- --force` menghapus semua konten dan pengaturan di database lalu mengisi ulang dari `seed/`.
+Folder `seed/` berisi konten awal yang dimasukkan sekali dengan `npm run db:seed`. Setelah database terisi, ubah konten lewat CMS, bukan lewat berkas ini. `npm run db:seed -- --force` menghapus semua konten dan pengaturan di database lalu mengisi ulang dari `seed/`. Untuk koleksi baru di database yang sudah berisi, pakai `npm run db:seed -- --only=<koleksi>`; koleksi yang sudah berisi dilewati.
 
 ## README profil
 
