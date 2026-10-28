@@ -112,6 +112,27 @@ Email notifikasi memakai Reply-To pengunjung, jadi tombol Balas langsung menuju 
 
 Pembatas per IP membutuhkan IP asli pengunjung, jadi pastikan pengaturan `real_ip_header` di langkah 5 sudah terpasang bila DNS diproksikan Cloudflare.
 
+## 8. Search Console dan Analytics
+
+Lakukan setelah situs bisa dibuka di `https://ngiliyun.my.id`. Semua isian ada di CMS, menu Pengaturan, **Search Console dan Analytics**, dan langsung berlaku setelah disimpan tanpa build ulang.
+
+**a. Bukti kepemilikan di Google Search Console.** Buka <https://search.google.com/search-console>, Tambahkan properti. Pilih salah satu cara (boleh lebih dari satu sebagai cadangan):
+
+| Cara | Langkah |
+| --- | --- |
+| Domain lewat DNS (disarankan) | Properti **Domain**, isi `ngiliyun.my.id`. Salin record TXT `google-site-verification=...`, lalu di Cloudflare: DNS, Add record, Type `TXT`, Name `@`, Content hasil salinan. Mencakup http, https, dan semua subdomain. Tidak lewat CMS |
+| Tag HTML | Properti **Awalan URL** `https://ngiliyun.my.id/`, metode Tag HTML. Tempel seluruh tag `<meta ...>` ke isian Google Search Console: tag HTML, simpan, lalu klik Verifikasi |
+| File HTML | Properti Awalan URL, metode File HTML. Isi nama berkasnya (misalnya `google1a2b3c4d5e6f7a8b.html`) ke CMS. Berkas tidak perlu diunggah; situs membuatnya sendiri. Cek dengan membuka `https://ngiliyun.my.id/<nama-berkas>` |
+| Google Analytics | Properti Awalan URL, metode Google Analytics. Berhasil bila ID GA4 sudah terpasang (langkah c) dan akun Google yang sama punya izin Edit di properti Analytics |
+
+Biarkan isian verifikasi tetap terpasang setelah berhasil, karena Google memeriksa ulang secara berkala.
+
+**b. Sitemap.** Di Search Console, menu Sitemaps, kirim `sitemap.xml`. Sitemap dibuat otomatis dari database: hanya beranda, arsip, dan halaman detail capaian yang **public** (versi Indonesia dan Inggris, dengan tanggal ubah terakhir). Data privat tidak pernah masuk, dan `robots.txt` memblokir `/admin/`, `/s/`, `/en/s/`, serta `/files/`. Tidak perlu mengirim ulang sitemap setiap kali konten berubah.
+
+**c. Google Analytics 4.** Buka <https://analytics.google.com>, Admin, Buat properti, lalu Aliran data Web dengan URL `https://ngiliyun.my.id`. Salin ID pengukuran (`G-XXXXXXXXXX`) ke CMS. Script hanya dipasang di beranda, arsip, dan detail capaian; tidak di CMS dan tidak di tautan berbagi rahasia, jadi token berbagi tidak terkirim ke Google. Kunjungan saat Mas Ilyun sedang masuk CMS tidak dihitung. Analytics memasang cookie pengunjung, jadi bila nanti dibutuhkan, tambahkan pemberitahuan privasi di situs.
+
+**d. Bing Webmaster (opsional).** Di <https://www.bing.com/webmasters>, cara tercepat adalah Import dari Google Search Console. Bila memilih tag meta, tempel tag `msvalidate.01` ke isian Bing Webmaster di CMS.
+
 ## Memperbarui
 
 ```bash

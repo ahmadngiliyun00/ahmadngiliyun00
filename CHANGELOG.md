@@ -16,6 +16,8 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 - Panduan deploy VPS aaPanel di `docs/DEPLOY.md`
 - Form kontak yang mengirim ke server: pesan tersimpan di kotak masuk CMS `/admin/pesan/` dan diteruskan ke email lewat SMTP dengan Reply-To pengunjung. Perlindungan spam: kolom jebakan, jebakan waktu, batas tautan, batas per IP, dan Cloudflare Turnstile opsional
 - Logo "A di dalam N", wordmark "ngiliyun", dan footer dengan cahaya biru dan hijau yang bergerak pelan
+- Pengaturan CMS "Search Console dan Analytics": meta verifikasi Google Search Console dan Bing, berkas verifikasi HTML Google, dan Google Analytics 4 yang tidak dipasang di CMS maupun tautan berbagi serta tidak menghitung kunjungan admin
+- Sitemap memakai tanggal ubah data yang sebenarnya, bukan waktu permintaan
 
 - Bagian "Sertifikat dan capaian" di beranda: baris indikator bertanggal (sitasi, h-index, skor SINTA, hak cipta, publikasi) dan sorotan dengan saringan sertifikat atau hak cipta
 - Arsip `/sertifikat/` dan `/en/certificates/` dengan pencarian, saringan kategori dan tahun, serta saringan yang tersimpan di URL

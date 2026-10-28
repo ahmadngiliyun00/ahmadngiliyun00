@@ -48,7 +48,7 @@ Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`.
 | Proyek | Proyek unggulan (kode terbuka) dan sistem yang dikembangkan (repo privat) |
 | Mengajar | Kampus, mata kuliah dengan kode semester, semester, bidang keahlian mengajar |
 | Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama, kanal kontak |
-| Pengaturan | Profil (hero, Tentang, email, running text, tema riset) dan metrik riset bertanggal |
+| Pengaturan | Profil (hero, Tentang, email, running text, tema riset), metrik riset bertanggal, serta Search Console dan Analytics (meta verifikasi Google dan Bing, berkas verifikasi HTML, ID GA4) |
 
 Setiap data punya status public atau privat, slug (alamat), dan urutan. Tombol **Tampilkan** dan **Sembunyikan** di daftar langsung mengubah situs.
 
