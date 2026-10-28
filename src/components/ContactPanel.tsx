@@ -128,21 +128,27 @@ export default function ContactPanel({
   }, [copied]);
 
   // Setelah setiap kiriman: tampilkan hasil baru, kosongkan isi pesan bila terkirim,
-  // fokuskan kolom pertama yang salah, tampilkan galat umum sebagai toast,
-  // dan minta token Turnstile baru (token sekali pakai).
+  // fokuskan kolom pertama yang salah, dan minta token Turnstile baru (token sekali pakai).
   useEffect(() => {
     setDismissed(false);
     if (state.status === "sent") setBody("");
     if (state.status === "error") {
       const first = FIELD_ORDER.find((f) => state.errors?.[f] !== undefined);
       if (first) document.getElementById(`${uid}-${first}`)?.focus();
-      if (state.formError) toast(formMessage(state.formError, labels.errors), "error");
     }
     const ts = (window as TurnstileWindow).turnstile;
     if (ts) {
       if (widgetId.current) ts.reset(widgetId.current);
     }
-  }, [state, uid, labels.errors]);
+  }, [state, uid]);
+
+  // Galat umum (captcha, terlalu sering, gagal kirim) tampil sebagai toast, sekali per kiriman.
+  // Teksnya dihitung di luar efek supaya efek di atas tidak ikut berjalan ulang
+  // bila objek label berganti tanpa ada kiriman baru.
+  const formErrorText = state.status === "error" ? (state.formError ? formMessage(state.formError, labels.errors) : "") : "";
+  useEffect(() => {
+    if (formErrorText !== "") toast(formErrorText, "error");
+  }, [state, formErrorText]);
 
   // Cloudflare Turnstile hanya dimuat bila kunci situs diatur.
   useEffect(() => {
