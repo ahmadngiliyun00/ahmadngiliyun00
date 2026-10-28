@@ -2,90 +2,96 @@
 
 Repositori ini berisi dua hal sekaligus:
 
-1. Kode sumber situs portofolio [ngiliyun.my.id](https://ngiliyun.my.id) (Next.js, TypeScript, Tailwind CSS), dua bahasa di `/` dan `/en/`
+1. Kode sumber situs portofolio [ngiliyun.my.id](https://ngiliyun.my.id) beserta CMS-nya (Next.js, TypeScript, Tailwind CSS, MySQL), dua bahasa di `/` dan `/en/`
 2. README profil GitHub (`README.md` di akar repo) beserta gambarnya di folder `profile/`
+
+Konten situs (profil, proyek, capaian, mengajar, garis waktu) disimpan di database MySQL dan dikelola lewat CMS di `/admin`. Hanya data berstatus **public** yang tampil di portofolio; data **privat** tetap tersimpan di CMS dan bisa dibagikan lewat tautan rahasia.
 
 ## Menjalankan
 
+Butuh Node.js 20.9 atau lebih baru (lihat `.nvmrc`) dan MySQL 8.
+
 ```bash
 npm install
+cp .env.example .env.local          # isi DATABASE_URL, SITE_URL=http://localhost:3000
+npm run db:migrate                  # buat tabel
+npm run db:seed                     # isi konten awal dari folder seed/
+npm run admin:create -- --email anda@contoh.id --name "Nama"
 npm run dev
 ```
 
-Buka http://localhost:3000. Memerlukan Node.js 20.9 atau lebih baru (lihat `.nvmrc`).
+Buka <http://localhost:3000> untuk situs dan <http://localhost:3000/admin/> untuk CMS.
 
 ## Perintah
 
 | Perintah | Fungsi |
 | --- | --- |
 | `npm run dev` | Server pengembangan |
-| `npm run data` | Ambil data GitHub ke `src/data/github.json`, lalu buat ulang gambar README |
-| `npm run readme` | Buat ulang gambar README dan bagian teks README yang dibangkitkan |
-| `npm run check:achievements` | Validasi `src/data/achievements.ts` dan `src/data/metrics.ts` |
-| `npm run check:achievements -- --online` | Validasi plus cek setiap URL verifikasi benar-benar terbuka |
-| `npm test` | Unit test pembangun URL LinkedIn dan teks siap tempel |
-| `npm run thumbs` | Buat thumbnail WebP dari PDF di `public/sertifikat/` (opsional) |
+| `npm run build` | Ambil data GitHub, perbarui README, lalu build produksi |
+| `npm start` | Jalankan hasil build (produksi) |
 | `npm run typecheck` | Pemeriksaan TypeScript |
-| `npm run build` | Validasi capaian, ambil data GitHub, perbarui README, lalu build statis ke `out/` |
-| `npm run preview` | Melayani folder `out/` secara lokal |
+| `npm test` | Unit test pembangun URL LinkedIn dan teks siap tempel |
+| `npm run data` | Ambil data GitHub ke `src/data/github.json`, lalu buat ulang gambar dan teks README |
+| `npm run readme` | Buat ulang gambar README dan bagian teks README dari database |
+| `npm run db:generate` | Buat berkas migrasi baru setelah mengubah `src/db/schema.ts` |
+| `npm run db:migrate` | Terapkan migrasi di folder `drizzle/` |
+| `npm run db:seed` | Isi database dari `seed/` (berhenti bila sudah berisi; `-- --force` menghapus dan mengisi ulang) |
+| `npm run admin:create` | Buat akun admin atau ganti kata sandinya |
 
 Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`. Opsional: set `GITHUB_TOKEN` agar batas rate limit API lebih longgar.
 
-## Mengubah konten situs
+## CMS
 
-Semua teks dan daftar ada di `src/data/profile.ts`.
-
-| Yang ingin diubah | Bagian di `profile.ts` |
+| Bagian | Isi |
 | --- | --- |
-| Status semester di hero | `status` |
-| Proyek unggulan | `featured` |
-| Repo yang tidak ingin tampil di "Terbaru di GitHub" | `recentRepos.exclude` |
-| Mata kuliah per kampus dan semester | `teaching`, `terms`, `currentTerm` |
-| Bidang keahlian mengajar | `teachingFocus` |
-| Sistem yang dikembangkan (repo privat) | `systems` |
-| Tema riset dan profil riset | `researchThemes`, `researchProfiles` |
-| Garis waktu | `journey` |
-| Kontribusi di luar kode | `contributions` |
-| Jenis kolaborasi | `collabs` |
-| Email | `site.email` |
-| Running text | `skills` dan `topics` |
+| Capaian | Sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, reviewer, keanggotaan |
+| Proyek | Proyek unggulan (kode terbuka) dan sistem yang dikembangkan (repo privat) |
+| Mengajar | Kampus, mata kuliah dengan kode semester, semester, bidang keahlian mengajar |
+| Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama, kanal kontak |
+| Pengaturan | Profil (hero, Tentang, email, running text, tema riset) dan metrik riset bertanggal |
 
-### Ganti semester
+Setiap data punya status public atau privat, slug (alamat), dan urutan. Tombol **Tampilkan** dan **Sembunyikan** di daftar langsung mengubah situs.
 
-1. Tambahkan kode semester baru di `terms` (misalnya `"26272": { id: "Genap 2026/2027", en: "Even semester 2026/2027" }`)
-2. Ubah label semester lama menjadi tahun akademiknya saja, lalu set `currentTerm` ke kode baru
-3. Tambahkan kode baru ke `terms` milik setiap mata kuliah yang diampu semester itu
-4. Perbarui `status` di hero
+Teks antarmuka (label tombol, judul bagian) tetap di kode: situs di `src/data/profile.ts`, CMS di `src/data/admin.ts`.
 
-## Sertifikat dan capaian
+### Arsitektur
 
-Semua sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, reviewer, dan keanggotaan ada di satu berkas: `src/data/achievements.ts`. Dari berkas ini dibangun:
-
-- Bagian "Sertifikat dan capaian" dan "Riset" di beranda
-- Arsip `/sertifikat/` dan `/en/certificates/` (pencarian, saringan kategori dan tahun, bisa dibagikan lewat URL, misalnya `/sertifikat/?kategori=hki`)
-- Halaman detail `/sertifikat/<id>/` dan `/en/certificates/<id>/` dengan tombol LinkedIn, teks siap tempel, dan JSON-LD
-- Entri di `sitemap.xml` dan bagian "Sertifikat dan capaian" di README
-
-### Menambah capaian
-
-1. Tambahkan objek baru di array `achievements`. Untuk sertifikat Dicoding cukup panggil pembantu `dicoding(...)` (URL verifikasi dan masa berlaku tiga tahun terisi otomatis)
-2. Isi `id` (slug unik, huruf kecil dan tanda hubung), `kind`, `title` (ID dan EN), `issuer`, `summary` (ID dan EN, wajib kecuali publikasi), dan `issued`
-3. Kolom yang belum diketahui dikosongkan. Jangan mengarang nomor, tanggal, atau ID
-4. Mulai dengan `visibility: "draft"`. Ganti ke `"public"` setelah data diperiksa
-5. Jalankan `npm run check:achievements`, lalu `npm run readme`
-
-| Kolom | Fungsi |
+| Berkas | Peran |
 | --- | --- |
-| `visibility` | `"draft"` tidak dirender, tidak masuk sitemap, tidak masuk README |
-| `featured` | Tampil di sorotan beranda, maksimal 6 |
-| `showOnHome` | Khusus HKI: tampil di tab "Hak cipta" beranda, maksimal 5 |
-| `linkedin` | Tombol "Tambahkan ke LinkedIn", hanya untuk `sertifikat` dan `pelatihan` |
-| `verifyUrl` | URL verifikasi resmi penerbit (https) |
-| `file` | Berkas di `public/`, misalnya `sertifikat/pekerti-batch-30.pdf` |
-| `related` | Tautan pendukung, misalnya repositori proyek akhir |
-| `authorship` | Khusus publikasi: `sole`, `first`, `second`, atau `co` |
+| `src/db/schema.ts` | Skema MySQL (Drizzle ORM): entries, settings, files, admins, sessions, login_attempts |
+| `src/content/types.ts` | Tipe semua konten dan label kategori |
+| `src/content/collections.ts` | Konfigurasi koleksi: field formulir, label, urutan |
+| `src/content/fields.ts` | Field generik: render formulir, baca FormData, validasi |
+| `src/server/content.ts` | Baca konten. `loadSite()` menyimpan salinan konten public di memori |
+| `src/server/entries.ts` | Tulis konten, aturan lintas data, tautan berbagi |
+| `src/server/auth/` | Kata sandi (scrypt), sesi database, login GitHub, pembatas login |
+| `src/server/files.ts` | Simpan dan baca berkas unggahan di `UPLOAD_DIR` |
+| `src/app/(admin)/admin/` | Halaman dan Server Action CMS |
 
-Angka sitasi, h-index, skor SINTA, dan metrik Microsoft Learn ada di `src/data/metrics.ts`. Setiap angka wajib punya `asOf` dan sumber, dan selalu ditampilkan bersama tanggalnya. Perbarui angka dan tanggal sekaligus; jangan membulatkan ke atas.
+Setiap halaman dan Server Action admin memanggil `requireAdmin()`. Jangan mengandalkan layout saja untuk pemeriksaan login.
+
+### Menambah koleksi atau field
+
+1. Tambahkan tipe di `src/content/types.ts` dan kunci koleksinya di `CollectionData`
+2. Tambahkan konfigurasi di `src/content/collections.ts`. Formulir dan validasinya ikut otomatis
+3. Pakai datanya di komponen lewat `loadSite()`
+4. Bila butuh kolom tabel baru (jarang, karena konten disimpan sebagai JSON), ubah `src/db/schema.ts` lalu `npm run db:generate` dan `npm run db:migrate`
+
+### Aturan data capaian
+
+Diperiksa saat menyimpan di CMS:
+
+- Judul dan ringkasan wajib dalam bahasa Indonesia dan Inggris (ringkasan boleh kosong untuk publikasi)
+- Item public wajib punya tanggal terbit, kecuali reviewer yang masih berjalan dan keanggotaan. Jangan menebak tanggal
+- Maksimal 6 sorotan beranda dan 5 HKI di tab Hak cipta beranda
+- Tombol LinkedIn hanya untuk sertifikat dan pelatihan; posisi penulis hanya untuk publikasi
+- URL harus https. Teks tidak boleh memuat em dash atau simbol ampersand (tulis "dan" atau "and")
+
+Angka metrik selalu tampil bersama tanggalnya. Perbarui angka dan tanggal sekaligus; jangan membulatkan ke atas.
+
+### Tautan berbagi
+
+Di halaman ubah capaian, **Buat tautan berbagi** menghasilkan alamat `/s/<token>/` yang menampilkan data itu, termasuk yang privat. Halaman tersebut tidak diindeks mesin pencari dan tidak mengirim header Referer. Database hanya menyimpan hash token, jadi tautan hanya terlihat sekali saat dibuat. **Cabut tautan** membuatnya langsung tidak berlaku.
 
 ### Tombol LinkedIn
 
@@ -93,51 +99,41 @@ Angka sitasi, h-index, skor SINTA, dan metrik Microsoft Learn ada di `src/data/m
 
 ### Berkas sertifikat dan privasi
 
-- Simpan di `public/sertifikat/<id>.pdf` atau gambar, maksimal 2 MB per berkas (validator memberi peringatan bila lebih)
-- Berkas lokal bersifat pelengkap. Sertifikat yang punya halaman verifikasi resmi tidak wajib diunggah
-- **Sebelum PDF atau gambar masuk repo, tutup semua data pribadi secara manual:** NIK, alamat, nomor telepon, NIDN atau NUPTK, nomor anggota, dan kode QR keanggotaan. Validator TIDAK bisa mendeteksi data pribadi di dalam berkas
-- Repo ini publik. Semua yang ada di `public/` ikut terbit dan tercatat di riwayat git
-- Thumbnail opsional: `npm run thumbs` (butuh `pdftoppm` dan `magick` atau `cwebp`) membuat `public/sertifikat/thumbs/<nama>.webp`, yang otomatis dipakai halaman detail
+- Unggah lewat CMS: PDF, PNG, JPG, atau WebP, maksimal 5 MB. Jenis berkas diperiksa dari isinya, bukan dari nama
+- Berkas disimpan di `UPLOAD_DIR` (di luar `public/` dan di luar repo) dan hanya bisa dibuka lewat `/files/<id>/` bila datanya public, pembukanya admin, atau membawa token berbagi yang cocok
+- **Sebelum mengunggah, tutup semua data pribadi secara manual:** NIK, alamat, nomor telepon, NIDN atau NUPTK, nomor anggota, dan kode QR keanggotaan. CMS tidak bisa mendeteksinya
+- Jangan memasukkan nomor kontrak hibah, anggaran, topologi atau alamat IP jaringan kampus, nama mahasiswa, nama kolega atau atasan, isi telaah naskah, atau penelitian yang belum terbit ke data public. Bila ragu, biarkan privat
 
-### Yang tidak boleh masuk data publik
+## Data awal (seed)
 
-Nomor kontrak hibah, anggaran, topologi atau alamat IP jaringan kampus, nama mahasiswa, nama kolega atau atasan, isi telaah naskah (blind review), penelitian yang belum terbit, dan nomor anggota. Bila ragu, jadikan `draft`.
+Folder `seed/` berisi konten awal yang dimasukkan sekali dengan `npm run db:seed`. Setelah database terisi, ubah konten lewat CMS, bukan lewat berkas ini. `npm run db:seed -- --force` menghapus semua konten dan pengaturan di database lalu mengisi ulang dari `seed/`.
 
 ## README profil
 
 - Teks pembuka, tabel "Yang saya kerjakan", dan ajakan kolaborasi ditulis langsung di `README.md`
-- Bagian di antara penanda `<!-- proyek:mulai -->`, `<!-- capaian:mulai -->`, `<!-- mengajar:mulai -->`, dan `<!-- perjalanan:mulai -->` dibangkitkan oleh `scripts/readme-sections.mjs` dari `profile.ts`, `achievements.ts`, dan `metrics.ts`. Jangan mengedit isi di antara penanda secara manual
+- Bagian di antara penanda `<!-- proyek:mulai -->`, `<!-- capaian:mulai -->`, `<!-- mengajar:mulai -->`, dan `<!-- perjalanan:mulai -->` dibangkitkan oleh `scripts/readme-sections.mjs` dari konten **public** di database. Jangan mengedit isi di antara penanda secara manual. Tanpa `DATABASE_URL`, bagian ini dilewati
 - Gambar dibuat oleh `scripts/readme-assets.mjs`:
   - `profile/banner.svg` banner nama dengan plot K-Means beranimasi
   - `profile/marquee.svg` running text teknologi dan topik
   - `profile/stats.svg` statistik kontribusi dan grafik per bulan
-- Teks di dalam gambar (tagline, daftar teknologi) diatur di bagian atas `scripts/readme-assets.mjs`
-- Font disematkan dari `profile/fonts/` (subset statis Bricolage Grotesque dan Instrument Sans, lisensi OFL). File `metrics.json` dipakai untuk mengukur lebar teks
-- Setelah `npm run data`, commit perubahan `profile/stats.svg` agar angka di README ikut segar
+- Font disematkan dari `profile/fonts/` (subset statis Bricolage Grotesque dan Instrument Sans, lisensi OFL)
+- Setelah mengubah konten di CMS, jalankan `npm run readme` di komputer yang terhubung ke database, lalu commit `README.md` dan gambar yang berubah
 
 ## Skrip dan berkas TypeScript
 
-Skrip Node (`check-achievements.mjs`, `readme-sections.mjs`, test) membaca berkas `.ts` lewat `scripts/lib/load-ts.mjs`, yang mentranspilasi dengan paket `typescript` dari devDependencies. Karena itu `profile.ts`, `achievements.ts`, `metrics.ts`, dan `src/lib/linkedin.ts` hanya boleh memuat `import type`, bukan impor nilai.
+Skrip Node membaca berkas `.ts` lewat `scripts/lib/load-ts.mjs`, yang mentranspilasi dengan paket `typescript` dari devDependencies. Karena itu `src/data/profile.ts`, `src/content/types.ts`, `src/lib/linkedin.ts`, dan berkas di `seed/` hanya boleh memuat `import type`, bukan impor nilai.
 
 ## Data GitHub
 
-`scripts/fetch-github.mjs` mengambil profil, repositori, dan grafik kontribusi. Setiap bagian yang gagal diambil memakai data lama di `src/data/github.json`, jadi build tidak pernah gagal karena skrip ini.
+`scripts/fetch-github.mjs` mengambil profil, repositori, dan grafik kontribusi saat build. Setiap bagian yang gagal diambil memakai data lama di `src/data/github.json`, jadi build tidak pernah gagal karena skrip ini.
 
-Supaya grafik di situs selalu segar, buat Deploy Hook di Vercel lalu panggil secara terjadwal (misalnya sehari sekali).
+## Deploy
 
-## Build dan deploy
-
-| Tujuan | Pengaturan |
-| --- | --- |
-| Vercel | Import repo, preset Next.js |
-| Cloudflare Pages | Build command `npm run build`, output directory `out` |
-| VPS dengan Nginx atau aaPanel | Unggah isi `out/` ke root situs, gunakan `try_files $uri $uri/ =404` |
-
-Jika DNS dikelola Cloudflare dan situs di Vercel, set record ke "DNS only" supaya sertifikat SSL Vercel tidak bentrok.
+Lihat [docs/DEPLOY.md](./DEPLOY.md) (VPS aaPanel, PM2, Nginx, cadangan).
 
 ## Aksesibilitas
 
-Tautan lompat ke konten, fokus keyboard terlihat, atribut `lang` per halaman, label untuk grafik dan plot, saringan dengan `aria-pressed`, jumlah hasil yang diumumkan ke pembaca layar, tautan tab baru yang dijelaskan, dan semua animasi (termasuk gambar README) mengikuti pengaturan "kurangi gerakan" di perangkat.
+Tautan lompat ke konten, fokus keyboard terlihat, atribut `lang` per halaman, label untuk grafik dan plot, saringan dengan `aria-pressed`, jumlah hasil yang diumumkan ke pembaca layar, tautan tab baru yang dijelaskan, formulir CMS dengan label, pesan galat yang terhubung ke field, dan semua animasi (termasuk gambar README) mengikuti pengaturan "kurangi gerakan" di perangkat.
 
 ## Rilis
 

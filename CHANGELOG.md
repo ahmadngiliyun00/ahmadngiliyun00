@@ -8,17 +8,24 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Ditambahkan
 
+- CMS di `/admin` untuk semua konten situs: capaian, proyek, mengajar, perjalanan, profil, dan metrik, dengan status public atau privat
+- Database MySQL (Drizzle ORM) dengan migrasi, seed dari data lama, dan pembuat akun admin
+- Login email dan kata sandi (scrypt) atau GitHub OAuth, sesi di database, pembatas percobaan login
+- Unggah berkas sertifikat yang disimpan di luar repo dan disajikan dengan pemeriksaan izin
+- Tautan berbagi rahasia `/s/<token>/` untuk membagikan data, termasuk yang privat, tanpa diindeks
+- Panduan deploy VPS aaPanel di `docs/DEPLOY.md`
+
 - Bagian "Sertifikat dan capaian" di beranda: baris indikator bertanggal (sitasi, h-index, skor SINTA, hak cipta, publikasi) dan sorotan dengan saringan sertifikat atau hak cipta
 - Arsip `/sertifikat/` dan `/en/certificates/` dengan pencarian, saringan kategori dan tahun, serta saringan yang tersimpan di URL
 - Halaman detail per capaian dengan tautan verifikasi resmi, tombol "Tambahkan ke LinkedIn", teks siap tempel, metadata, Open Graph, dan JSON-LD
 - Bagian "Riset": tema, hibah Penelitian Dosen Pemula NetA, publikasi per tahun dengan posisi penulis, dan profil riset
 - RupiahVision sebagai proyek unggulan dan daftar "Sistem yang saya kembangkan" untuk repositori privat
-- Sumber data tunggal `src/data/achievements.ts` dan `src/data/metrics.ts`
-- Validator `npm run check:achievements` (dijalankan sebelum build) dengan opsi `--online`
-- Unit test pembangun URL LinkedIn (`npm test`) dan skrip thumbnail PDF opsional (`npm run thumbs`)
-- Bagian README (proyek, capaian, mengajar, perjalanan) dibangkitkan otomatis dari data situs
+- Unit test pembangun URL LinkedIn (`npm test`)
+- Bagian README (proyek, capaian, mengajar, perjalanan) dibangkitkan otomatis dari konten public di database
 
 ### Diubah
+
+- Situs kini berjalan sebagai server Node.js dan membaca konten dari database, bukan build statis
 
 - Mengajar dipisah per kampus dengan "Semester ini" dan "Pernah diampu", ditambah bidang keahlian mengajar
 - Garis waktu dikoreksi: jalur S1 (STIKOM Poltek Cirebon lalu UNU Cirebon), S2 STMIK LIKMI Bandung, AWATARA Februari 2022, dan Dicoding 2020 sebagai "bergabung"
