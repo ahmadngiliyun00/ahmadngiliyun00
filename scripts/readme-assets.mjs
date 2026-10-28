@@ -5,10 +5,12 @@
 //
 // Font (subset statis Bricolage Grotesque dan Instrument Sans, lisensi OFL) disematkan
 // langsung ke SVG, karena GitHub tidak memuat font eksternal di dalam gambar.
+// Bagian teks README (proyek, capaian, mengajar, perjalanan) dibangkitkan oleh readme-sections.mjs.
 // Jalankan: npm run readme  (otomatis juga dijalankan oleh npm run data dan prebuild)
 
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
+import { renderReadmeSections } from "./readme-sections.mjs";
 
 const OUT = new URL("../profile/", import.meta.url);
 const FONTS = new URL("../profile/fonts/", import.meta.url);
@@ -43,11 +45,12 @@ const BANNER = {
 
 const SKILLS = [
   "Next.js", "React", "TypeScript", "Tailwind CSS", "Laravel", "Expo", "React Native",
-  "Python", "Jupyter", "Docker", "AlmaLinux", "Ubuntu", "Nginx", "Cloudflare", "Moodle",
+  "Python", "PyTorch", "FastAPI", "Jupyter", "Docker", "AlmaLinux", "Ubuntu", "Nginx", "Cloudflare", "Moodle",
 ];
 
 const TOPICS = [
-  "Klasifikasi", "Clustering K-Means", "Analisis sentimen", "Sistem rekomendasi", "AI agent",
+  "Klasifikasi", "Clustering K-Means", "Analisis sentimen", "Deep learning", "Computer vision",
+  "Sistem rekomendasi", "AI agent",
   "REST API", "Aplikasi seluler", "Keamanan server", "LMS", "Data warehouse",
 ];
 
@@ -453,6 +456,7 @@ export async function renderReadmeAssets(data) {
     await writeFile(new URL(name, OUT), svg);
   }
   console.log(`[readme] ${files.map((f) => f[0]).join(", ")} diperbarui`);
+  await renderReadmeSections();
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
