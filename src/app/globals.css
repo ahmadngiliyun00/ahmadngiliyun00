@@ -1056,18 +1056,20 @@ body::after {
 .project-card-visual {
   display: grid;
   place-items: center;
-  height: 9.5rem;
+  height: 10.5rem;
   padding: 0.75rem;
+  overflow: hidden;
   border-bottom: 1px solid var(--color-line);
   background-color: var(--color-ink);
   background-image: radial-gradient(color-mix(in srgb, var(--color-line) 80%, transparent) 1px, transparent 1px);
   background-size: 18px 18px;
 }
 
+/* SVG mengisi kotak dengan rasio tetap (preserveAspectRatio bawaan), tidak meluap ke teks kartu. */
 .project-card-visual .project-visual-svg {
-  width: auto;
-  height: 100%;
-  max-width: 100%;
+  width: 100%;
+  height: 9rem;
+  max-width: none;
 }
 
 .project-card-body {
