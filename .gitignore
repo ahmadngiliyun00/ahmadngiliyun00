@@ -12,3 +12,6 @@ docs/PROMPT_*.md
 
 # Berkas unggahan CMS (bisa memuat data pribadi), jangan masuk repo
 storage/
+
+*.txt
+*.docx
