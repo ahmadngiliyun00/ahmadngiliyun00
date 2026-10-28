@@ -4,6 +4,7 @@ import ConfirmButton from "@/components/admin/ConfirmButton";
 import Icon from "@/components/admin/Icon";
 import ListControls from "@/components/admin/ListControls";
 import Pagination from "@/components/admin/Pagination";
+import FlashToast from "@/components/FlashToast";
 import { paginate } from "@/components/admin/paginate";
 import { adminCopy } from "@/data/admin";
 import { requireAdmin } from "@/server/auth/session";
@@ -81,13 +82,9 @@ export default async function AdminMessages({ searchParams }: Props) {
       <h1 className="admin-title">{t.title}</h1>
       <p className="admin-intro">{t.intro}</p>
 
-      {sp.deleted ? (
-        <p role="status" className="admin-success mt-6">
-          {t.deleted}
-        </p>
-      ) : null}
+      {sp.deleted ? <FlashToast message={t.deleted} clear={["deleted"]} set={{ f: filter }} /> : null}
       {missing ? (
-        <p role="alert" className="admin-error mt-6">
+        <p className="admin-note mt-6">
           {t.tableMissing}
         </p>
       ) : null}

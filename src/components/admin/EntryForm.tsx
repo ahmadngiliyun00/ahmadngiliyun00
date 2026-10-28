@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import type { FormState } from "@/app/(admin)/admin/actions";
+import { toast } from "@/components/Toaster";
 import FieldInput, { type FieldLabels, type FieldValue } from "@/components/admin/FieldInput";
 import { fieldWidth, type Field, type Option } from "@/content/fields";
 
@@ -33,7 +34,6 @@ export default function EntryForm({
   references,
   file,
   labels,
-  notice,
 }: {
   action: (state: FormState, form: FormData) => Promise<FormState>;
   hidden: Record<string, string>;
@@ -43,43 +43,31 @@ export default function EntryForm({
   references?: Record<string, Option[]>;
   file?: { url: string; name: string } | null;
   labels: EntryFormLabels;
-  notice?: string;
 }) {
   const [state, formAction, pending] = useActionState<FormState, FormData>(action, undefined);
   const raw = state?.values ? (name: string) => state.values?.[name] : undefined;
   const errors = state?.errors ?? {};
-  const errorList = Object.entries(errors);
-  const message = state?.ok ? labels.saved : notice;
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Hasil simpan tampil sebagai toast. Bila gagal, isian pertama yang salah langsung difokus;
+  // pesan per isian tetap tampil di bawah isiannya.
+  useEffect(() => {
+    if (state === undefined) return;
+    if (state.ok) {
+      toast(labels.saved, "success");
+      return;
+    }
+    const list = Object.values(state.errors ?? {});
+    toast(state.message ?? labels.errorsTitle, "error", list);
+    const first = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+    first?.focus();
+  }, [state, labels.saved, labels.errorsTitle]);
 
   return (
-    <form action={formAction} className="admin-form" encType="multipart/form-data" noValidate>
+    <form ref={formRef} action={formAction} className="admin-form" encType="multipart/form-data" noValidate>
       {Object.entries(hidden).map(([k, v]) => (
         <input key={k} type="hidden" name={k} value={v} />
       ))}
-
-      {errorList.length > 0 ? (
-        <div role="alert" className="admin-error-box">
-          <p className="font-semibold">{state?.message ?? labels.errorsTitle}</p>
-          <ul>
-            {errorList.map(([k, v]) => (
-              <li key={k}>
-                <a href={`#fld-${k.replace(/\./g, "-")}`}>{v}</a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : state?.message ? (
-        state.ok ? null : (
-          <p role="alert" className="admin-error">
-            {state.message}
-          </p>
-        )
-      ) : null}
-      {message ? (
-        <p role="status" className="admin-success">
-          {message}
-        </p>
-      ) : null}
 
       {meta ? (
         <fieldset className="admin-card admin-meta">

@@ -4,6 +4,7 @@ import AdminShell from "@/components/admin/AdminShell";
 import Icon from "@/components/admin/Icon";
 import ListControls from "@/components/admin/ListControls";
 import Pagination from "@/components/admin/Pagination";
+import FlashToast from "@/components/FlashToast";
 import { paginate } from "@/components/admin/paginate";
 import { getCollection } from "@/content/collections";
 import type { Achievement } from "@/content/types";
@@ -60,16 +61,8 @@ export default async function AdminList({ params, searchParams }: Props) {
         </a>
       </div>
 
-      {sp.deleted ? (
-        <p role="status" className="admin-success mt-6">
-          {t.list.deleted}
-        </p>
-      ) : null}
-      {sp.error ? (
-        <p role="alert" className="admin-error mt-6">
-          {sp.error}
-        </p>
-      ) : null}
+      {sp.deleted ? <FlashToast message={t.list.deleted} clear={["deleted"]} /> : null}
+      {sp.error ? <FlashToast message={sp.error} kind="error" clear={["error"]} /> : null}
 
       <ListControls
         q={sp.q ?? ""}

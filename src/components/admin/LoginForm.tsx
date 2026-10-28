@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { loginWithPassword, type FormState } from "@/app/(admin)/admin/actions";
+import { toast } from "@/components/Toaster";
 
 export type LoginLabels = {
   email: string;
@@ -13,6 +14,9 @@ export type LoginLabels = {
 
 export default function LoginForm({ labels }: { labels: LoginLabels }) {
   const [state, action, pending] = useActionState<FormState, FormData>(loginWithPassword, undefined);
+  useEffect(() => {
+    if (state?.message) toast(state.message, "error");
+  }, [state]);
   return (
     <form action={action} className="grid gap-4">
       <div className="grid gap-2">
@@ -49,11 +53,6 @@ export default function LoginForm({ labels }: { labels: LoginLabels }) {
           placeholder={labels.passwordPlaceholder}
         />
       </div>
-      {state?.message ? (
-        <p role="alert" className="admin-error">
-          {state.message}
-        </p>
-      ) : null}
       <button type="submit" className="btn btn-solid" disabled={pending}>
         {labels.submit}
       </button>

@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useId, useRef, useState } from "react";
 import { useLocalTime } from "@/components/LiveClock";
+import { toast } from "@/components/Toaster";
 import type { Lang } from "@/data/profile";
 import type { ContactField, ContactFieldError, ContactFormError, ContactState } from "@/lib/contact";
 import { sendContactMessage } from "@/server/contact-action";
@@ -108,7 +109,6 @@ export default function ContactPanel({
   const time = useLocalTime(lang, timeZone);
 
   const errors = state.status === "error" ? (state.errors ?? {}) : {};
-  const formError = state.status === "error" ? state.formError : undefined;
   const sent = state.status === "sent" ? !dismissed : false;
 
   // Alamat email dirakit di peramban supaya tidak tertulis utuh di HTML.
@@ -128,19 +128,21 @@ export default function ContactPanel({
   }, [copied]);
 
   // Setelah setiap kiriman: tampilkan hasil baru, kosongkan isi pesan bila terkirim,
-  // fokuskan kolom pertama yang salah, dan minta token Turnstile baru (token sekali pakai).
+  // fokuskan kolom pertama yang salah, tampilkan galat umum sebagai toast,
+  // dan minta token Turnstile baru (token sekali pakai).
   useEffect(() => {
     setDismissed(false);
     if (state.status === "sent") setBody("");
     if (state.status === "error") {
       const first = FIELD_ORDER.find((f) => state.errors?.[f] !== undefined);
       if (first) document.getElementById(`${uid}-${first}`)?.focus();
+      if (state.formError) toast(formMessage(state.formError, labels.errors), "error");
     }
     const ts = (window as TurnstileWindow).turnstile;
     if (ts) {
       if (widgetId.current) ts.reset(widgetId.current);
     }
-  }, [state, uid]);
+  }, [state, uid, labels.errors]);
 
   // Cloudflare Turnstile hanya dimuat bila kunci situs diatur.
   useEffect(() => {
@@ -341,12 +343,6 @@ export default function ContactPanel({
           </div>
 
           {TURNSTILE_SITE_KEY === "" ? null : <div ref={widgetRef} className="min-h-[65px]" />}
-
-          {formError === undefined ? null : (
-            <p role="alert" className="field-error">
-              {formMessage(formError, labels.errors)}
-            </p>
-          )}
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
             <button type="submit" className="btn btn-solid" disabled={pending} aria-disabled={pending}>

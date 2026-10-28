@@ -589,35 +589,6 @@
     background: linear-gradient(transparent, var(--color-ink) 35%);
   }
 
-  .admin-error,
-  .admin-error-box {
-    padding: 0.75rem 1rem;
-    border: 1px solid color-mix(in srgb, #ff9b8a 60%, transparent);
-    border-radius: 0.8rem;
-    background: color-mix(in srgb, #ff9b8a 10%, transparent);
-    color: #ffc2b8;
-    font-size: 0.9rem;
-  }
-
-  .admin-error-box ul {
-    margin-top: 0.4rem;
-    padding-left: 1.1rem;
-    list-style: disc;
-  }
-
-  .admin-error-box a {
-    text-decoration: underline;
-  }
-
-  .admin-success {
-    padding: 0.75rem 1rem;
-    border: 1px solid color-mix(in srgb, var(--color-leaf) 60%, transparent);
-    border-radius: 0.8rem;
-    background: color-mix(in srgb, var(--color-leaf) 10%, transparent);
-    color: #b9f3c4;
-    font-size: 0.9rem;
-  }
-
   .admin-danger {
     border-color: color-mix(in srgb, #ff9b8a 50%, var(--color-line));
     color: #ffc2b8;

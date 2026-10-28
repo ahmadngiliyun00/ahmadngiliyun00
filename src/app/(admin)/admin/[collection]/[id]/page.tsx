@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import AdminShell from "@/components/admin/AdminShell";
 import EntryEditor from "@/components/admin/EntryEditor";
+import FlashToast from "@/components/FlashToast";
 import { getCollection } from "@/content/collections";
 import { adminCopy as t } from "@/data/admin";
 import { requireAdmin } from "@/server/auth/session";
@@ -24,12 +25,9 @@ export default async function AdminEdit({ params, searchParams }: Props) {
   const sp = await searchParams;
   return (
     <AdminShell session={session} active={cfg.key}>
-      {sp.error ? (
-        <p role="alert" className="admin-error mb-4">
-          {sp.error}
-        </p>
-      ) : null}
-      <EntryEditor cfg={cfg} entry={entry} notice={sp.saved ? t.form.created : undefined} />
+      {sp.saved ? <FlashToast message={t.form.created} clear={["saved"]} /> : null}
+      {sp.error ? <FlashToast message={sp.error} kind="error" clear={["error"]} /> : null}
+      <EntryEditor cfg={cfg} entry={entry} />
     </AdminShell>
   );
 }

@@ -2358,6 +2358,132 @@ select.field {
 
 /* ---------- Kurangi gerakan ---------- */
 
+/* Toast: notifikasi yang muncul sebentar di pojok kanan bawah (di ponsel di atas, selebar layar). */
+@layer components {
+  .toast-region {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 70;
+    display: grid;
+    gap: 0.6rem;
+    width: min(24rem, calc(100vw - 2rem));
+    pointer-events: none;
+  }
+
+  /* Di ponsel toast tampil di atas supaya tidak menutupi tombol Simpan yang lengket di bawah. */
+  @media (max-width: 639px) {
+    .toast-region {
+      top: 1rem;
+      bottom: auto;
+    }
+  }
+
+  .toast {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 0.85rem 1rem 1rem;
+    overflow: hidden;
+    border: 1px solid var(--toast-color);
+    border-left-width: 4px;
+    border-radius: 0.8rem;
+    background: var(--color-surface);
+    box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.7);
+    color: var(--color-fg);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    pointer-events: auto;
+    animation: toast-in 0.28s var(--ease-out-soft);
+    --toast-color: var(--color-leaf);
+  }
+
+  .toast[data-kind="error"] {
+    --toast-color: #ff9b8a;
+  }
+
+  .toast[data-kind="info"] {
+    --toast-color: var(--color-sky);
+  }
+
+  .toast[data-closing] {
+    animation: toast-out 0.2s ease-in forwards;
+  }
+
+  .toast-body {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .toast-message {
+    font-weight: 600;
+  }
+
+  .toast-detail {
+    margin-top: 0.35rem;
+    padding-left: 1.1rem;
+    list-style: disc;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+  }
+
+  .toast-close {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin: -0.2rem -0.1rem 0 0;
+    border-radius: 999px;
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+
+  .toast-close:hover {
+    background: var(--color-raised);
+    color: var(--color-fg);
+  }
+
+  /* Sisa waktu tampil. Berhenti saat toast disorot atau difokus. */
+  .toast-timer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--toast-color);
+    opacity: 0.55;
+    transform-origin: left;
+    animation: toast-timer var(--toast-ms) linear forwards;
+  }
+
+  .toast[data-paused] .toast-timer {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+}
+
+@keyframes toast-timer {
+  to {
+    transform: scaleX(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -2416,5 +2542,13 @@ select.field {
   *::before,
   *::after {
     transition-duration: 0.01ms !important;
+  }
+
+  .toast {
+    animation: none;
+  }
+
+  .toast-timer {
+    display: none;
   }
 }

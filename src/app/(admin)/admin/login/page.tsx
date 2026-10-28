@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import LoginForm from "@/components/admin/LoginForm";
+import FlashToast from "@/components/FlashToast";
 import Monogram from "@/components/Monogram";
 import { adminCopy as t } from "@/data/admin";
 import { githubConfig } from "@/server/auth/github";
@@ -21,11 +22,7 @@ export default async function LoginPage({ searchParams }: Props) {
         <Monogram className="h-12 w-12" />
         <h1 className="mt-6 font-display text-3xl font-bold tracking-tight">{t.login.title}</h1>
         <p className="mt-2 text-muted">{t.login.intro}</p>
-        {message ? (
-          <p role="alert" className="admin-error mt-6">
-            {message}
-          </p>
-        ) : null}
+        {message ? <FlashToast message={message} kind="error" clear={["error"]} /> : null}
         {github ? (
           <>
             <a href="/admin/auth/github/" className="btn btn-line mt-8 w-full">

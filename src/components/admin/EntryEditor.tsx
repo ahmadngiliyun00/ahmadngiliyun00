@@ -16,11 +16,9 @@ import { getFileMeta } from "@/server/files";
 export default async function EntryEditor({
   cfg,
   entry,
-  notice,
 }: {
   cfg: CollectionConfig;
   entry: Entry | null;
-  notice?: string;
 }) {
   const data = (entry?.data ?? {}) as Doc;
   const values: Record<string, FieldValue> = {};
@@ -64,7 +62,6 @@ export default async function EntryEditor({
           references={references}
           file={meta ? { url: `/files/${meta.id}/`, name: meta.originalName } : null}
           labels={formLabels}
-          notice={notice}
         />
 
         {entry !== null ? (

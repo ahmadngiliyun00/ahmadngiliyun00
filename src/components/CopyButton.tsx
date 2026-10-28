@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "@/components/Toaster";
 
 // Tombol salin teks ke clipboard, dengan pengumuman untuk pembaca layar.
 export default function CopyButton({
@@ -16,7 +17,7 @@ export default function CopyButton({
   failed: string;
   describedBy?: string;
 }) {
-  const [state, setState] = useState<"idle" | "done" | "error">("idle");
+  const [state, setState] = useState<"idle" | "done">("idle");
 
   useEffect(() => {
     if (state === "idle") return;
@@ -29,7 +30,8 @@ export default function CopyButton({
       await navigator.clipboard.writeText(text);
       setState("done");
     } catch {
-      setState("error");
+      setState("idle");
+      toast(failed, "error");
     }
   };
 
@@ -41,11 +43,6 @@ export default function CopyButton({
       <span className="sr-only" aria-live="polite">
         {state === "done" ? copied : ""}
       </span>
-      {state === "error" ? (
-        <span role="alert" className="text-sm text-[#ff9b8a]">
-          {failed}
-        </span>
-      ) : null}
     </>
   );
 }
