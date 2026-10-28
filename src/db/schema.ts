@@ -7,16 +7,25 @@
 import {
   bigint,
   boolean,
+  customType,
   datetime,
   index,
   int,
-  json,
   mysqlEnum,
   mysqlTable,
   text,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/mysql-core";
+
+// Kolom JSON yang aman untuk MySQL maupun MariaDB. Di MariaDB, JSON hanyalah LONGTEXT,
+// sehingga driver mysql2 mengembalikan teks, bukan objek; teks itu diurai di sini.
+// Tipe SQL tetap "json", jadi migrasi tidak berubah.
+const json = customType<{ data: unknown; driverData: unknown }>({
+  dataType: () => "json",
+  toDriver: (value) => JSON.stringify(value),
+  fromDriver: (value) => (typeof value === "string" ? JSON.parse(value) : value),
+});
 
 export const entries = mysqlTable(
   "entries",
