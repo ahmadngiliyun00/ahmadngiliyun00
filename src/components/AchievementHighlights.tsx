@@ -9,6 +9,7 @@ export type HighlightGroup = { key: string; label: string; items: AchievementCar
 
 // Sorotan capaian di beranda dengan saringan ringan per kelompok.
 // Tanpa JavaScript, kelompok pertama tetap tampil dan arsip lengkap tetap bisa dibuka.
+// Di ponsel kartunya menjadi baris geser (snap-row di globals.css).
 export default function AchievementHighlights({
   groups,
   filterLabel,
@@ -44,7 +45,7 @@ export default function AchievementHighlights({
         ))}
       </div>
       <Spotlight className="mt-6">
-        <ul id={`${uid}-list`} className="cred-grid">
+        <ul id={`${uid}-list`} className="cred-grid snap-row">
           {current.items.map((item) => (
             <li key={item.id}>
               <CredCard item={item} labels={labels} />

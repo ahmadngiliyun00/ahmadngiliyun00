@@ -229,7 +229,10 @@ export default async function ProjectsPage({ lang }: { lang: Lang }) {
             <dl className="stack-areas mt-6">
               {areas.map((area) => (
                 <div key={area.icon}>
-                  <dt>{area.title[lang]}</dt>
+                  <dt>
+                    {area.title[lang]}
+                    <span className="stack-area-body">{area.body[lang]}</span>
+                  </dt>
                   <dd>
                     <ul className="tags">
                       {area.tools.map((tool) => (

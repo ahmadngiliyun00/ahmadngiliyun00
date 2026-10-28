@@ -384,7 +384,7 @@ export const settingsConfigs: SettingsConfig[] = [
   {
     key: "profile",
     label: "Profil",
-    description: "Teks hero, Tentang, email, running text, dan profil riset.",
+    description: "Teks hero, Tentang, email, alat dan topik, serta tema riset.",
     fields: [
       { name: "status", label: "Status di hero", type: "localized", required: true, help: "Perbarui tiap semester." },
       { name: "heroStatement", label: "Kalimat utama hero", type: "localized", required: true },
@@ -392,10 +392,16 @@ export const settingsConfigs: SettingsConfig[] = [
       { name: "aboutStatement", label: "Pernyataan Tentang", type: "localized", multiline: true, required: true },
       { name: "email.user", label: "Email: nama", type: "text", placeholder: "ahmad", help: "Kosongkan untuk menyembunyikan email dan formulir pesan." },
       { name: "email.domain", label: "Email: domain", type: "text", placeholder: "ngiliyun.my.id" },
-      { name: "skills", label: "Running text teknologi", type: "list", required: true },
-      { name: "topics", label: "Running text topik", type: "localizedList", required: true },
+      { name: "skills", label: "Daftar teknologi", type: "list", required: true, help: "Tampil lengkap di halaman Proyek, bagian Teknologi dan topik." },
+      {
+        name: "homeTools",
+        label: "Alat utama di beranda",
+        type: "list",
+        help: "Baris alat di bagian Tentang beranda, maksimal 8. Kosongkan untuk mengambil satu alat bergiliran dari tiap bidang kerja.",
+      },
+      { name: "topics", label: "Topik yang didalami", type: "localizedList", required: true, help: "Tampil di halaman Proyek, bagian Teknologi dan topik." },
       { name: "researchThemes", label: "Tema riset", type: "localizedList", required: true },
-      { name: "learning", label: "Sedang saya dalami", type: "localizedList", help: "Daftar di bagian Arah ke depan. Kosongkan untuk menyembunyikan." },
+      { name: "learning", label: "Sedang saya dalami", type: "localizedList", help: "Daftar di bagian Arah ke depan, halaman Perjalanan. Kosongkan untuk menyembunyikan." },
     ],
   },
   {

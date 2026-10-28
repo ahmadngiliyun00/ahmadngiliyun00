@@ -119,7 +119,16 @@ export type Copy = {
   };
   about: {
     title: string;
+    intro: string;
     areasTitle: string;
+    toolsTitle: string;
+  };
+  explore: {
+    title: string;
+    intro: string;
+    research: { body: string; stat: string };
+    teaching: { body: string; stat: string };
+    journey: { body: string; stat: string };
   };
   projects: {
     title: string;
@@ -203,6 +212,7 @@ export type Copy = {
     publications: string;
     asOf: string;
     allCredentials: string;
+    homeTitle: string;
   };
   archive: {
     metaTitle: string;
@@ -277,6 +287,7 @@ export type Copy = {
   };
   news: {
     title: string;
+    homeTitle: string;
     intro: string;
     all: string;
     readOn: string;
@@ -417,7 +428,16 @@ export const copy: Localized<Copy> = {
     },
     about: {
       title: "Tentang",
+      intro: "Siapa saya, di mana saya bekerja, dan apa yang saya kerjakan setiap hari.",
       areasTitle: "Yang saya kerjakan",
+      toolsTitle: "Alat utama",
+    },
+    explore: {
+      title: "Jelajahi",
+      intro: "Tiga halaman untuk mengenal kerja saya lebih dalam.",
+      research: { body: "Tema riset, hibah, angka sitasi, dan publikasi per tahun.", stat: "{n} publikasi" },
+      teaching: { body: "Mata kuliah semester ini, yang pernah diampu, dan materi terbuka.", stat: "{n} kampus" },
+      journey: { body: "Garis waktu sejak repositori pertama dan rencana lima tahun ke depan.", stat: "Sejak {year}" },
     },
     projects: {
       title: "Proyek",
@@ -501,6 +521,7 @@ export const copy: Localized<Copy> = {
       publications: "publikasi",
       asOf: "Sitasi, h-index, dan skor SINTA per {date}.",
       allCredentials: "Semua kredensial di",
+      homeTitle: "Sorotan capaian",
     },
     archive: {
       metaTitle: "Sertifikat dan Capaian - Ahmad Ngiliyun",
@@ -581,6 +602,7 @@ export const copy: Localized<Copy> = {
     },
     news: {
       title: "Kabar dan liputan",
+      homeTitle: "Kabar terbaru",
       intro: "Liputan media tentang kerja saya, tulisan saya sendiri, dan kabar terbaru.",
       all: "Lihat semua kabar",
       readOn: "Baca di {outlet}",
@@ -761,7 +783,16 @@ export const copy: Localized<Copy> = {
     },
     about: {
       title: "About",
+      intro: "Who I am, where I work, and what I do every day.",
       areasTitle: "What I work on",
+      toolsTitle: "Main tools",
+    },
+    explore: {
+      title: "Explore",
+      intro: "Three pages to get to know my work in more depth.",
+      research: { body: "Research themes, grants, citation figures, and publications by year.", stat: "{n} publications" },
+      teaching: { body: "This semester's courses, earlier ones, and open course materials.", stat: "{n} universities" },
+      journey: { body: "A timeline from the first repository, plus the five-year plan ahead.", stat: "Since {year}" },
     },
     projects: {
       title: "Projects",
@@ -845,6 +876,7 @@ export const copy: Localized<Copy> = {
       publications: "publications",
       asOf: "Citations, h-index, and SINTA score as of {date}.",
       allCredentials: "All credentials on",
+      homeTitle: "Highlights",
     },
     archive: {
       metaTitle: "Credentials and Achievements - Ahmad Ngiliyun",
@@ -925,6 +957,7 @@ export const copy: Localized<Copy> = {
     },
     news: {
       title: "News and press",
+      homeTitle: "Latest news",
       intro: "Press coverage of my work, my own writing, and recent updates.",
       all: "See all news",
       readOn: "Read on {outlet}",

@@ -159,6 +159,7 @@ export type ProfileSettings = {
   facts: Localized<{ label: string; value: string }[]>;
   email: { user: string; domain: string };
   skills: string[];
+  homeTools?: string[]; // baris alat utama di Tentang beranda; kosong berarti diambil dari bidang kerja
   topics: Localized<string[]>;
   researchThemes: Localized<string[]>;
   learning?: Localized<string[]>; // "Sedang saya dalami" di bagian Arah ke depan
