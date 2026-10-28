@@ -292,7 +292,7 @@ export function getCollection(key: string): CollectionConfig | undefined {
 
 // ---------- Pengaturan tunggal ----------
 
-export type SettingsConfig = { key: "profile" | "metrics" | "seo"; label: string; description: string; fields: Field[] };
+export type SettingsConfig = { key: "profile" | "metrics" | "seo" | "mail"; label: string; description: string; fields: Field[] };
 
 export const settingsConfigs: SettingsConfig[] = [
   {
@@ -369,6 +369,34 @@ export const settingsConfigs: SettingsConfig[] = [
         type: "text",
         help: "Format G-XXXXXXXXXX. Kunjungan saat Anda masuk CMS tidak dihitung, dan tautan berbagi rahasia tidak dilacak.",
       },
+    ],
+  },
+  {
+    key: "mail",
+    label: "Email dan SMTP",
+    description:
+      "Pesan dari form kontak selalu tersimpan di Pesan masuk. Isi SMTP supaya pesan baru juga diteruskan ke email. Kosongkan Server SMTP untuk mematikan penerusan.",
+    fields: [
+      { name: "smtp.host", label: "Server SMTP", type: "text", placeholder: "smtp.gmail.com" },
+      { name: "smtp.port", label: "Port", type: "number", min: 1, max: 65535, placeholder: "465", help: "465 untuk SSL/TLS, 587 untuk STARTTLS." },
+      {
+        name: "smtp.security",
+        label: "Keamanan koneksi",
+        type: "select",
+        options: [
+          { value: "ssl", label: "SSL/TLS langsung (port 465)" },
+          { value: "starttls", label: "STARTTLS (port 587)" },
+        ],
+      },
+      { name: "smtp.user", label: "Nama pengguna SMTP", type: "text", placeholder: "nama@gmail.com", help: "Untuk Gmail: alamat Gmail lengkap." },
+      {
+        name: "smtp.pass",
+        label: "Kata sandi SMTP",
+        type: "secret",
+        help: "Untuk Gmail: sandi aplikasi 16 huruf dari myaccount.google.com/apppasswords, bukan kata sandi akun. Tidak pernah ditampilkan ulang; kosongkan untuk tetap memakai sandi tersimpan.",
+      },
+      { name: "smtp.from", label: "Alamat pengirim", type: "text", placeholder: "nama@gmail.com", help: "Kosongkan untuk memakai nama pengguna SMTP. Gmail hanya mengizinkan alamat akunnya sendiri atau alias yang sudah diverifikasi." },
+      { name: "contactTo", label: "Penerima notifikasi pesan", type: "text", placeholder: "ahmad@ngiliyun.my.id", help: "Alamat yang menerima pesan baru, misalnya ahmad@ngiliyun.my.id yang diteruskan Cloudflare ke Gmail." },
     ],
   },
 ];

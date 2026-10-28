@@ -259,6 +259,7 @@ export async function saveSettings(key: string, form: FormData): Promise<SaveRes
     }
   }
   if (key === "seo") checkSeo(data, errors);
+  if (key === "mail") checkMail(data, errors);
   if (Object.keys(errors).length > 0) return { ok: false, errors, message: "Periksa kembali isian yang ditandai." };
   const now = new Date();
   if (rows.length === 0) await db.insert(settings).values({ key, value: data, updatedAt: now });
@@ -299,5 +300,29 @@ function checkSeo(data: Doc, errors: FieldErrors) {
     const clean = ga.trim().toUpperCase();
     data.gaMeasurementId = clean;
     if (!/^G-[A-Z0-9]{4,20}$/.test(clean)) errors.gaMeasurementId = "Google Analytics 4: ID harus berformat G-XXXXXXXXXX.";
+  }
+}
+
+const EMAIL = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+
+// SMTP hanya aktif bila server, pengguna, sandi, dan penerima lengkap.
+function checkMail(data: Doc, errors: FieldErrors) {
+  const smtp = (data.smtp ?? {}) as Record<string, unknown>;
+  const text = (v: unknown) => (typeof v === "string" ? v : "");
+  const host = text(smtp.host);
+  if (host !== "") {
+    if (!/^[A-Za-z0-9.-]+$/.test(host)) errors["smtp.host"] = "Server SMTP: hanya nama host, misalnya smtp.gmail.com.";
+    if (text(smtp.user) === "") errors["smtp.user"] = "Nama pengguna SMTP wajib diisi bila Server SMTP diisi.";
+    if (text(smtp.pass) === "") errors["smtp.pass"] = "Kata sandi SMTP wajib diisi bila Server SMTP diisi.";
+    if (text(data.contactTo) === "") errors.contactTo = "Penerima notifikasi wajib diisi bila Server SMTP diisi.";
+  }
+  const from = text(smtp.from);
+  if (from !== "") {
+    const inner = from.match(/<([^>]+)>\s*$/);
+    if (!EMAIL.test(inner ? inner[1] : from)) errors["smtp.from"] = "Alamat pengirim: tulis alamat email, misalnya nama@gmail.com.";
+  }
+  const to = text(data.contactTo);
+  if (to !== "") {
+    if (!EMAIL.test(to)) errors.contactTo = "Penerima notifikasi: tulis satu alamat email.";
   }
 }

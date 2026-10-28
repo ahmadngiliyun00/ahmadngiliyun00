@@ -2,7 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { getCollection } from "@/content/collections";
+import { getCollection, getSettingsConfig } from "@/content/collections";
 import type { FieldErrors } from "@/content/fields";
 import type { CollectionKey } from "@/content/types";
 import { db } from "@/db";
@@ -10,6 +10,7 @@ import { admins } from "@/db/schema";
 import { DUMMY_HASH, verifyPassword } from "@/server/auth/password";
 import { clearFailures, clientIp, isLimited, recordFailure } from "@/server/auth/rate-limit";
 import { createSession, destroySession, requireAdmin } from "@/server/auth/session";
+import { sendTestMail } from "@/server/mail";
 import { deleteMessage, setMessageStatus, type MessageStatus } from "@/server/messages";
 import {
   createShare,
@@ -130,9 +131,23 @@ export async function revokeShareAction(id: number): Promise<void> {
 
 export async function saveSettingsAction(_prev: FormState, form: FormData): Promise<FormState> {
   await requireAdmin();
-  const res = await saveSettings(String(form.get("key") ?? ""), form);
-  if (!res.ok) return { message: res.message, errors: res.errors, values: rawValues(form) };
+  const key = String(form.get("key") ?? "");
+  const res = await saveSettings(key, form);
+  if (!res.ok) {
+    // Isian rahasia (sandi SMTP) tidak dikirim balik ke browser.
+    const values = rawValues(form);
+    for (const f of getSettingsConfig(key)?.fields ?? []) {
+      if (f.type === "secret") delete values[`f.${f.name}`];
+    }
+    return { message: res.message, errors: res.errors, values };
+  }
   return { ok: true, message: "Tersimpan." };
+}
+
+export async function sendTestMailAction(_prev: FormState, _form: FormData): Promise<FormState> {
+  await requireAdmin();
+  const res = await sendTestMail();
+  return { ok: res.ok, message: res.message };
 }
 
 // ---------- Pesan masuk ----------

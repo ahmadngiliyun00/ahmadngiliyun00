@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { saveSettingsAction } from "@/app/(admin)/admin/actions";
 import AdminShell from "@/components/admin/AdminShell";
 import EntryForm from "@/components/admin/EntryForm";
+import MailTest from "@/components/admin/MailTest";
 import type { FieldValue } from "@/components/admin/FieldInput";
 import { formLabels } from "@/components/admin/labels";
 import { getSettingsConfig } from "@/content/collections";
@@ -27,9 +28,10 @@ export default async function AdminSettings({ params }: Props) {
       <h1 className="admin-title">{cfg.label}</h1>
       <p className="admin-intro">{cfg.description}</p>
       {cfg.key === "seo" ? <SeoLinks htmlFile={typeof doc.googleHtmlFile === "string" ? doc.googleHtmlFile : undefined} /> : null}
-      <div className="mt-8 max-w-4xl">
+      <div className="mt-8">
         <EntryForm action={saveSettingsAction} hidden={{ key: cfg.key }} fields={cfg.fields} values={values} meta={null} labels={formLabels} />
       </div>
+      {cfg.key === "mail" ? <MailTest labels={adminCopy.settings.mail} /> : null}
     </AdminShell>
   );
 }

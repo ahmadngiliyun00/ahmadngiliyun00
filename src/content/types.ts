@@ -163,6 +163,12 @@ export type SeoSettings = {
   gaMeasurementId?: string; // ID pengukuran Google Analytics 4, misalnya G-ABC123XYZ9
 };
 
+// SMTP untuk meneruskan pesan form kontak ke email. Disimpan di database lewat CMS.
+export type MailSettings = {
+  smtp?: { host?: string; port?: number; security?: "ssl" | "starttls"; user?: string; pass?: string; from?: string };
+  contactTo?: string; // penerima notifikasi pesan baru
+};
+
 // Peta koleksi ke tipe datanya.
 export type CollectionData = {
   achievement: Achievement;
