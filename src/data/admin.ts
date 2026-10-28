@@ -3,6 +3,33 @@
 
 export const adminCopy = {
   meta: { title: "CMS Portofolio - Ahmad Ngiliyun" },
+  // Halaman error CMS. Label umum (Kembali, Rincian error) memakai copy.id.errors di profile.ts.
+  errors: {
+    dashboard: "Ke ringkasan CMS",
+    site: "Lihat situs",
+    notFound: {
+      status: "404 Not Found",
+      title: "Halaman CMS tidak ditemukan",
+      lead: "Ini halaman error. Alamat CMS yang Anda buka tidak ada, atau data yang dicari sudah tidak tersimpan.",
+      causes: [
+        "Data sudah dihapus dari CMS, misalnya dari tab lain.",
+        "Nama koleksi atau pengaturan di alamat tidak dikenal.",
+        "Nomor data di alamat salah atau terpotong.",
+      ],
+      hint: "Kembali ke daftar data atau ringkasan CMS, lalu buka lagi dari menu.",
+    },
+    server: {
+      status: "500 Internal Server Error",
+      title: "CMS gagal memuat halaman ini",
+      lead: "Ini halaman error. Server gagal menyiapkan halaman CMS ini. Perubahan yang belum disimpan di halaman ini mungkin hilang.",
+      causes: [
+        "Database tidak bisa dihubungi, atau tabel belum dimigrasi (npm run db:migrate).",
+        "Sesi login berakhir di tengah proses.",
+        "Ada galat di kode halaman ini. Cari kode referensi di pm2 logs ngiliyun.",
+      ],
+      hint: "Coba lagi dalam beberapa saat. Bila tetap gagal, periksa log server dengan kode referensi di bawah.",
+    },
+  },
   brand: "CMS Portofolio",
   skip: "Lompat ke konten",
   nav: {

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0A1633">
+<title>Server situs sedang tidak menjawab | Ahmad Ngiliyun</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%2296%2096%20320%20320%22%20aria-hidden%3D%22true%22%3E%3Cpath%20d%3D%22M120%20400%20L120%20112%20L176%20112%20L336%20312%20L336%20135.5%20L392%20205.5%20L392%20400%20L336%20400%20L176%20200%20L176%20400%20Z%22%20fill%3D%22%23eaf0fb%22%2F%3E%3Cpath%20d%3D%22M176%20268%20L336%20268%20L336%20300%20L176%20300%20Z%22%20fill%3D%22%233fd35a%22%2F%3E%3Cpath%20d%3D%22M336%20112%20L392%20112%20L392%20182%20Z%22%20fill%3D%22%236b97ff%22%2F%3E%3C%2Fsvg%3E">
+<style>@font-face{font-family:"Bricolage";src:url("/errors/fonts/bricolage.woff2") format("woff2");font-weight:200 800;font-display:swap}
+@font-face{font-family:"Instrument";src:url("/errors/fonts/instrument.woff2") format("woff2");font-weight:400 700;font-display:swap}
+:root{--ink:#0a1633;--surface:#0f1e43;--line:#22376b;--fg:#eaf0fb;--muted:#a3b3d1;--leaf:#3fd35a;--sky:#6b97ff;--amber:#f5c451;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--ink)}
+body{min-height:100dvh;background:var(--ink);color:var(--fg);font-family:"Instrument",ui-sans-serif,system-ui,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:64px 64px;opacity:.3;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 70% 30%,#000 10%,transparent 75%);mask-image:radial-gradient(ellipse 70% 60% at 70% 30%,#000 10%,transparent 75%)}
+body::after{content:"";position:fixed;z-index:-1;top:-15%;right:-12%;width:55vw;height:55vw;max-width:760px;max-height:760px;border-radius:999px;background:radial-gradient(closest-side,rgba(107,151,255,.2),transparent);pointer-events:none}
+ul{list-style:none}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--sky);outline-offset:3px;border-radius:6px}
+.bar{max-width:72rem;margin:0 auto;padding:1.1rem 1.25rem;display:flex;align-items:center;gap:.6rem;font-family:"Bricolage",sans-serif;font-weight:700}
+.bar svg{width:2rem;height:2rem}
+main{max-width:72rem;margin:0 auto;padding:clamp(1.5rem,6vw,4.5rem) 1.25rem 4rem}
+.layout{display:grid;gap:3rem}
+@media(min-width:1024px){.layout{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:center;gap:4rem}.bar,main{padding-inline:2rem}}
+.badge{display:inline-flex;align-items:center;gap:.65rem;padding:.4rem .95rem .4rem .8rem;border:1px solid var(--line);border-radius:999px;background:rgba(15,30,67,.7);font-size:.875rem}
+.dot-status{position:relative;width:.55rem;height:.55rem;border-radius:999px;background:var(--amber)}
+.dot-status::after{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--amber);animation:pulse 2.2s ease-out infinite}
+.code{display:flex;margin-top:1.25rem;overflow:hidden;padding-bottom:.08em;font-family:"Bricolage",sans-serif;font-weight:800;font-size:clamp(6rem,24vw,12rem);line-height:.85;letter-spacing:-.06em}
+.digit{display:inline-block;animation:up .95s cubic-bezier(.2,.7,.2,1) both,float 5s ease-in-out infinite;animation-delay:var(--d),calc(var(--d) + 1.1s)}
+.digit:nth-child(odd){color:var(--leaf)}.digit:nth-child(even){color:var(--sky)}
+.title{margin-top:1.25rem;font-family:"Bricolage",sans-serif;font-weight:800;font-size:clamp(1.9rem,4.5vw,3rem);line-height:1;letter-spacing:-.035em}
+.lead{margin-top:1rem;max-width:52ch;font-size:1.1rem;color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:2rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.875rem;padding:0 1.3rem;border-radius:999px;font:600 .95rem/1 "Instrument",sans-serif;cursor:pointer;border:1px solid transparent;transition:background-color .2s,border-color .2s}
+.btn-solid{background:var(--leaf);color:#06210e}.btn-solid:hover{background:#5fe077}
+.btn-line{background:transparent;color:var(--fg);border-color:var(--line)}.btn-line:hover{border-color:var(--muted)}
+.auto{margin-top:1rem;font-size:.9rem;color:var(--muted)}
+.side{display:grid;gap:1.25rem}
+.plot-wrap{padding:1rem;border:1px solid var(--line);border-radius:1.25rem;background-color:rgba(15,30,67,.85);background-image:linear-gradient(rgba(34,55,107,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(34,55,107,.5) 1px,transparent 1px);background-size:10% 12.5%}
+.plot{display:block;width:100%;height:auto;max-height:15rem;overflow:visible}
+.link{stroke:rgba(163,179,209,.28);stroke-width:1;stroke-dasharray:2 4}
+.dot,.center{transform-box:fill-box;transform-origin:center}
+.dot{animation:jitter .9s steps(2,jump-none) infinite}
+.center{animation:flicker 2.6s linear infinite}
+.details{padding:1.4rem 1.5rem;border:1px solid var(--line);border-radius:1.25rem;background:var(--surface)}
+.details h2{font-family:"Bricolage",sans-serif;font-size:1.15rem;letter-spacing:-.015em}
+.details dl{margin-top:.75rem}
+.details dl>div{display:grid;gap:.2rem;padding:.6rem 0;border-top:1px solid var(--line)}
+@media(min-width:640px){.details dl>div{grid-template-columns:10rem minmax(0,1fr);gap:1rem}}
+.details dt{font-size:.85rem;color:var(--muted)}
+.details code{font-size:.9rem;overflow-wrap:anywhere}
+.details h3{margin-top:1.1rem;font-size:1rem}
+.details ul{display:grid;gap:.35rem;margin-top:.5rem;font-size:.925rem;color:var(--muted)}
+.details li{position:relative;padding-left:1rem}
+.details li::before{content:"";position:absolute;left:0;top:.65em;width:.35rem;height:.35rem;border-radius:999px;background:var(--sky)}
+.hint{margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--line);font-size:.9rem}
+@keyframes pulse{0%{transform:scale(1);opacity:.7}80%,100%{transform:scale(2.8);opacity:0}}
+@keyframes up{from{transform:translateY(105%) rotate(6deg)}to{transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-.05em)}}
+@keyframes jitter{0%{transform:translate(0,0)}50%{transform:translate(1.5px,-1px)}100%{transform:translate(-1px,1.5px)}}
+@keyframes flicker{0%,42%,48%,100%{opacity:1}44%,46%{opacity:.15}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}</style>
+</head>
+<body>
+<header class="bar"><svg viewBox="96 96 320 320" aria-hidden="true"><path d="M120 400 L120 112 L176 112 L336 312 L336 135.5 L392 205.5 L392 400 L336 400 L176 200 L176 400 Z" fill="#eaf0fb"/><path d="M176 268 L336 268 L336 300 L176 300 Z" fill="#3fd35a"/><path d="M336 112 L392 112 L392 182 Z" fill="#6b97ff"/></svg>Ahmad Ngiliyun</header>
+<main>
+<div class="lang" data-lang="id">
+  <div class="layout">
+    <div>
+      <p class="badge"><span class="dot-status" aria-hidden="true"></span>Halaman error 502</p>
+      <p class="code" aria-hidden="true"><span class="digit" style="--d:120ms">5</span><span class="digit" style="--d:230ms">0</span><span class="digit" style="--d:340ms">2</span></p>
+      <h1 class="title">Server situs sedang tidak menjawab</h1>
+      <p class="lead">Ini halaman error. Server web sudah menerima permintaan Anda, tetapi aplikasi situs di belakangnya tidak memberi jawaban.</p>
+      <div class="actions">
+        <button type="button" class="btn btn-solid" data-action="retry"><span aria-hidden="true">↻</span>Coba lagi</button>
+        <button type="button" class="btn btn-line" data-action="back"><span aria-hidden="true">←</span>Kembali</button>
+        <a class="btn btn-line" href="/">Ke beranda</a>
+      </div>
+      <p class="auto" aria-live="polite" data-auto="Halaman ini mencoba memuat ulang sendiri dalam {s} detik."></p>
+    </div>
+    <div class="side">
+      <div class="plot-wrap"><svg viewBox="0 0 300 220" class="plot" aria-hidden="true"><line x1="78" y1="70" x2="98" y2="70" class="link"/><line x1="78" y1="70" x2="110" y2="77" class="link"/><line x1="78" y1="70" x2="57" y2="68" class="link"/><line x1="78" y1="70" x2="75" y2="81" class="link"/><line x1="78" y1="70" x2="90" y2="81" class="link"/><line x1="78" y1="70" x2="87" y2="57" class="link"/><line x1="78" y1="70" x2="84" y2="93" class="link"/><line x1="78" y1="70" x2="58" y2="64" class="link"/><line x1="78" y1="70" x2="67" y2="93" class="link"/><line x1="78" y1="70" x2="86" y2="88" class="link"/><line x1="78" y1="70" x2="96" y2="71" class="link"/><line x1="78" y1="70" x2="68" y2="69" class="link"/><line x1="78" y1="70" x2="94" y2="67" class="link"/><line x1="214" y1="58" x2="242" y2="61" class="link"/><line x1="214" y1="58" x2="229" y2="54" class="link"/><line x1="214" y1="58" x2="225" y2="31" class="link"/><line x1="214" y1="58" x2="245" y2="58" class="link"/><line x1="214" y1="58" x2="213" y2="78" class="link"/><line x1="214" y1="58" x2="245" y2="50" class="link"/><line x1="214" y1="58" x2="219" y2="54" class="link"/><line x1="214" y1="58" x2="236" y2="52" class="link"/><line x1="214" y1="58" x2="181" y2="56" class="link"/><line x1="214" y1="58" x2="247" y2="45" class="link"/><line x1="214" y1="58" x2="222" y2="42" class="link"/><line x1="214" y1="58" x2="222" y2="60" class="link"/><line x1="214" y1="58" x2="228" y2="67" class="link"/><line x1="150" y1="158" x2="135" y2="170" class="link"/><line x1="150" y1="158" x2="141" y2="165" class="link"/><line x1="150" y1="158" x2="117" y2="149" class="link"/><line x1="150" y1="158" x2="187" y2="154" class="link"/><line x1="150" y1="158" x2="133" y2="152" class="link"/><line x1="150" y1="158" x2="137" y2="144" class="link"/><line x1="150" y1="158" x2="136" y2="156" class="link"/><line x1="150" y1="158" x2="119" y2="146" class="link"/><line x1="150" y1="158" x2="169" y2="182" class="link"/><line x1="150" y1="158" x2="142" y2="183" class="link"/><line x1="150" y1="158" x2="166" y2="146" class="link"/><line x1="150" y1="158" x2="151" y2="166" class="link"/><line x1="150" y1="158" x2="160" y2="149" class="link"/><circle cx="98" cy="70" r="3" fill="#3fd35a" class="dot" style="animation-delay:748ms"/><circle cx="110" cy="77" r="3" fill="#3fd35a" class="dot" style="animation-delay:981ms"/><circle cx="57" cy="68" r="3" fill="#3fd35a" class="dot" style="animation-delay:1133ms"/><circle cx="75" cy="81" r="3" fill="#3fd35a" class="dot" style="animation-delay:1713ms"/><circle cx="90" cy="81" r="3" fill="#3fd35a" class="dot" style="animation-delay:1411ms"/><circle cx="87" cy="57" r="3" fill="#3fd35a" class="dot" style="animation-delay:203ms"/><circle cx="84" cy="93" r="3" fill="#3fd35a" class="dot" style="animation-delay:1422ms"/><circle cx="58" cy="64" r="3" fill="#3fd35a" class="dot" style="animation-delay:564ms"/><circle cx="67" cy="93" r="3" fill="#3fd35a" class="dot" style="animation-delay:28ms"/><circle cx="86" cy="88" r="3" fill="#3fd35a" class="dot" style="animation-delay:1711ms"/><circle cx="96" cy="71" r="3" fill="#3fd35a" class="dot" style="animation-delay:2129ms"/><circle cx="68" cy="69" r="3" fill="#3fd35a" class="dot" style="animation-delay:1465ms"/><circle cx="94" cy="67" r="3" fill="#3fd35a" class="dot" style="animation-delay:2163ms"/><circle cx="242" cy="61" r="3" fill="#6b97ff" class="dot" style="animation-delay:1939ms"/><circle cx="229" cy="54" r="3" fill="#6b97ff" class="dot" style="animation-delay:400ms"/><circle cx="225" cy="31" r="3" fill="#6b97ff" class="dot" style="animation-delay:1756ms"/><circle cx="245" cy="58" r="3" fill="#6b97ff" class="dot" style="animation-delay:1035ms"/><circle cx="213" cy="78" r="3" fill="#6b97ff" class="dot" style="animation-delay:58ms"/><circle cx="245" cy="50" r="3" fill="#6b97ff" class="dot" style="animation-delay:844ms"/><circle cx="219" cy="54" r="3" fill="#6b97ff" class="dot" style="animation-delay:1599ms"/><circle cx="236" cy="52" r="3" fill="#6b97ff" class="dot" style="animation-delay:1630ms"/><circle cx="181" cy="56" r="3" fill="#6b97ff" class="dot" style="animation-delay:1041ms"/><circle cx="247" cy="45" r="3" fill="#6b97ff" class="dot" style="animation-delay:1021ms"/><circle cx="222" cy="42" r="3" fill="#6b97ff" class="dot" style="animation-delay:541ms"/><circle cx="222" cy="60" r="3" fill="#6b97ff" class="dot" style="animation-delay:1985ms"/><circle cx="228" cy="67" r="3" fill="#6b97ff" class="dot" style="animation-delay:1322ms"/><circle cx="135" cy="170" r="3" fill="#f2efe6" class="dot" style="animation-delay:254ms"/><circle cx="141" cy="165" r="3" fill="#f2efe6" class="dot" style="animation-delay:1375ms"/><circle cx="117" cy="149" r="3" fill="#f2efe6" class="dot" style="animation-delay:236ms"/><circle cx="187" cy="154" r="3" fill="#f2efe6" class="dot" style="animation-delay:1858ms"/><circle cx="133" cy="152" r="3" fill="#f2efe6" class="dot" style="animation-delay:2067ms"/><circle cx="137" cy="144" r="3" fill="#f2efe6" class="dot" style="animation-delay:734ms"/><circle cx="136" cy="156" r="3" fill="#f2efe6" class="dot" style="animation-delay:2310ms"/><circle cx="119" cy="146" r="3" fill="#f2efe6" class="dot" style="animation-delay:353ms"/><circle cx="169" cy="182" r="3" fill="#f2efe6" class="dot" style="animation-delay:1658ms"/><circle cx="142" cy="183" r="3" fill="#f2efe6" class="dot" style="animation-delay:873ms"/><circle cx="166" cy="146" r="3" fill="#f2efe6" class="dot" style="animation-delay:1222ms"/><circle cx="151" cy="166" r="3" fill="#f2efe6" class="dot" style="animation-delay:1915ms"/><circle cx="160" cy="149" r="3" fill="#f2efe6" class="dot" style="animation-delay:1818ms"/><g class="center" style="animation-delay:0ms"><circle cx="78" cy="70" r="9" fill="none" stroke="#3fd35a" stroke-width="2"/><circle cx="78" cy="70" r="3" fill="#3fd35a"/></g><g class="center" style="animation-delay:400ms"><circle cx="214" cy="58" r="9" fill="none" stroke="#6b97ff" stroke-width="2"/><circle cx="214" cy="58" r="3" fill="#6b97ff"/></g><g class="center" style="animation-delay:800ms"><circle cx="150" cy="158" r="9" fill="none" stroke="#f2efe6" stroke-width="2"/><circle cx="150" cy="158" r="3" fill="#f2efe6"/></g></svg></div>
+      <div class="details">
+        <h2>Rincian error</h2>
+        <dl>
+          <div><dt>Kode error</dt><dd><code>502 Bad Gateway</code></dd></div>
+          <div><dt>Alamat yang dibuka</dt><dd><code class="path">/</code></dd></div>
+        </dl>
+        <h3>Kemungkinan penyebab</h3>
+        <ul><li>Situs sedang dimulai ulang setelah pembaruan.</li><li>Aplikasi situs berhenti dan sedang dinyalakan lagi.</li><li>Server kehabisan memori sesaat.</li></ul>
+        <p class="hint">Bila masalah berlanjut, kabari lewat ahmad@ngiliyun.my.id.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="lang" data-lang="en" hidden>
+  <div class="layout">
+    <div>
+      <p class="badge"><span class="dot-status" aria-hidden="true"></span>Error page 502</p>
+      <p class="code" aria-hidden="true"><span class="digit" style="--d:120ms">5</span><span class="digit" style="--d:230ms">0</span><span class="digit" style="--d:340ms">2</span></p>
+      <h1 class="title">The site's server is not responding</h1>
+      <p class="lead">This is an error page. The web server received your request, but the site application behind it did not answer.</p>
+      <div class="actions">
+        <button type="button" class="btn btn-solid" data-action="retry"><span aria-hidden="true">↻</span>Try again</button>
+        <button type="button" class="btn btn-line" data-action="back"><span aria-hidden="true">←</span>Go back</button>
+        <a class="btn btn-line" href="/en/">Go to home</a>
+      </div>
+      <p class="auto" aria-live="polite" data-auto="This page will try to reload by itself in {s} seconds."></p>
+    </div>
+    <div class="side">
+      <div class="plot-wrap"><svg viewBox="0 0 300 220" class="plot" aria-hidden="true"><line x1="78" y1="70" x2="98" y2="70" class="link"/><line x1="78" y1="70" x2="110" y2="77" class="link"/><line x1="78" y1="70" x2="57" y2="68" class="link"/><line x1="78" y1="70" x2="75" y2="81" class="link"/><line x1="78" y1="70" x2="90" y2="81" class="link"/><line x1="78" y1="70" x2="87" y2="57" class="link"/><line x1="78" y1="70" x2="84" y2="93" class="link"/><line x1="78" y1="70" x2="58" y2="64" class="link"/><line x1="78" y1="70" x2="67" y2="93" class="link"/><line x1="78" y1="70" x2="86" y2="88" class="link"/><line x1="78" y1="70" x2="96" y2="71" class="link"/><line x1="78" y1="70" x2="68" y2="69" class="link"/><line x1="78" y1="70" x2="94" y2="67" class="link"/><line x1="214" y1="58" x2="242" y2="61" class="link"/><line x1="214" y1="58" x2="229" y2="54" class="link"/><line x1="214" y1="58" x2="225" y2="31" class="link"/><line x1="214" y1="58" x2="245" y2="58" class="link"/><line x1="214" y1="58" x2="213" y2="78" class="link"/><line x1="214" y1="58" x2="245" y2="50" class="link"/><line x1="214" y1="58" x2="219" y2="54" class="link"/><line x1="214" y1="58" x2="236" y2="52" class="link"/><line x1="214" y1="58" x2="181" y2="56" class="link"/><line x1="214" y1="58" x2="247" y2="45" class="link"/><line x1="214" y1="58" x2="222" y2="42" class="link"/><line x1="214" y1="58" x2="222" y2="60" class="link"/><line x1="214" y1="58" x2="228" y2="67" class="link"/><line x1="150" y1="158" x2="135" y2="170" class="link"/><line x1="150" y1="158" x2="141" y2="165" class="link"/><line x1="150" y1="158" x2="117" y2="149" class="link"/><line x1="150" y1="158" x2="187" y2="154" class="link"/><line x1="150" y1="158" x2="133" y2="152" class="link"/><line x1="150" y1="158" x2="137" y2="144" class="link"/><line x1="150" y1="158" x2="136" y2="156" class="link"/><line x1="150" y1="158" x2="119" y2="146" class="link"/><line x1="150" y1="158" x2="169" y2="182" class="link"/><line x1="150" y1="158" x2="142" y2="183" class="link"/><line x1="150" y1="158" x2="166" y2="146" class="link"/><line x1="150" y1="158" x2="151" y2="166" class="link"/><line x1="150" y1="158" x2="160" y2="149" class="link"/><circle cx="98" cy="70" r="3" fill="#3fd35a" class="dot" style="animation-delay:748ms"/><circle cx="110" cy="77" r="3" fill="#3fd35a" class="dot" style="animation-delay:981ms"/><circle cx="57" cy="68" r="3" fill="#3fd35a" class="dot" style="animation-delay:1133ms"/><circle cx="75" cy="81" r="3" fill="#3fd35a" class="dot" style="animation-delay:1713ms"/><circle cx="90" cy="81" r="3" fill="#3fd35a" class="dot" style="animation-delay:1411ms"/><circle cx="87" cy="57" r="3" fill="#3fd35a" class="dot" style="animation-delay:203ms"/><circle cx="84" cy="93" r="3" fill="#3fd35a" class="dot" style="animation-delay:1422ms"/><circle cx="58" cy="64" r="3" fill="#3fd35a" class="dot" style="animation-delay:564ms"/><circle cx="67" cy="93" r="3" fill="#3fd35a" class="dot" style="animation-delay:28ms"/><circle cx="86" cy="88" r="3" fill="#3fd35a" class="dot" style="animation-delay:1711ms"/><circle cx="96" cy="71" r="3" fill="#3fd35a" class="dot" style="animation-delay:2129ms"/><circle cx="68" cy="69" r="3" fill="#3fd35a" class="dot" style="animation-delay:1465ms"/><circle cx="94" cy="67" r="3" fill="#3fd35a" class="dot" style="animation-delay:2163ms"/><circle cx="242" cy="61" r="3" fill="#6b97ff" class="dot" style="animation-delay:1939ms"/><circle cx="229" cy="54" r="3" fill="#6b97ff" class="dot" style="animation-delay:400ms"/><circle cx="225" cy="31" r="3" fill="#6b97ff" class="dot" style="animation-delay:1756ms"/><circle cx="245" cy="58" r="3" fill="#6b97ff" class="dot" style="animation-delay:1035ms"/><circle cx="213" cy="78" r="3" fill="#6b97ff" class="dot" style="animation-delay:58ms"/><circle cx="245" cy="50" r="3" fill="#6b97ff" class="dot" style="animation-delay:844ms"/><circle cx="219" cy="54" r="3" fill="#6b97ff" class="dot" style="animation-delay:1599ms"/><circle cx="236" cy="52" r="3" fill="#6b97ff" class="dot" style="animation-delay:1630ms"/><circle cx="181" cy="56" r="3" fill="#6b97ff" class="dot" style="animation-delay:1041ms"/><circle cx="247" cy="45" r="3" fill="#6b97ff" class="dot" style="animation-delay:1021ms"/><circle cx="222" cy="42" r="3" fill="#6b97ff" class="dot" style="animation-delay:541ms"/><circle cx="222" cy="60" r="3" fill="#6b97ff" class="dot" style="animation-delay:1985ms"/><circle cx="228" cy="67" r="3" fill="#6b97ff" class="dot" style="animation-delay:1322ms"/><circle cx="135" cy="170" r="3" fill="#f2efe6" class="dot" style="animation-delay:254ms"/><circle cx="141" cy="165" r="3" fill="#f2efe6" class="dot" style="animation-delay:1375ms"/><circle cx="117" cy="149" r="3" fill="#f2efe6" class="dot" style="animation-delay:236ms"/><circle cx="187" cy="154" r="3" fill="#f2efe6" class="dot" style="animation-delay:1858ms"/><circle cx="133" cy="152" r="3" fill="#f2efe6" class="dot" style="animation-delay:2067ms"/><circle cx="137" cy="144" r="3" fill="#f2efe6" class="dot" style="animation-delay:734ms"/><circle cx="136" cy="156" r="3" fill="#f2efe6" class="dot" style="animation-delay:2310ms"/><circle cx="119" cy="146" r="3" fill="#f2efe6" class="dot" style="animation-delay:353ms"/><circle cx="169" cy="182" r="3" fill="#f2efe6" class="dot" style="animation-delay:1658ms"/><circle cx="142" cy="183" r="3" fill="#f2efe6" class="dot" style="animation-delay:873ms"/><circle cx="166" cy="146" r="3" fill="#f2efe6" class="dot" style="animation-delay:1222ms"/><circle cx="151" cy="166" r="3" fill="#f2efe6" class="dot" style="animation-delay:1915ms"/><circle cx="160" cy="149" r="3" fill="#f2efe6" class="dot" style="animation-delay:1818ms"/><g class="center" style="animation-delay:0ms"><circle cx="78" cy="70" r="9" fill="none" stroke="#3fd35a" stroke-width="2"/><circle cx="78" cy="70" r="3" fill="#3fd35a"/></g><g class="center" style="animation-delay:400ms"><circle cx="214" cy="58" r="9" fill="none" stroke="#6b97ff" stroke-width="2"/><circle cx="214" cy="58" r="3" fill="#6b97ff"/></g><g class="center" style="animation-delay:800ms"><circle cx="150" cy="158" r="9" fill="none" stroke="#f2efe6" stroke-width="2"/><circle cx="150" cy="158" r="3" fill="#f2efe6"/></g></svg></div>
+      <div class="details">
+        <h2>Error details</h2>
+        <dl>
+          <div><dt>Error code</dt><dd><code>502 Bad Gateway</code></dd></div>
+          <div><dt>Requested address</dt><dd><code class="path">/</code></dd></div>
+        </dl>
+        <h3>Possible causes</h3>
+        <ul><li>The site is restarting after an update.</li><li>The site application stopped and is starting again.</li><li>The server briefly ran out of memory.</li></ul>
+        <p class="hint">If the problem continues, let me know at ahmad@ngiliyun.my.id.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+<script>(function(){
+  var en = location.pathname.indexOf("/en/") === 0;
+  var lang = en ? "en" : "id";
+  document.documentElement.lang = lang;
+  document.querySelectorAll(".lang").forEach(function(el){ el.hidden = el.getAttribute("data-lang") !== lang; });
+  document.title = document.querySelector('.lang[data-lang="' + lang + '"] .title').textContent + " | Ahmad Ngiliyun";
+  document.querySelectorAll(".path").forEach(function(el){ el.textContent = decodeURI(location.pathname + location.search); });
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-action]");
+    if (!b) return;
+    if (b.getAttribute("data-action") === "retry") location.reload();
+    else if (history.length > 1) history.back();
+    else location.href = en ? "/en/" : "/";
+  });
+  var auto = document.querySelector('.lang[data-lang="' + lang + '"] .auto');
+  if (!auto) return;
+  var s = 20;
+  var tick = function(){
+    auto.textContent = auto.getAttribute("data-auto").replace("{s}", s);
+    if (s === 0) location.reload(); else { s -= 1; setTimeout(tick, 1000); }
+  };
+  tick();
+})();</script>
+</body>
+</html>

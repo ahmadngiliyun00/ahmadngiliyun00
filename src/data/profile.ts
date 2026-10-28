@@ -347,6 +347,25 @@ export type Copy = {
   };
   footer: { built: string; jobTitle: string; top: string };
   newTab: string;
+  errors: ErrorCopy;
+};
+
+// Teks halaman error. {code} diganti nomor status HTTP.
+export type ErrorPageCopy = { status: string; title: string; lead: string; causes: string[]; hint: string };
+export type ErrorCopy = {
+  badge: string;
+  details: string;
+  codeLabel: string;
+  pathLabel: string;
+  refLabel: string;
+  refNote: string;
+  causesTitle: string;
+  back: string;
+  home: string;
+  retry: string;
+  suggestions: string;
+  notFound: ErrorPageCopy;
+  server: ErrorPageCopy;
 };
 
 export const copy: Localized<Copy> = {
@@ -704,6 +723,41 @@ export const copy: Localized<Copy> = {
       top: "Kembali ke atas",
     },
     newTab: "membuka tab baru",
+    errors: {
+      badge: "Halaman error {code}",
+      details: "Rincian error",
+      codeLabel: "Kode error",
+      pathLabel: "Alamat yang dibuka",
+      refLabel: "Kode referensi",
+      refNote: "Sebutkan kode ini bila melaporkan masalah, supaya catatan server mudah dicari.",
+      causesTitle: "Kemungkinan penyebab",
+      back: "Kembali",
+      home: "Ke beranda",
+      retry: "Coba lagi",
+      suggestions: "Mungkin yang Anda cari",
+      notFound: {
+        status: "404 Not Found",
+        title: "Halaman tidak ditemukan",
+        lead: "Ini halaman error. Alamat yang Anda buka tidak ada di situs ini, jadi tidak ada isi yang bisa ditampilkan.",
+        causes: [
+          "Alamatnya salah ketik atau tautannya terpotong.",
+          "Halamannya sudah dipindah, misalnya isi beranda yang kini punya halaman sendiri.",
+          "Datanya dijadikan privat, atau tautan berbagi sudah dicabut.",
+        ],
+        hint: "Periksa lagi alamatnya, kembali ke halaman sebelumnya, atau buka salah satu halaman di bawah.",
+      },
+      server: {
+        status: "500 Internal Server Error",
+        title: "Terjadi kesalahan di server",
+        lead: "Ini halaman error. Server gagal menyiapkan halaman ini, jadi isinya tidak bisa ditampilkan. Masalahnya ada di sisi situs, bukan di perangkat Anda.",
+        causes: [
+          "Database sedang tidak bisa dihubungi.",
+          "Situs baru saja diperbarui dan sedang dimulai ulang.",
+          "Ada galat di kode halaman ini yang perlu diperbaiki.",
+        ],
+        hint: "Coba muat ulang dalam beberapa saat. Bila tetap gagal, kirim kode referensi di bawah ke ahmad@ngiliyun.my.id.",
+      },
+    },
   },
   en: {
     meta: {
@@ -1059,5 +1113,40 @@ export const copy: Localized<Copy> = {
       top: "Back to top",
     },
     newTab: "opens in a new tab",
+    errors: {
+      badge: "Error page {code}",
+      details: "Error details",
+      codeLabel: "Error code",
+      pathLabel: "Requested address",
+      refLabel: "Reference code",
+      refNote: "Mention this code when reporting the problem so the server logs are easy to search.",
+      causesTitle: "Possible causes",
+      back: "Go back",
+      home: "Go to home",
+      retry: "Try again",
+      suggestions: "You might be looking for",
+      notFound: {
+        status: "404 Not Found",
+        title: "Page not found",
+        lead: "This is an error page. The address you opened does not exist on this site, so there is nothing to show.",
+        causes: [
+          "The address has a typo or the link was cut off.",
+          "The page has moved, for example homepage content that now has its own page.",
+          "The item was made private, or the share link was revoked.",
+        ],
+        hint: "Check the address, go back to the previous page, or open one of the pages below.",
+      },
+      server: {
+        status: "500 Internal Server Error",
+        title: "Something went wrong on the server",
+        lead: "This is an error page. The server could not prepare this page, so its content cannot be shown. The problem is on the site's side, not on your device.",
+        causes: [
+          "The database cannot be reached right now.",
+          "The site was just updated and is restarting.",
+          "There is a bug in this page's code that needs fixing.",
+        ],
+        hint: "Try reloading in a moment. If it keeps failing, send the reference code below to ahmad@ngiliyun.my.id.",
+      },
+    },
   },
 };
