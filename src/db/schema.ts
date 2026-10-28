@@ -128,3 +128,45 @@ export const messages = mysqlTable(
   },
   (t) => [index("messages_status_created").on(t.status, t.createdAt)],
 );
+
+// Pembaca halaman tulisan (/kabar/<slug>/). Satu baris per pengunjung per tulisan per hari,
+// jadi muat ulang berkali-kali tidak menambah hitungan. visitor adalah hash harian dari IP dan
+// user agent yang tidak bisa dibalik ke IP dan tidak bisa dikaitkan antarhari.
+export const postViews = mysqlTable(
+  "post_views",
+  {
+    id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),
+    entryId: int("entry_id").notNull(),
+    visitor: varchar("visitor", { length: 64 }).notNull(),
+    day: varchar("day", { length: 10 }).notNull(), // YYYY-MM-DD, waktu Indonesia barat
+    // Asal kunjungan: whatsapp, facebook, x, linkedin, telegram, google, bing, direct, atau nama host lain.
+    source: varchar("source", { length: 60 }).notNull().default("direct"),
+    device: mysqlEnum("device", ["mobile", "desktop"]).notNull().default("desktop"),
+    lang: mysqlEnum("lang", ["id", "en"]).notNull().default("id"),
+    createdAt: datetime("created_at").notNull(),
+  },
+  (t) => [uniqueIndex("post_views_unique").on(t.entryId, t.visitor, t.day), index("post_views_entry_day").on(t.entryId, t.day)],
+);
+
+// Komentar pengunjung pada tulisan. Baru tampil di situs setelah disetujui di CMS (/admin/komentar/).
+// Email pengomentar tidak pernah ditampilkan di situs.
+export const comments = mysqlTable(
+  "comments",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    entryId: int("entry_id").notNull(),
+    name: varchar("name", { length: 80 }).notNull(),
+    email: varchar("email", { length: 190 }).notNull(),
+    body: text("body").notNull(),
+    lang: mysqlEnum("lang", ["id", "en"]).notNull().default("id"),
+    // pending = menunggu persetujuan, approved = tampil di situs, spam = disembunyikan.
+    status: mysqlEnum("status", ["pending", "approved", "spam"]).notNull().default("pending"),
+    // Balasan Mas Ilyun, tampil di bawah komentar.
+    reply: text("reply"),
+    ipHash: varchar("ip_hash", { length: 64 }),
+    createdAt: datetime("created_at").notNull(),
+    approvedAt: datetime("approved_at"),
+    repliedAt: datetime("replied_at"),
+  },
+  (t) => [index("comments_entry_status").on(t.entryId, t.status), index("comments_status_created").on(t.status, t.createdAt)],
+);

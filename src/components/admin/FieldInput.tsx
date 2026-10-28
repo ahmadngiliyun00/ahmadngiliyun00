@@ -1,5 +1,7 @@
 "use client";
 
+import RichTextPair from "@/components/admin/RichTextPair";
+import type { RichTextLabels } from "@/components/admin/RichTextEditor";
 import type { Field, Option } from "@/content/fields";
 import type { PartialDate } from "@/content/types";
 
@@ -15,6 +17,7 @@ export type FieldLabels = {
   openFile: string;
   removeFile: string;
   required: string;
+  editor: RichTextLabels;
   placeholder: {
     write: string;
     writeId: string;
@@ -62,6 +65,7 @@ function placeholderFor(field: Field, labels: FieldLabels, part?: "id" | "en"): 
     case "localizedList":
       return part === "en" ? ph.listEn : ph.list;
     case "localized":
+    case "richtext":
       return (part === "en" ? ph.writeEn : ph.writeId).replace("{label}", name);
     default:
       return ph.write.replace("{label}", name);
@@ -126,6 +130,22 @@ export default function FieldInput({
   );
 
   switch (field.type) {
+    case "richtext":
+      return (
+        <fieldset className="admin-field" aria-describedby={describedBy}>
+          <legend>{label}</legend>
+          <RichTextPair
+            name={key}
+            id={id}
+            value={{ id: one(`${key}.id`, pair.id ?? ""), en: one(`${key}.en`, pair.en ?? "") }}
+            placeholder={{ id: placeholderFor(field, labels, "id"), en: placeholderFor(field, labels, "en") }}
+            langLabels={{ id: labels.id, en: labels.en }}
+            labels={labels.editor}
+            invalid={invalid}
+          />
+          {foot}
+        </fieldset>
+      );
     case "text":
     case "url":
     case "number":

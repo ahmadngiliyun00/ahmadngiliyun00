@@ -11,6 +11,7 @@ import { admins } from "@/db/schema";
 import { DUMMY_HASH, verifyPassword } from "@/server/auth/password";
 import { clearFailures, clientIp, isLimited, recordFailure } from "@/server/auth/rate-limit";
 import { createSession, destroySession, requireAdmin } from "@/server/auth/session";
+import { saveUpload } from "@/server/files";
 import { sendTestMail } from "@/server/mail";
 import { deleteMessage, setMessageStatus, type MessageStatus } from "@/server/messages";
 import {
@@ -126,6 +127,25 @@ export async function moveEntryAction(form: FormData) {
 export async function createShareAction(id: number): Promise<{ token: string }> {
   await requireAdmin();
   return { token: await createShare(toId(id)) };
+}
+
+// Unggah gambar dari editor rich text. Gambar dikaitkan ke datanya (entryId) supaya izin
+// aksesnya mengikuti status data itu; untuk data baru, kaitan dibuat saat pertama disimpan.
+export async function uploadInlineImageAction(
+  form: FormData,
+): Promise<{ ok: true; url: string } | { ok: false; message: string }> {
+  await requireAdmin();
+  const file = form.get("file");
+  if (!(file instanceof File)) return { ok: false, message: "Tidak ada gambar." };
+  const idText = String(form.get("entryId") ?? "");
+  const entryId = idText === "" ? null : toId(idText);
+  try {
+    const buf = Buffer.from(await file.arrayBuffer());
+    const meta = await saveUpload(buf, file.name, entryId, { imagesOnly: true });
+    return { ok: true, url: `/files/${meta.id}/` };
+  } catch (err) {
+    return { ok: false, message: (err as Error).message };
+  }
 }
 
 export async function revokeShareAction(id: number): Promise<void> {

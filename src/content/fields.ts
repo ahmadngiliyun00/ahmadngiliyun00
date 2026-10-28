@@ -2,6 +2,7 @@
 // Satu definisi dipakai tiga kali: merender formulir admin, membaca FormData, dan memvalidasi data.
 
 import type { PartialDate } from "@/content/types";
+import { asHtml, htmlToText } from "@/lib/richtext";
 
 export type Option = { value: string; label: string };
 
@@ -26,6 +27,11 @@ interface NumberField extends Base {
   min?: number;
   max?: number;
 }
+// Isi panjang dengan format (judul, daftar, tautan, gambar) dari editor, per bahasa.
+// Disimpan sebagai HTML yang dibersihkan di server (src/server/richtext.ts).
+interface RichTextField extends Base {
+  type: "richtext";
+}
 interface ChoiceField extends Base {
   type: "select" | "multiselect";
   options: Option[];
@@ -38,7 +44,7 @@ interface ReferenceField extends Base {
 // Lebar isian di grid 12 kolom formulir CMS (desktop). Di layar sempit semua isian selebar penuh.
 export type FieldWidth = "full" | "half" | "third" | "quarter";
 
-export type Field = PlainField | LocalizedField | NumberField | ChoiceField | ReferenceField;
+export type Field = PlainField | LocalizedField | RichTextField | NumberField | ChoiceField | ReferenceField;
 
 export type FieldErrors = Record<string, string>;
 
@@ -208,6 +214,20 @@ export function readField(field: Field, form: FormData, errors: FieldErrors): un
       items.forEach((item) => checkText(item, label, errors, field.name));
       return items.length === 0 ? undefined : items;
     }
+    case "richtext": {
+      // Bahasa yang hanya berisi tag kosong dianggap kosong. Boleh hanya satu bahasa.
+      const id = str(form, `${key}.id`);
+      const en = str(form, `${key}.en`);
+      const idText = htmlToText(id);
+      const enText = htmlToText(en);
+      const idEmpty = idText === "" ? !id.includes("<img") : false;
+      const enEmpty = enText === "" ? !en.includes("<img") : false;
+      if (idEmpty) {
+        if (enEmpty) return undefined;
+      }
+      checkText(`${idText} ${enText}`, label, errors, field.name);
+      return { id: idEmpty ? "" : id, en: enEmpty ? "" : en };
+    }
     case "localizedList": {
       const id = lines(str(form, `${key}.id`));
       const en = lines(str(form, `${key}.en`));
@@ -271,6 +291,11 @@ export function formValue(field: Field, doc: Doc): string | { id: string; en: st
     case "localized": {
       const o = (v ?? {}) as { id?: string; en?: string };
       return { id: o.id ?? "", en: o.en ?? "" };
+    }
+    case "richtext": {
+      // Isi lama berupa teks biasa diubah ke HTML supaya bisa dibuka di editor.
+      const o = (v ?? {}) as { id?: string; en?: string };
+      return { id: asHtml(o.id ?? ""), en: asHtml(o.en ?? "") };
     }
     case "localizedList": {
       const o = (v ?? {}) as { id?: string[]; en?: string[] };

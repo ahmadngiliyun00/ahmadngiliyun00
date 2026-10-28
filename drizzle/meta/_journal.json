@@ -15,6 +15,13 @@
       "when": 1793207091478,
       "tag": "0001_contact_messages",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1793219738762,
+      "tag": "0002_post_views_comments",
+      "breakpoints": true
     }
   ]
 }

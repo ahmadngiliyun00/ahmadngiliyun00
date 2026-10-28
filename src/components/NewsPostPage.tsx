@@ -3,11 +3,12 @@ import ExternalLink from "@/components/ExternalLink";
 import SubpageShell from "@/components/SubpageShell";
 import { copy, site, type Lang } from "@/data/profile";
 import { homePath } from "@/lib/nav";
+import { asHtml } from "@/lib/richtext";
+import { renderRichText } from "@/server/richtext";
 import {
   type PostItem,
   hasPage,
   isoPartialDate,
-  postBlocks,
   postDate,
   postKindLabel,
   postPath,
@@ -22,7 +23,8 @@ export default function NewsPostPage({ lang, post }: { lang: Lang; post: PostIte
   const title = post.title[lang];
   const kind = postKindLabel(post, lang);
   const date = postDate(post, lang);
-  const blocks = postBlocks(post.body?.[lang] ?? "");
+  // Dibersihkan lagi saat dirender, sebagai lapis kedua setelah pembersihan saat disimpan.
+  const html = renderRichText(asHtml(post.body?.[lang] ?? ""));
   const otherHref = hasPage(post, other) ? postPath(other, post.slug) : postsPath(other);
 
   const structured = {
@@ -76,22 +78,7 @@ export default function NewsPostPage({ lang, post }: { lang: Lang; post: PostIte
             </p>
             {post.summary ? <p className="section-intro">{post.summary[lang]}</p> : null}
 
-            <div className="post-body">
-              {blocks.map((b, i) =>
-                b.type === "heading" ? (
-                  <h2 key={i}>{b.text}</h2>
-                ) : (
-                  <p key={i}>
-                    {b.lines.map((line, j) => (
-                      <span key={j}>
-                        {j > 0 ? <br /> : null}
-                        {line}
-                      </span>
-                    ))}
-                  </p>
-                ),
-              )}
-            </div>
+            <div className="post-body" dangerouslySetInnerHTML={{ __html: html }} />
 
             <div className="post-foot">
               {post.url ? (

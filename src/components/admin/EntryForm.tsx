@@ -64,7 +64,7 @@ export default function EntryForm({
   }, [state, labels.saved, labels.errorsTitle]);
 
   return (
-    <form ref={formRef} action={formAction} className="admin-form" encType="multipart/form-data" noValidate>
+    <form ref={formRef} action={formAction} className="admin-form" noValidate>
       {Object.entries(hidden).map(([k, v]) => (
         <input key={k} type="hidden" name={k} value={v} />
       ))}

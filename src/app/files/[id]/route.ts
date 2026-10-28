@@ -7,17 +7,23 @@ import { getFileMeta, readStored } from "@/server/files";
 
 // Menyajikan berkas unggahan. Izin dibuka bila salah satu terpenuhi:
 // 1. pengunjung adalah admin yang sedang masuk,
-// 2. berkas milik data yang public,
+// 2. berkas milik data yang public (lampiran sertifikat atau gambar di dalam tulisan),
 // 3. permintaan membawa token tautan berbagi (?s=) yang cocok dengan data pemilik berkas.
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
   const meta = await getFileMeta(id);
   if (meta === undefined) return new Response("Tidak ditemukan", { status: 404 });
 
+  // Pemilik: data yang memakai berkas ini sebagai fileId (sertifikat), atau data yang tercatat
+  // di files.entry_id (gambar di dalam isi tulisan).
   const owners = await db
     .select({ visibility: entries.visibility, shareHash: entries.shareHash })
     .from(entries)
-    .where(sql`JSON_UNQUOTE(JSON_EXTRACT(${entries.data}, '$.fileId')) = ${id}`)
+    .where(
+      meta.entryId === null
+        ? sql`JSON_UNQUOTE(JSON_EXTRACT(${entries.data}, '$.fileId')) = ${id}`
+        : sql`${entries.id} = ${meta.entryId} OR JSON_UNQUOTE(JSON_EXTRACT(${entries.data}, '$.fileId')) = ${id}`,
+    )
     .limit(1);
   const owner = owners[0];
   const isPublic = owner ? owner.visibility === "public" : false;

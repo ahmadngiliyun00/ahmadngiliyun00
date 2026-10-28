@@ -134,10 +134,8 @@ export const collections: CollectionConfig[] = [
       {
         name: "body",
         label: "Isi lengkap",
-        type: "localized",
-        multiline: true,
-        rows: 14,
-        help: "Opsional. Bila diisi, tulisan punya halaman sendiri di /kabar/. Pisahkan paragraf dengan satu baris kosong; baris yang diawali ## menjadi subjudul.",
+        type: "richtext",
+        help: "Opsional. Bila diisi, tulisan punya halaman sendiri di /kabar/. Gambar bisa diunggah lewat tombol gambar, ditempel, atau diseret; ukurannya diperkecil otomatis. Isi teks alternatif untuk setiap gambar.",
       },
     ],
   },

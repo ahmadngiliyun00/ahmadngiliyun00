@@ -66,21 +66,6 @@ export function isoPartialDate(d: PartialDate): string {
   return parts.join("-");
 }
 
-// Isi lengkap: paragraf dipisah baris kosong, baris berawalan "## " menjadi subjudul.
-export type PostBlock = { type: "heading"; text: string } | { type: "paragraph"; lines: string[] };
-
-export function postBlocks(body: string): PostBlock[] {
-  return body
-    .replace(/\r\n?/g, "\n")
-    .split(/\n\s*\n/)
-    .map((chunk) => chunk.trim())
-    .filter((chunk) => chunk !== "")
-    .map((chunk): PostBlock => {
-      if (chunk.startsWith("## ")) return { type: "heading", text: chunk.slice(3).trim() };
-      return { type: "paragraph", lines: chunk.split("\n").map((l) => l.trim()) };
-    });
-}
-
 // Dikelompokkan per tahun untuk arsip.
 export function groupByYear(items: PostItem[]): { year: string; items: PostItem[] }[] {
   const groups: { year: string; items: PostItem[] }[] = [];

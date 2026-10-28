@@ -2,7 +2,7 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray, isNull, or } from "drizzle-orm";
 import { db } from "@/db";
 import { files } from "@/db/schema";
 
@@ -43,9 +43,18 @@ export function sniffType(buf: Buffer): string | null {
   return null;
 }
 
-export async function saveUpload(buf: Buffer, originalName: string, entryId: number | null): Promise<FileMeta> {
+// imagesOnly untuk gambar di dalam tulisan (editor rich text): PDF ditolak.
+export async function saveUpload(
+  buf: Buffer,
+  originalName: string,
+  entryId: number | null,
+  opts: { imagesOnly?: boolean } = {},
+): Promise<FileMeta> {
   const mime = sniffType(buf);
-  if (mime === null) throw new Error("Berkas harus PDF, PNG, JPG, atau WebP.");
+  if (mime === null) throw new Error(opts.imagesOnly ? "Gambar harus PNG, JPG, atau WebP." : "Berkas harus PDF, PNG, JPG, atau WebP.");
+  if (opts.imagesOnly) {
+    if (mime === "application/pdf") throw new Error("Gambar harus PNG, JPG, atau WebP.");
+  }
   if (buf.length > MAX_UPLOAD_BYTES) throw new Error("Berkas melebihi 5 MB.");
   const id = randomBytes(12).toString("hex");
   const storedName = `${id}.${ALLOWED_TYPES[mime]}`;
@@ -72,6 +81,29 @@ export async function getFileMeta(id: string): Promise<FileMeta | undefined> {
 
 export async function readStored(meta: FileMeta): Promise<Buffer> {
   return readFile(storedPath(meta.storedName));
+}
+
+// Mengaitkan gambar di dalam isi ke datanya dan menghapus gambar milik data itu yang tidak
+// dipakai lagi (misalnya dihapus dari editor). keep = berkas lain yang tetap dipakai (fileId).
+export async function syncInlineFiles(entryId: number, used: string[], keep: string[] = []) {
+  if (used.length > 0) {
+    await db
+      .update(files)
+      .set({ entryId })
+      .where(and(inArray(files.id, used), or(isNull(files.entryId), eq(files.entryId, entryId))));
+  }
+  const owned = await db.select({ id: files.id }).from(files).where(eq(files.entryId, entryId));
+  for (const f of owned) {
+    if (used.includes(f.id)) continue;
+    if (keep.includes(f.id)) continue;
+    await deleteFile(f.id);
+  }
+}
+
+// Semua berkas milik satu data, dipakai saat data dihapus.
+export async function deleteEntryFiles(entryId: number) {
+  const owned = await db.select({ id: files.id }).from(files).where(eq(files.entryId, entryId));
+  for (const f of owned) await deleteFile(f.id);
 }
 
 export async function deleteFile(id: string) {

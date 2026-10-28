@@ -2,13 +2,15 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import { and, asc, eq, ne } from "drizzle-orm";
 import { getCollection, getSettingsConfig } from "@/content/collections";
-import { readFields, slugify, SLUG_PATTERN, type Doc, type FieldErrors } from "@/content/fields";
+import { getPath, readFields, setPath, slugify, SLUG_PATTERN, type Doc, type FieldErrors } from "@/content/fields";
 import type { CollectionKey, Visibility } from "@/content/types";
 import { db } from "@/db";
-import { entries, settings } from "@/db/schema";
+import { comments, entries, postViews, settings } from "@/db/schema";
+import { fileIdsIn, htmlToText } from "@/lib/richtext";
 import { sha256 } from "@/server/auth/session";
 import { invalidateSite, rowToEntry } from "@/server/content";
-import { deleteFile, saveUpload } from "@/server/files";
+import { deleteEntryFiles, deleteFile, saveUpload, syncInlineFiles } from "@/server/files";
+import { sanitizeRichText } from "@/server/richtext";
 
 // Lapisan tulis konten untuk CMS. Pemanggil (Server Action) WAJIB sudah memanggil requireAdmin().
 
@@ -115,6 +117,19 @@ export async function saveEntry(
   }
 
   const { data, errors } = readFields(cfg.fields, form, existing);
+  // Isi rich text dibersihkan di server; bahasa yang kosong setelah dibersihkan dibuang.
+  const richFields = cfg.fields.filter((f) => f.type === "richtext");
+  for (const f of richFields) {
+    const v = getPath(data, f.name) as { id?: string; en?: string } | undefined;
+    if (v === undefined) continue;
+    const clean = (html: string) => {
+      const out = sanitizeRichText(html);
+      return htmlToText(out) === "" ? (out.includes("<img") ? out : "") : out;
+    };
+    const id = clean(v.id ?? "");
+    const en = clean(v.en ?? "");
+    setPath(data, f.name, id === "" ? (en === "" ? undefined : { id, en }) : { id, en });
+  }
   const visibility: Visibility = form.get("visibility") === "public" ? "public" : "private";
   const positionText = String(form.get("position") ?? "").trim();
   const position = positionText === "" ? 0 : Number(positionText);
@@ -174,6 +189,16 @@ export async function saveEntry(
     if (oldFileId !== data.fileId) await deleteFile(oldFileId);
   }
 
+  // Gambar di dalam isi: kaitkan ke data ini, hapus yang tidak dipakai lagi.
+  if (richFields.length > 0) {
+    const html = richFields
+      .map((f) => getPath(data, f.name) as { id?: string; en?: string } | undefined)
+      .map((v) => `${v?.id ?? ""} ${v?.en ?? ""}`)
+      .join(" ");
+    const keep = typeof data.fileId === "string" ? [data.fileId] : [];
+    await syncInlineFiles(savedId as number, fileIdsIn(html), keep);
+  }
+
   // Hanya satu semester berjalan.
   if (collection === "term") {
     if (data.current === true) {
@@ -196,6 +221,12 @@ export async function deleteEntry(id: number) {
   const d = row.data as Doc;
   await db.delete(entries).where(eq(entries.id, id));
   if (typeof d.fileId === "string") await deleteFile(d.fileId);
+  // Gambar di dalam isi, komentar, dan statistik baca ikut dihapus.
+  await deleteEntryFiles(id);
+  if (row.collection === "post") {
+    await db.delete(comments).where(eq(comments.entryId, id));
+    await db.delete(postViews).where(eq(postViews.entryId, id));
+  }
   invalidateSite();
 }
 
