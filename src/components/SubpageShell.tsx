@@ -32,7 +32,7 @@ export default function SubpageShell({
       <main id="main" className="subpage">
         {children}
       </main>
-      <SiteFooter lang={lang} otherHref={otherHref} />
+      <SiteFooter lang={lang} />
     </>
   );
 }

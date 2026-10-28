@@ -248,16 +248,7 @@ export type Copy = {
       failed: string;
     };
   };
-  footer: {
-    built: string;
-    jobTitle: string;
-    top: string;
-    linksLabel: string;
-    explore: string;
-    profiles: string;
-    site: string;
-    otherLang: string;
-  };
+  footer: { built: string; jobTitle: string; top: string };
   newTab: string;
 };
 
@@ -485,11 +476,6 @@ export const copy: Localized<Copy> = {
       built: "Dibuat di Cirebon dengan Next.js, TypeScript, dan Tailwind CSS.",
       jobTitle: "AI Engineer, dosen informatika, pengembang full-stack, dan spesialis IT support",
       top: "Kembali ke atas",
-      linksLabel: "Tautan footer",
-      explore: "Jelajahi",
-      profiles: "Profil",
-      site: "Situs",
-      otherLang: "English",
     },
     newTab: "membuka tab baru",
   },
@@ -716,11 +702,6 @@ export const copy: Localized<Copy> = {
       built: "Made in Cirebon with Next.js, TypeScript, and Tailwind CSS.",
       jobTitle: "AI engineer, informatics lecturer, full-stack developer, and IT support specialist",
       top: "Back to top",
-      linksLabel: "Footer links",
-      explore: "Explore",
-      profiles: "Profiles",
-      site: "Site",
-      otherLang: "Bahasa Indonesia",
     },
     newTab: "opens in a new tab",
   },

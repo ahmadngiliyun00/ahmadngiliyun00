@@ -2185,59 +2185,13 @@ select.field {
   z-index: 1;
 }
 
-.footer-top {
-  display: grid;
-  gap: 3rem;
-}
-
-@media (min-width: 900px) {
-  .footer-top {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr);
-  }
-}
-
-.footer-cols {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 2rem 1.5rem;
-}
-
-@media (min-width: 640px) {
-  .footer-cols {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.footer-col-title {
-  margin-bottom: 0.9rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-muted);
-}
-
-.footer-cols ul {
-  display: grid;
-  gap: 0.15rem;
-}
-
-.footer-link {
-  display: inline-block;
-  padding-block: 0.3rem;
-  color: var(--color-fg);
-  transition: color 0.2s ease;
-}
-
-.footer-link:hover {
-  color: var(--color-leaf);
-}
-
 .footer-legal {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.5rem 1.5rem;
-  margin-top: 3.5rem;
-  padding-top: 1.25rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
   border-top: 1px solid var(--color-line);
   font-size: 0.875rem;
   color: var(--color-muted);
