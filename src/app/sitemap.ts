@@ -9,6 +9,9 @@ import { loadSite } from "@/server/content";
 // CMS, tautan berbagi, dan berkas unggahan diblokir di robots.ts.
 // lastModified memakai waktu ubah data terakhir, bukan waktu sekarang, supaya Google
 // hanya merayapi ulang halaman yang memang berubah.
+// Pasangan bahasa (hreflang) tidak ditulis di sini karena sudah ada di <head> setiap halaman
+// (alternates.languages di src/lib/metadata.ts). Tanpa elemen xhtml:link, browser menampilkan
+// sitemap sebagai pohon XML yang mudah dibaca, bukan teks yang menyambung.
 export const dynamic = "force-dynamic";
 
 function latest(list: Entry[]): Date | undefined {
@@ -19,13 +22,10 @@ function latest(list: Entry[]): Date | undefined {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const content = await loadSite();
-  const pair = (id: string, en: string, lastModified: Date | undefined) => {
-    const languages = { id: `${site.url}${id}`, en: `${site.url}${en}` };
-    return [
-      { url: languages.id, lastModified, alternates: { languages } },
-      { url: languages.en, lastModified, alternates: { languages } },
-    ];
-  };
+  const pair = (id: string, en: string, lastModified: Date | undefined) => [
+    { url: `${site.url}${id}`, lastModified },
+    { url: `${site.url}${en}`, lastModified },
+  ];
 
   const achievements = content.achievement.filter((e) => e.visibility === "public");
   const everything = Object.values(content).filter(Array.isArray).flat() as Entry[];
