@@ -6,8 +6,10 @@
     "dev": "next dev",
     "data": "node scripts/fetch-github.mjs",
     "readme": "node scripts/readme-assets.mjs",
+    "check:achievements": "node scripts/check-achievements.mjs",
+    "thumbs": "node scripts/thumbnails.mjs",
     "test": "node --test tests/linkedin.test.mjs",
-    "prebuild": "node scripts/fetch-github.mjs",
+    "prebuild": "node scripts/prebuild.mjs",
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "preview": "npx --yes serve out"
