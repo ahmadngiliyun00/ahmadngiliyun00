@@ -4,6 +4,9 @@
   "description": "Portofolio pribadi Ahmad Ngiliyun (ngiliyun.my.id)",
   "scripts": {
     "dev": "next dev",
+    "data": "node scripts/fetch-github.mjs",
+    "readme": "node scripts/readme-assets.mjs",
+    "prebuild": "node scripts/fetch-github.mjs",
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "preview": "npx --yes serve out"

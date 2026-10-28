@@ -10,6 +10,8 @@ export type KMeansLabels = {
   iteration: string;
   running: string;
   converged: string;
+  cluster: string;
+  points: string;
 };
 
 type Point = { x: number; y: number; c: number };
@@ -68,6 +70,7 @@ export default function KMeans({ labels }: { labels: KMeansLabels }) {
   const apiRef = useRef<Api | null>(null);
   const [iter, setIter] = useState(0);
   const [converged, setConverged] = useState(false);
+  const [counts, setCounts] = useState<number[]>([PER_BLOB, PER_BLOB, PER_BLOB]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -123,6 +126,11 @@ export default function KMeans({ labels }: { labels: KMeansLabels }) {
         });
         p.c = best;
       });
+      const next = new Array(K).fill(0);
+      points.forEach((p) => {
+        next[p.c] += 1;
+      });
+      setCounts(next);
     };
 
     const computeTargets = () => {
@@ -323,11 +331,14 @@ export default function KMeans({ labels }: { labels: KMeansLabels }) {
   }, []);
 
   return (
-    <figure className="m-0">
-      <div
-        ref={wrapRef}
-        className="relative aspect-[5/4] w-full overflow-hidden rounded-2xl border border-line bg-surface"
-      >
+    <figure className="plot m-0">
+      <div className="plot-head" aria-hidden="true">
+        <span className="plot-title">k-means, k = 3</span>
+        <span className={converged ? "plot-state is-done" : "plot-state"}>
+          {labels.iteration} {iter}, {converged ? labels.converged : labels.running}
+        </span>
+      </div>
+      <div ref={wrapRef} className="plot-area">
         <canvas
           ref={canvasRef}
           role="img"
@@ -335,8 +346,18 @@ export default function KMeans({ labels }: { labels: KMeansLabels }) {
           className="block h-full w-full cursor-crosshair touch-manipulation"
         />
       </div>
-      <figcaption className="mt-5 flex flex-col gap-4 text-sm text-muted">
-        <p className="max-w-[48ch]">{labels.caption}</p>
+      <ul className="plot-legend" aria-hidden="true">
+        {counts.map((n, i) => (
+          <li key={COLORS[i]}>
+            <span className="plot-swatch" style={{ background: COLORS[i] }} />
+            {labels.cluster} {i + 1}
+            <span className="tabular-nums text-fg">{n}</span>
+            {labels.points}
+          </li>
+        ))}
+      </ul>
+      <figcaption className="mt-4 flex flex-col gap-4 text-sm text-muted">
+        <p className="max-w-[52ch]">{labels.caption}</p>
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
@@ -352,9 +373,6 @@ export default function KMeans({ labels }: { labels: KMeansLabels }) {
           >
             {labels.reset}
           </button>
-          <span aria-hidden="true" className="text-xs">
-            {labels.iteration} {iter}, {converged ? labels.converged : labels.running}
-          </span>
         </div>
         <span className="sr-only" aria-live="polite">
           {converged ? labels.converged : labels.running}

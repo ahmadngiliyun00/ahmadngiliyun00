@@ -1,54 +1,105 @@
 import type { CSSProperties, ReactNode } from "react";
+import AreaIcon from "@/components/AreaIcon";
+import ContactPanel from "@/components/ContactPanel";
+import ContributionGraph from "@/components/ContributionGraph";
+import CountUp from "@/components/CountUp";
 import ExternalLink from "@/components/ExternalLink";
+import Header from "@/components/Header";
 import KMeans from "@/components/KMeans";
+import LiveClock from "@/components/LiveClock";
 import Marquee from "@/components/Marquee";
+import Monogram from "@/components/Monogram";
+import ProjectVisual from "@/components/ProjectVisual";
 import Reveal from "@/components/Reveal";
+import Spotlight from "@/components/Spotlight";
+import Timeline from "@/components/Timeline";
 import {
-  contacts,
+  areas,
+  channels,
+  collabs,
+  contributions,
   copy,
-  courses,
+  featured,
+  journey,
   links,
-  projects,
   site,
   skills,
+  status,
+  teaching,
+  topics,
   type Lang,
 } from "@/data/profile";
+import {
+  formatDate,
+  formatMonthYear,
+  formatNumber,
+  getContributionModel,
+  getGithubMeta,
+  getRecentRepos,
+  languageColors,
+} from "@/lib/github";
+
+function d(ms: number): CSSProperties {
+  return { "--d": `${ms}ms` } as CSSProperties;
+}
 
 function Section({
   id,
   title,
+  intro,
   children,
+  wide = false,
 }: {
   id: string;
   title: string;
+  intro?: string;
   children: ReactNode;
+  wide?: boolean;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-16 border-t border-line">
-      <div className="mx-auto grid max-w-6xl gap-8 px-5 py-16 sm:px-8 lg:grid-cols-[14rem_1fr] lg:gap-16 lg:py-24">
-        <Reveal>
-          <h2
-            id={`${id}-title`}
-            className="font-display text-3xl font-bold tracking-tight lg:text-[2.1rem]"
-          >
+    <section id={id} aria-labelledby={`${id}-title`} className="section">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        <Reveal className={wide ? "section-head" : "section-head max-w-3xl"}>
+          <h2 id={`${id}-title`} className="section-title">
             {title}
           </h2>
+          {intro ? <p className="section-intro">{intro}</p> : null}
         </Reveal>
-        <div>{children}</div>
+        {children}
       </div>
     </section>
   );
 }
 
-function delay(ms: number): CSSProperties {
-  return { "--d": `${ms}ms` } as CSSProperties;
+function Letters({ text, start, className }: { text: string; start: number; className: string }) {
+  return (
+    <span className={`name-line ${className}`} aria-hidden="true">
+      {[...text].map((ch, i) => (
+        <span key={`${ch}-${i}`} className="name-char" style={d(start + i * 45)}>
+          {ch}
+        </span>
+      ))}
+    </span>
+  );
 }
 
 export default function PortfolioPage({ lang }: { lang: Lang }) {
   const t = copy[lang];
-  const other: Lang = lang === "id" ? "en" : "id";
   const home = lang === "id" ? "/" : "/en/";
   const otherHome = lang === "id" ? "/en/" : "/";
+  const contrib = getContributionModel(lang);
+  const gh = getGithubMeta();
+  const recent = getRecentRepos();
+  const dateLocale = lang === "id" ? "id-ID" : "en-GB";
+
+  const navItems = [
+    { id: "about", label: t.nav.about },
+    { id: "projects", label: t.nav.projects },
+    { id: "activity", label: t.nav.activity },
+    { id: "teaching", label: t.nav.teaching },
+    { id: "journey", label: t.nav.journey },
+    { id: "contact", label: t.nav.contact },
+  ];
 
   const personJsonLd = {
     "@context": "https://schema.org",
@@ -57,20 +108,17 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
     honorificSuffix: "M.Kom.",
     url: site.url,
     jobTitle: t.meta.jobTitle,
-    affiliation: {
-      "@type": "CollegeOrUniversity",
-      name: "Universitas Insan Mahardika",
-    },
-    sameAs: [
-      links.github,
-      links.linkedin,
-      links.orcid,
-      links.youtube,
-      links.x,
-      links.instagram,
-      links.facebook,
-    ],
+    worksFor: { "@type": "CollegeOrUniversity", name: "Universitas Insan Mahardika" },
+    address: { "@type": "PostalAddress", addressLocality: "Cirebon", addressCountry: "ID" },
+    sameAs: Object.values(links),
   };
+
+  const stats = [
+    { value: contrib.total, label: t.activity.total },
+    { value: contrib.activeDays, label: t.activity.activeDays },
+    { value: contrib.longestStreak, label: t.activity.longestStreak },
+    { value: contrib.busiest.count, label: t.activity.busiestDay },
+  ];
 
   return (
     <>
@@ -78,216 +126,396 @@ export default function PortfolioPage({ lang }: { lang: Lang }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
       />
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-leaf focus:px-4 focus:py-2 focus:font-semibold focus:text-[#06210e]"
-      >
+      <a href="#main" className="skip-link">
         {t.nav.skip}
       </a>
 
-      <header className="sticky top-0 z-40 border-b border-line/70 bg-ink/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-4 sm:px-8">
-          <a
-            href={home}
-            className="font-display text-lg font-bold tracking-tight"
-            aria-label={site.name}
-          >
-            <span className="text-leaf">Ahmad</span>{" "}
-            <span className="text-sky">Ngiliyun</span>
-          </a>
-          <div className="flex items-center gap-6">
-            <nav aria-label={t.nav.label}>
-              <ul className="flex items-center gap-5 text-sm text-muted">
-                <li><a className="link-nav" href="#about">{t.nav.about}</a></li>
-                <li><a className="link-nav" href="#teaching">{t.nav.teaching}</a></li>
-                <li><a className="link-nav" href="#projects">{t.nav.projects}</a></li>
-                <li><a className="link-nav" href="#contact">{t.nav.contact}</a></li>
-              </ul>
-            </nav>
-            <div
-              className="flex items-center gap-2 text-sm"
-              role="group"
-              aria-label={t.nav.switchLabel}
-            >
-              <span aria-current="true" className="font-semibold text-fg">
-                {lang === "id" ? "ID" : "EN"}
-              </span>
-              <span aria-hidden="true" className="text-line">/</span>
-              <a
-                href={otherHome}
-                hrefLang={other}
-                lang={other}
-                className="link-nav text-muted"
-              >
-                {other === "id" ? "ID" : "EN"}
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header
+        lang={lang}
+        items={navItems}
+        labels={t.nav}
+        homeHref={home}
+        otherHref={otherHome}
+        name={site.name}
+      />
 
       <main id="main">
-        <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 pb-20 pt-10 sm:px-8 lg:grid-cols-[1.08fr_1fr] lg:gap-16 lg:pb-28 lg:pt-16">
-          <div>
-            <h1
-              className="rise font-display text-[clamp(2.6rem,6.2vw,5.2rem)] font-bold leading-[1.02] tracking-[-0.035em] text-balance"
-              style={delay(60)}
-            >
-              {t.hero.title}
-            </h1>
-            <p
-              className="rise mt-6 max-w-[52ch] text-lg text-muted"
-              style={delay(240)}
-            >
-              {t.hero.lead}
-            </p>
-            <div className="rise mt-8 flex flex-wrap gap-3" style={delay(380)}>
-              <a href="#projects" className="btn btn-solid">
-                {t.hero.primary}
-              </a>
-              <ExternalLink
-                href={links.github}
-                newTab={t.newTab}
-                className="btn btn-line"
-              >
-                {t.hero.secondary}
-              </ExternalLink>
+        {/* Hero */}
+        <section className="hero" aria-labelledby="hero-title">
+          <div className="hero-grid" aria-hidden="true" />
+          <div className="hero-layout mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-8 lg:pb-24 lg:pt-14">
+            <div className="hero-copy">
+              <p className="status rise" style={d(0)}>
+                <span className="pulse-dot" aria-hidden="true" />
+                {status[lang]}
+              </p>
+
+              <h1 id="hero-title" className="name">
+                <span className="sr-only">{site.name}</span>
+                <Letters text="Ahmad" start={80} className="text-leaf" />
+                <Letters text="Ngiliyun" start={260} className="text-sky" />
+              </h1>
+
+              <p className="hero-statement rise" style={d(620)}>
+                {t.hero.statement}
+              </p>
+              <p className="rise mt-5 max-w-[50ch] text-lg text-muted" style={d(720)}>
+                {t.hero.lead}
+              </p>
+              <div className="rise mt-8 flex flex-wrap gap-3" style={d(820)}>
+                <a href="#projects" className="btn btn-solid">
+                  {t.hero.primary}
+                </a>
+                <a href="#contact" className="btn btn-line">
+                  {t.hero.secondary}
+                </a>
+              </div>
+              <dl className="rise hero-meta" style={d(920)}>
+                <div>
+                  <dt>{t.hero.localTime}</dt>
+                  <dd>
+                    <LiveClock lang={lang} timeZone={site.timeZone} zoneLabel={site.timeZoneLabel} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>GitHub</dt>
+                  <dd>
+                    <span className="tabular-nums">{gh.publicRepos}</span> {t.activity.publicRepos}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t.activity.title}</dt>
+                  <dd>
+                    <span className="tabular-nums">{formatNumber(contrib.total, lang)}</span> / {t.hero.year}
+                  </dd>
+                </div>
+              </dl>
             </div>
-          </div>
-          <div className="rise" style={delay(320)}>
-            <KMeans labels={t.kmeans} />
+            <div className="hero-plot rise" style={d(500)}>
+              <KMeans labels={t.kmeans} />
+            </div>
           </div>
         </section>
 
-        <div className="border-t border-line py-5">
-          <Marquee items={skills} label={t.skillsLabel} />
+        {/* Running text */}
+        <div className="marquee-band">
+          <Marquee items={skills} label={t.marqueeLabel.skills} seconds={46} />
+          <Marquee items={topics[lang]} label={t.marqueeLabel.topics} reverse variant="outline" seconds={58} />
         </div>
 
+        {/* Tentang */}
         <Section id="about" title={t.about.title}>
-          <Reveal>
-            <p className="max-w-[62ch] text-lg leading-relaxed">{t.about.body}</p>
+          <div className="grid gap-12 lg:grid-cols-[1.35fr_1fr] lg:gap-16">
+            <Reveal>
+              <p className="about-statement">{t.about.statement}</p>
+            </Reveal>
+            <Reveal delay={120}>
+              <dl className="facts">
+                {t.about.facts.map((fact) => (
+                  <div key={fact.label}>
+                    <dt>{fact.label}</dt>
+                    <dd>{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Reveal>
+          </div>
+
+          <Reveal className="mt-20">
+            <h3 className="sub-title">{t.about.areasTitle}</h3>
           </Reveal>
-          <Reveal delay={120}>
-            <dl className="mt-10">
-              {t.about.facts.map((fact) => (
-                <div
-                  key={fact.label}
-                  className="grid gap-1 border-t border-line py-4 sm:grid-cols-[11rem_1fr] sm:gap-6"
-                >
-                  <dt className="text-muted">{fact.label}</dt>
-                  <dd className="m-0">{fact.value}</dd>
+          <Spotlight className="areas mt-8">
+            {areas.map((area, i) => (
+              <Reveal key={area.icon} delay={i * 80} className="h-full">
+                <article className="area" data-spot>
+                  <span className="area-icon">
+                    <AreaIcon kind={area.icon} />
+                  </span>
+                  <h4 className="font-display text-xl font-bold tracking-tight">{area.title[lang]}</h4>
+                  <p className="mt-3 text-muted">{area.body[lang]}</p>
+                  <ul className="tags mt-5">
+                    {area.tools.map((tool) => (
+                      <li key={tool}>{tool}</li>
+                    ))}
+                  </ul>
+                </article>
+              </Reveal>
+            ))}
+          </Spotlight>
+        </Section>
+
+        {/* Proyek */}
+        <Section id="projects" title={t.projects.title} intro={t.projects.intro}>
+          <Spotlight className="mt-12 grid gap-6">
+            {featured.map((project, i) => (
+              <Reveal key={project.name} delay={i * 100}>
+                <article className="feature" data-spot data-flip={i % 2 === 1 ? "true" : undefined}>
+                  <div className="feature-visual">
+                    <ProjectVisual
+                      kind={project.visual}
+                      label={project.visual === "cluster" ? t.projects.visualCluster : t.projects.visualSentiment}
+                      sentimentNames={t.projects.sentimentLabels}
+                    />
+                  </div>
+                  <div className="feature-body">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                      <span className="lang-dot">
+                        <span style={{ background: languageColors[project.stack] ?? "var(--color-muted)" }} />
+                        {project.stack}
+                      </span>
+                      {project.copyright ? <span className="badge">{t.projects.copyright}</span> : null}
+                    </div>
+                    <h3 className="mt-4 font-display text-[clamp(2rem,4vw,2.9rem)] font-bold leading-none tracking-tight">
+                      {project.name}
+                    </h3>
+                    <p className="mt-4 max-w-[52ch] text-muted">{project.summary[lang]}</p>
+                    <ul className="tags mt-5">
+                      {project.tags[lang].map((tag) => (
+                        <li key={tag}>{tag}</li>
+                      ))}
+                    </ul>
+                    <div className="mt-7 flex flex-wrap gap-3">
+                      {project.demo ? (
+                        <ExternalLink href={project.demo} newTab={t.newTab} className="btn btn-solid btn-small">
+                          {t.projects.demo}
+                        </ExternalLink>
+                      ) : null}
+                      <ExternalLink href={project.repo} newTab={t.newTab} className="btn btn-line btn-small">
+                        {t.projects.code}
+                      </ExternalLink>
+                    </div>
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </Spotlight>
+
+          {recent.length === 0 ? null : (
+            <div className="mt-20">
+              <Reveal className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <h3 className="sub-title">{t.projects.recentTitle}</h3>
+                  <p className="mt-2 text-sm text-muted">{t.projects.recentIntro}</p>
+                </div>
+                <ExternalLink href={gh.profileUrl} newTab={t.newTab} className="link text-sm">
+                  {t.projects.all}
+                </ExternalLink>
+              </Reveal>
+              <ul className="repo-list mt-6">
+                {recent.map((repo, i) => (
+                  <li key={repo.name}>
+                    <Reveal delay={i * 60}>
+                      <article className="repo">
+                        <div className="min-w-0">
+                          <h4 className="font-display text-lg font-bold tracking-tight">
+                            <ExternalLink href={repo.url} newTab={t.newTab} className="repo-link">
+                              {repo.name}
+                            </ExternalLink>
+                          </h4>
+                          <p className="repo-desc">{repo.description}</p>
+                        </div>
+                        <div className="repo-meta">
+                          {repo.language ? (
+                            <span className="lang-dot">
+                              <span style={{ background: languageColors[repo.language] ?? "var(--color-muted)" }} />
+                              {repo.language}
+                            </span>
+                          ) : null}
+                          <span>
+                            {t.projects.updated} {formatMonthYear(repo.pushedAt, lang)}
+                          </span>
+                          {repo.homepage ? (
+                            <ExternalLink href={repo.homepage} newTab={t.newTab} className="link">
+                              {repo.homepageIsRelease ? t.projects.release : t.projects.demo}
+                            </ExternalLink>
+                          ) : null}
+                        </div>
+                      </article>
+                    </Reveal>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </Section>
+
+        {/* Kontribusi */}
+        <Section id="activity" title={t.activity.title} intro={t.activity.intro}>
+          <Reveal className="mt-12">
+            <div className="stats">
+              {stats.map((s) => (
+                <div key={s.label} className="stat">
+                  <CountUp value={s.value} lang={lang} className="stat-value" />
+                  <span className="stat-label">{s.label}</span>
                 </div>
               ))}
-            </dl>
+            </div>
           </Reveal>
-        </Section>
 
-        <Section id="teaching" title={t.teaching.title}>
-          <Reveal>
-            <p className="max-w-[62ch] text-lg text-muted">{t.teaching.intro}</p>
+          <Reveal className="mt-8" delay={100}>
+            <div className="graph-panel">
+              <ContributionGraph
+                weeks={contrib.weeks}
+                months={contrib.months}
+                weekdays={t.activity.weekdays}
+                summary={t.activity.summary
+                  .replace("{n}", String(contrib.total))
+                  .replace("{d}", String(contrib.activeDays))}
+                less={t.activity.less}
+                more={t.activity.more}
+                tooltip={{
+                  none: t.activity.tooltipNone,
+                  one: t.activity.tooltipOne,
+                  many: t.activity.tooltipMany,
+                }}
+                dateLocale={dateLocale}
+              />
+              <p className="graph-foot">
+                <span>
+                  {t.activity.since} {gh.sinceYear}
+                </span>
+                <span>{t.activity.updatedAt.replace("{date}", formatDate(gh.fetchedAt, lang))}</span>
+              </p>
+            </div>
           </Reveal>
-          <Reveal delay={120}>
-            <ul className="mt-8 grid gap-x-10 sm:grid-cols-2">
-              {courses[lang].map((course) => (
-                <li
-                  key={course}
-                  className="border-t border-line py-4 font-display text-xl font-semibold tracking-tight"
-                >
-                  {course}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        </Section>
 
-        <Section id="projects" title={t.projects.title}>
-          <Reveal>
-            <p className="max-w-[62ch] text-lg text-muted">{t.projects.intro}</p>
+          <Reveal className="mt-16">
+            <h3 className="sub-title">{t.activity.otherTitle}</h3>
           </Reveal>
-          <ul className="mt-8">
-            {projects.map((project, index) => (
-              <li key={project.name}>
-                <Reveal delay={index * 90}>
-                  <article className="project grid gap-3 border-t border-line py-8">
-                    <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-                      <h3 className="font-display text-2xl font-bold tracking-tight">
-                        <ExternalLink
-                          href={project.href}
-                          newTab={t.newTab}
-                          className="project-link"
-                        >
-                          {project.name}
+          <ul className="beyond mt-6">
+            {contributions.map((c, i) => (
+              <li key={c.title.id}>
+                <Reveal delay={i * 80} className="h-full">
+                  <div className="beyond-item">
+                    <h4 className="font-display text-lg font-bold tracking-tight">{c.title[lang]}</h4>
+                    <p className="mt-2 text-muted">{c.body[lang]}</p>
+                    {c.href ? (
+                      <p className="mt-4">
+                        <ExternalLink href={c.href} newTab={t.newTab} className="link text-sm">
+                          {t.activity.open} ORCID
                         </ExternalLink>
-                      </h3>
-                      <span className="text-sm text-leaf">{project.stack}</span>
-                    </div>
-                    <p className="max-w-[62ch] text-muted">
-                      {project.description[lang]}
-                    </p>
-                    <p className="text-sm text-muted/80">{project.display}</p>
-                  </article>
+                      </p>
+                    ) : null}
+                  </div>
                 </Reveal>
               </li>
             ))}
-            <li>
-              <Reveal delay={projects.length * 90}>
-                <div className="grid gap-3 border-t border-line py-8">
-                  <p className="max-w-[62ch] text-muted">{t.projects.more}</p>
-                  <p>
-                    <ExternalLink
-                      href={links.github}
-                      newTab={t.newTab}
-                      className="link"
-                    >
-                      {t.projects.moreLink}
-                    </ExternalLink>
-                  </p>
-                </div>
-              </Reveal>
-            </li>
           </ul>
         </Section>
 
-        <Section id="contact" title={t.contact.title}>
-          <Reveal>
-            <p className="max-w-[62ch] text-lg text-muted">{t.contact.intro}</p>
-          </Reveal>
-          <Reveal delay={120}>
-            <ul className="mt-8">
-              {site.email === "" ? null : (
-                <li className="grid gap-1 border-t border-line py-4 sm:grid-cols-[11rem_1fr] sm:gap-6">
-                  <span className="text-muted">{t.contact.emailLabel}</span>
-                  <a className="link w-fit" href={`mailto:${site.email}`}>
-                    {site.email}
-                  </a>
-                </li>
-              )}
-              {contacts.map((item) => (
-                <li
-                  key={item.label}
-                  className="grid gap-1 border-t border-line py-4 sm:grid-cols-[11rem_1fr] sm:gap-6"
-                >
-                  <span className="text-muted">{item.label}</span>
-                  <ExternalLink
-                    href={item.href}
-                    newTab={t.newTab}
-                    className="link w-fit"
-                  >
-                    {item.handle}
-                  </ExternalLink>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+        {/* Mengajar */}
+        <Section id="teaching" title={t.teaching.title} intro={t.teaching.intro}>
+          <div className="mt-12 grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
+            {teaching.map((inst, i) => (
+              <Reveal key={inst.name} delay={i * 120}>
+                <div>
+                  <h3 className="font-display text-2xl font-bold tracking-tight">{inst.name}</h3>
+                  <p className="mt-1 text-muted">{inst.role[lang]}</p>
+                  <ul className="courses mt-6">
+                    {inst.courses.map((course) => (
+                      <li key={course.name.id} className="course">
+                        <span className="course-name">{course.name[lang]}</span>
+                        {course.repo ? (
+                          <ExternalLink href={course.repo} newTab={t.newTab} className="course-link">
+                            {t.teaching.materials}
+                          </ExternalLink>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </Section>
+
+        {/* Perjalanan */}
+        <Section id="journey" title={t.journey.title} intro={t.journey.intro}>
+          <div className="mt-12">
+            <Timeline
+              items={journey.map((m) => ({
+                when: m.when[lang],
+                title: m.title[lang],
+                body: m.body[lang],
+                current: m.current,
+              }))}
+            />
+          </div>
+        </Section>
+
+        {/* Kolaborasi dan kontak */}
+        <div className="giant-band">
+          <Marquee
+            items={[t.contact.marquee, t.contact.marquee, t.contact.marquee]}
+            variant="giant"
+            seconds={34}
+            decorative
+          />
+        </div>
+
+        <Section id="contact" title={t.contact.title} intro={t.contact.intro}>
+          <Spotlight className="collabs mt-12">
+            {collabs.map((c, i) => (
+              <Reveal key={c.title.id} delay={i * 70} className="h-full">
+                <div className="collab" data-spot>
+                  <h3 className="font-display text-lg font-bold tracking-tight">{c.title[lang]}</h3>
+                  <p className="mt-2 text-sm text-muted">{c.body[lang]}</p>
+                </div>
+              </Reveal>
+            ))}
+          </Spotlight>
+
+          <div className="mt-14 grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
+            {site.email.user === "" ? null : (
+              <Reveal>
+                <ContactPanel
+                  lang={lang}
+                  user={site.email.user}
+                  domain={site.email.domain}
+                  topics={collabs.map((c) => c.title[lang])}
+                  labels={t.contact}
+                  timeZone={site.timeZone}
+                  zoneLabel={site.timeZoneLabel}
+                />
+              </Reveal>
+            )}
+            <Reveal delay={120}>
+              <div>
+                <h3 className="sub-title">{t.contact.channelsTitle}</h3>
+                <ul className="channels mt-6">
+                  {channels.map((ch) => (
+                    <li key={ch.label}>
+                      <ExternalLink href={ch.href} newTab={t.newTab} className="channel">
+                        <span className="channel-label">{ch.label}</span>
+                        <span className="channel-note">{ch.note[lang]}</span>
+                        <span className="channel-handle">{ch.handle}</span>
+                      </ExternalLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+          </div>
         </Section>
       </main>
 
-      <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-8 text-sm text-muted sm:px-8">
-          <p>
-            © {new Date().getFullYear()} {site.fullName}
+      <footer className="footer">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <div className="flex flex-wrap items-end justify-between gap-8">
+            <div className="flex items-center gap-4">
+              <Monogram className="h-14 w-14" />
+              <div>
+                <p className="font-display text-xl font-bold tracking-tight">{site.fullName}</p>
+                <p className="text-sm text-muted">{t.footer.built}</p>
+              </div>
+            </div>
+            <a href="#main" className="btn btn-line btn-small">
+              {t.footer.top}
+            </a>
+          </div>
+          <p className="mt-10 border-t border-line pt-6 text-sm text-muted">
+            © {new Date().getFullYear()} {site.name}. ngiliyun.my.id
           </p>
-          <p>{t.footer.built}</p>
         </div>
       </footer>
     </>
