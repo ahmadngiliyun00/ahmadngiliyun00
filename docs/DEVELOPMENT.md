@@ -30,7 +30,7 @@ Buka <http://localhost:3000> untuk situs dan <http://localhost:3000/admin/> untu
 | `npm run build` | Ambil data GitHub, perbarui README, lalu build produksi |
 | `npm start` | Jalankan hasil build (produksi) |
 | `npm run typecheck` | Pemeriksaan TypeScript |
-| `npm test` | Unit test URL LinkedIn, form kontak, template email, rich text, hitungan pembaca, dan komentar |
+| `npm test` | Unit test URL LinkedIn, form kontak, template email, rich text, hitungan pembaca, komentar, dan isian dua bahasa |
 | `npm run data` | Ambil data GitHub ke `src/data/github.json`, lalu buat ulang gambar dan teks README |
 | `npm run readme` | Buat ulang gambar README dan bagian teks README dari database |
 | `npm run db:generate` | Buat berkas migrasi baru setelah mengubah `src/db/schema.ts` |
@@ -50,7 +50,7 @@ Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`.
 | Proyek | Proyek unggulan (kode terbuka) dan sistem yang dikembangkan (repo privat) |
 | Mengajar | Kampus, mata kuliah dengan kode semester, semester, bidang keahlian mengajar |
 | Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama, rencana ke depan, prinsip kerja dengan AI, kanal kontak |
-| Pengaturan | Profil (hero, Tentang, email, running text, tema riset), metrik riset bertanggal, SEO dan Search Console (judul, deskripsi, dan kata kunci beranda serta arsip dengan pratinjau hasil Google, meta verifikasi Google dan Bing, berkas verifikasi HTML, ID GA4), serta Email dan SMTP untuk meneruskan pesan form kontak |
+| Pengaturan | Profil (hero, Tentang, email, running text, tema riset), metrik riset bertanggal, Bahasa (bahasa utama isian dua bahasa), SEO dan Search Console (judul, deskripsi, dan kata kunci beranda serta arsip dengan pratinjau hasil Google, meta verifikasi Google dan Bing, berkas verifikasi HTML, ID GA4), serta Email dan SMTP untuk meneruskan pesan form kontak |
 
 Setiap data punya status public atau privat, slug (alamat), dan urutan. Tombol **Tampilkan** dan **Sembunyikan** di daftar langsung mengubah situs.
 
@@ -82,6 +82,14 @@ Setiap halaman dan Server Action admin memanggil `requireAdmin()`. Jangan mengan
 - Kondisi yang menetap (misalnya tabel belum dimigrasi atau SMTP belum diatur) tetap ditulis sebagai catatan di halaman, bukan toast
 - Server Action simpan memanggil `revalidatePath("/admin", "layout")` setelah berhasil. React mengosongkan formulir ke nilai awal setelah action berhasil, jadi tanpa ini formulir tampak kosong walau data sudah tersimpan
 
+### Isian dua bahasa
+
+Bahasa utama diatur di Pengaturan, **Bahasa** (bawaan Indonesia). Formulir CMS menampilkan bahasa utama lebih dulu; tombol globe di setiap isian membuka bahasa lain, dan tab bahasa di atas formulir membuka semua isian berdampingan. Warna globe: hijau semua bahasa terisi, merah terjemahan belum lengkap, abu-abu belum diisi.
+
+- Isian dua bahasa yang wajib cukup diisi dalam bahasa utama, dan isian apa pun tidak boleh hanya berisi bahasa lain (`readFields` di `src/content/fields.ts`)
+- `loadSite()` mengisi terjemahan yang kosong dengan teks bahasa utama (`fillLocalized` di `src/lib/i18n.ts`), kecuali isi lengkap tulisan (`body`): tulisan tanpa terjemahan tidak punya halaman di bahasa itu. Pengaturan SEO juga tidak diisi otomatis, karena kosong berarti memakai teks bawaan bahasa itu
+- Daftar CMS memberi lencana "Terjemahan belum lengkap" dengan nama isiannya (`translationGaps`)
+
 ### Kabar: editor, pembaca, dan komentar
 
 - **Editor** (`src/components/admin/RichTextEditor.tsx`, Tiptap) dipakai field berjenis `richtext`. Isinya HTML per bahasa, dikirim lewat event `formdata`. Aturan pembersihan HTML ada di `src/lib/richtext.ts` dan dijalankan oleh `src/server/richtext.ts` saat disimpan dan saat dirender. Gambar hanya boleh dari `/files/<id>/`: gambar dari situs lain dan base64 dibuang. Isi lama berupa teks biasa tetap tampil
@@ -100,7 +108,7 @@ Setiap halaman dan Server Action admin memanggil `requireAdmin()`. Jangan mengan
 
 Diperiksa saat menyimpan di CMS:
 
-- Judul dan ringkasan wajib dalam bahasa Indonesia dan Inggris (ringkasan boleh kosong untuk publikasi)
+- Judul dan ringkasan wajib dalam bahasa utama (ringkasan boleh kosong untuk publikasi); terjemahannya boleh menyusul
 - Item public wajib punya tanggal terbit, kecuali reviewer yang masih berjalan dan keanggotaan. Jangan menebak tanggal
 - Maksimal 6 sorotan beranda dan 5 HKI di tab Hak cipta beranda
 - Tombol LinkedIn hanya untuk sertifikat dan pelatihan; posisi penulis hanya untuk publikasi
