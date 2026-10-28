@@ -13,6 +13,7 @@ import {
   json,
   mysqlEnum,
   mysqlTable,
+  text,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/mysql-core";
@@ -96,3 +97,25 @@ export const loginAttempts = mysqlTable("login_attempts", {
   count: int("count").notNull().default(0),
   windowStart: datetime("window_start").notNull(),
 });
+
+// Pesan dari form kontak situs. Dibaca dan dibalas lewat kotak masuk CMS (/admin/pesan/).
+export const messages = mysqlTable(
+  "messages",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    name: varchar("name", { length: 120 }).notNull(),
+    email: varchar("email", { length: 190 }).notNull(),
+    topic: varchar("topic", { length: 120 }).notNull(),
+    body: text("body").notNull(),
+    lang: mysqlEnum("lang", ["id", "en"]).notNull().default("id"),
+    // new = belum dibaca, read = sudah dibaca, archived = disimpan di arsip.
+    status: mysqlEnum("status", ["new", "read", "archived"]).notNull().default("new"),
+    // Hash SHA-256 alamat IP pengirim, bukan IP aslinya. Cukup untuk menandai spam berulang.
+    ipHash: varchar("ip_hash", { length: 64 }),
+    // true bila email notifikasi ke Mas Ilyun berhasil terkirim.
+    notified: boolean("notified").notNull().default(false),
+    createdAt: datetime("created_at").notNull(),
+    readAt: datetime("read_at"),
+  },
+  (t) => [index("messages_status_created").on(t.status, t.createdAt)],
+);
