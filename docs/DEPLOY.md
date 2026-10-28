@@ -28,7 +28,7 @@ Isi `.env.production.local`:
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | dari OAuth App (langkah 6), boleh kosong bila hanya login email |
 | `GITHUB_ALLOWED_LOGIN` | `ahmadngiliyun00` |
 | `UPLOAD_DIR` | `/www/wwwroot/ngiliyun-storage/uploads` (di LUAR folder situs dan di luar `public/`) |
-| `CONTACT_IP_SALT` | teks acak panjang, misalnya hasil `openssl rand -hex 32` |
+| `CONTACT_IP_SALT` | teks acak panjang, misalnya hasil `openssl rand -hex 32`. Dipakai untuk hash IP form kontak, komentar, dan hitungan pembaca |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile (langkah 7), boleh kosong |
 
 ```bash

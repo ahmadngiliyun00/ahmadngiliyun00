@@ -39,6 +39,9 @@ scripts/lib/load-ts.mjs          memuat berkas .ts dari skrip Node
 tests/linkedin.test.mjs          unit test URL LinkedIn dan teks siap tempel (npm test)
 tests/contact.test.mjs           unit test validasi form kontak (npm test)
 tests/mail.test.mjs              unit test template email: escape isian dan baris baru (npm test)
+tests/richtext.test.mjs          unit test pembersihan HTML editor (npm test)
+tests/views.test.mjs             unit test aturan hitungan pembaca (npm test)
+tests/comment.test.mjs           unit test validasi komentar (npm test)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, sertifikat atau certificates, kabar atau news, s/[token]
@@ -75,6 +78,8 @@ src/
 - Setiap halaman dan Server Action admin wajib memanggil `requireAdmin()`. Server Action bisa dipanggil langsung tanpa halaman
 - Field baru: tambah di `src/content/collections.ts` (formulir dan validasi ikut otomatis). Urutkan supaya isian pendek berpasangan di grid 12 kolom; atur `width` bila lebar bawaan `fieldWidth()` tidak pas. Kolom tabel baru: `src/db/schema.ts` lalu `npm run db:generate`
 - Aturan capaian (maksimal 6 sorotan, 5 HKI beranda, LinkedIn hanya sertifikat dan pelatihan) ada di `src/server/entries.ts`
+- Isi tulisan memakai editor rich text. HTML wajib lewat `sanitizeRichText` saat disimpan dan `renderRichText` saat dirender; jangan merender HTML isi tanpa keduanya. Gambar diunggah ke `UPLOAD_DIR`, tidak pernah base64
+- Hitungan pembaca tidak menyimpan IP (hanya hash harian) dan tidak memakai cookie. Komentar selalu menunggu persetujuan; email pengomentar tidak pernah tampil di situs
 - Berita dan tulisan (koleksi `post`): liputan media wajib media dan tautan sumber, dan ringkasannya ditulis sendiri tanpa menyalin detail sistem internal kampus dari artikel. Hanya tulisan dengan isi lengkap yang punya halaman `/kabar/<slug>/`
 - Metrik riset wajib bertanggal (`asOf`) dan bersumber
 - Berkas unggahan disimpan di `UPLOAD_DIR` (di luar repo dan `public/`), disajikan lewat `/files/<id>/`
@@ -121,7 +126,7 @@ npm run admin:create -- --email anda@contoh.id --name "Nama"
 npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
-npm test               # unit test URL LinkedIn, form kontak, dan template email
+npm test               # unit test LinkedIn, form kontak, email, rich text, pembaca, komentar
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build

@@ -30,7 +30,7 @@ Buka <http://localhost:3000> untuk situs dan <http://localhost:3000/admin/> untu
 | `npm run build` | Ambil data GitHub, perbarui README, lalu build produksi |
 | `npm start` | Jalankan hasil build (produksi) |
 | `npm run typecheck` | Pemeriksaan TypeScript |
-| `npm test` | Unit test URL LinkedIn, form kontak, dan template email |
+| `npm test` | Unit test URL LinkedIn, form kontak, template email, rich text, hitungan pembaca, dan komentar |
 | `npm run data` | Ambil data GitHub ke `src/data/github.json`, lalu buat ulang gambar dan teks README |
 | `npm run readme` | Buat ulang gambar README dan bagian teks README dari database |
 | `npm run db:generate` | Buat berkas migrasi baru setelah mengubah `src/db/schema.ts` |
@@ -45,7 +45,8 @@ Di balik proxy (misalnya sandbox), jalankan `NODE_USE_ENV_PROXY=1 npm run data`.
 | Bagian | Isi |
 | --- | --- |
 | Capaian | Sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, reviewer, keanggotaan |
-| Kabar | Berita dan tulisan: liputan media (wajib media dan tautan sumber), tulisan sendiri, kabar singkat. Isi lengkap membuat halaman `/kabar/<slug>/`; tanpa isi, kartu menaut ke sumber |
+| Kabar | Berita dan tulisan: liputan media (wajib media dan tautan sumber), tulisan sendiri, kabar singkat. Isi lengkap (editor rich text) membuat halaman `/kabar/<slug>/`; tanpa isi, kartu menaut ke sumber. Statistik pembaca tampil di halaman ubah |
+| Komentar | Moderasi komentar tulisan di `/admin/komentar/`: menunggu, disetujui, spam. Membalas sekaligus menyetujui |
 | Proyek | Proyek unggulan (kode terbuka) dan sistem yang dikembangkan (repo privat) |
 | Mengajar | Kampus, mata kuliah dengan kode semester, semester, bidang keahlian mengajar |
 | Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama, rencana ke depan, prinsip kerja dengan AI, kanal kontak |
@@ -80,6 +81,13 @@ Setiap halaman dan Server Action admin memanggil `requireAdmin()`. Jangan mengan
 - Toast sukses tampil 4 detik dan galat 8 detik, berhenti saat disorot atau difokus. Galat validasi juga tampil di bawah isiannya dan isian pertama yang salah difokus
 - Kondisi yang menetap (misalnya tabel belum dimigrasi atau SMTP belum diatur) tetap ditulis sebagai catatan di halaman, bukan toast
 - Server Action simpan memanggil `revalidatePath("/admin", "layout")` setelah berhasil. React mengosongkan formulir ke nilai awal setelah action berhasil, jadi tanpa ini formulir tampak kosong walau data sudah tersimpan
+
+### Kabar: editor, pembaca, dan komentar
+
+- **Editor** (`src/components/admin/RichTextEditor.tsx`, Tiptap) dipakai field berjenis `richtext`. Isinya HTML per bahasa, dikirim lewat event `formdata`. Aturan pembersihan HTML ada di `src/lib/richtext.ts` dan dijalankan oleh `src/server/richtext.ts` saat disimpan dan saat dirender. Gambar hanya boleh dari `/files/<id>/`: gambar dari situs lain dan base64 dibuang. Isi lama berupa teks biasa tetap tampil
+- **Gambar di dalam isi** diperkecil di peramban (lebar maksimal 1600 px, WebP atau JPEG), diunggah lewat `uploadInlineImageAction`, lalu dikaitkan ke tulisan lewat `files.entry_id` saat disimpan (`syncInlineFiles`). Gambar yang dibuang dari isi ikut dihapus. Gambar dari tulisan baru yang tidak pernah disimpan tetap tertinggal tanpa pemilik
+- **Pembaca** (`post_views`, `src/server/views.ts`, aturan di `src/lib/views.ts`): komponen `ViewBeacon` mengirim ke `/api/views/` setelah halaman terlihat 2 detik. Satu baris per pengunjung per tulisan per hari WIB; pengunjung dikenali lewat hash harian IP dan user agent dengan garam `CONTACT_IP_SALT`. Robot, admin yang sedang masuk, permintaan dari situs lain, dan lebih dari 300 kiriman per IP per jam diabaikan
+- **Komentar** (`comments`, `src/server/comments.ts`, `src/server/comment-action.ts`, aturan di `src/lib/comment.ts`): selalu menunggu persetujuan, kolom jebakan, jebakan waktu 3 detik, maksimal 2 tautan, 3 komentar per IP per 10 menit. Email pengomentar tidak pernah dirender di situs
 
 ### Menambah koleksi atau field
 
