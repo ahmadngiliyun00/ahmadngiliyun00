@@ -4,6 +4,27 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/) dan penomoran versi mengikuti
 [Semantic Versioning](https://semver.org/lang/id/).
 
+## [Belum dirilis]
+
+### Ditambahkan
+
+- Bagian "Sertifikat dan capaian" di beranda: baris indikator bertanggal (sitasi, h-index, skor SINTA, hak cipta, publikasi) dan sorotan dengan saringan sertifikat atau hak cipta
+- Arsip `/sertifikat/` dan `/en/certificates/` dengan pencarian, saringan kategori dan tahun, serta saringan yang tersimpan di URL
+- Halaman detail per capaian dengan tautan verifikasi resmi, tombol "Tambahkan ke LinkedIn", teks siap tempel, metadata, Open Graph, dan JSON-LD
+- Bagian "Riset": tema, hibah Penelitian Dosen Pemula NetA, publikasi per tahun dengan posisi penulis, dan profil riset
+- RupiahVision sebagai proyek unggulan dan daftar "Sistem yang saya kembangkan" untuk repositori privat
+- Sumber data tunggal `src/data/achievements.ts` dan `src/data/metrics.ts`
+- Validator `npm run check:achievements` (dijalankan sebelum build) dengan opsi `--online`
+- Unit test pembangun URL LinkedIn (`npm test`) dan skrip thumbnail PDF opsional (`npm run thumbs`)
+- Bagian README (proyek, capaian, mengajar, perjalanan) dibangkitkan otomatis dari data situs
+
+### Diubah
+
+- Mengajar dipisah per kampus dengan "Semester ini" dan "Pernah diampu", ditambah bidang keahlian mengajar
+- Garis waktu dikoreksi: jalur S1 (STIKOM Poltek Cirebon lalu UNU Cirebon), S2 STMIK LIKMI Bandung, AWATARA Februari 2022, dan Dicoding 2020 sebagai "bergabung"
+- Klaim kelulusan IDCamp 2023 dihapus
+- Peran di bagian Tentang kini mencakup staf IT
+
 ## [1.0.0] - 2026-10-28
 
 Rilis pertama situs portofolio [ngiliyun.my.id](https://ngiliyun.my.id) beserta README profil GitHub.
