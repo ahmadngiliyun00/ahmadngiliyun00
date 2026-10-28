@@ -11,6 +11,7 @@ interface Base {
   help?: string;
   required?: boolean;
   placeholder?: string; // bila kosong, FieldInput membuat placeholder dari jenis dan label field
+  width?: FieldWidth; // lebar di desktop; bila kosong, ditentukan oleh fieldWidth()
 }
 interface PlainField extends Base {
   type: "text" | "url" | "textarea" | "boolean" | "date" | "list" | "localizedList" | "links" | "file" | "secret";
@@ -33,9 +34,33 @@ interface ReferenceField extends Base {
   collection: string;
 }
 
+// Lebar isian di grid 12 kolom formulir CMS (desktop). Di layar sempit semua isian selebar penuh.
+export type FieldWidth = "full" | "half" | "third" | "quarter";
+
 export type Field = PlainField | LocalizedField | NumberField | ChoiceField | ReferenceField;
 
 export type FieldErrors = Record<string, string>;
+
+// Isian pendek berbagi baris, teks panjang selebar penuh. Urutan field di collections.ts
+// diatur supaya isian pendek berpasangan dan tidak menyisakan ruang kosong.
+export function fieldWidth(field: Field): FieldWidth {
+  if (field.width) return field.width;
+  switch (field.type) {
+    case "text":
+    case "url":
+    case "select":
+    case "reference":
+    case "secret":
+    case "date":
+      return "half";
+    case "number":
+      return "quarter";
+    case "boolean":
+      return "third";
+    default:
+      return "full";
+  }
+}
 
 // Satu objek data JSON bebas. Nilainya divalidasi oleh field, bukan oleh tipe TypeScript.
 export type Doc = Record<string, unknown>;

@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import type { FormState } from "@/app/(admin)/admin/actions";
 import FieldInput, { type FieldLabels, type FieldValue } from "@/components/admin/FieldInput";
-import type { Field, Option } from "@/content/fields";
+import { fieldWidth, type Field, type Option } from "@/content/fields";
 
 export interface EntryFormLabels extends FieldLabels {
   meta: string;
@@ -150,16 +150,17 @@ export default function EntryForm({
 
       <div className="admin-card admin-fields">
         {fields.map((field) => (
-          <FieldInput
-            key={field.name}
-            field={field}
-            value={values[field.name] ?? null}
-            raw={raw}
-            error={errors[field.name]}
-            options={field.type === "reference" ? references?.[field.collection] : undefined}
-            file={field.type === "file" ? file : undefined}
-            labels={labels}
-          />
+          <div key={field.name} className="admin-cell" data-w={fieldWidth(field)}>
+            <FieldInput
+              field={field}
+              value={values[field.name] ?? null}
+              raw={raw}
+              error={errors[field.name]}
+              options={field.type === "reference" ? references?.[field.collection] : undefined}
+              file={field.type === "file" ? file : undefined}
+              labels={labels}
+            />
+          </div>
         ))}
       </div>
 

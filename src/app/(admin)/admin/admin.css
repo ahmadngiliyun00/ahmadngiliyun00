@@ -445,7 +445,40 @@
 
   .admin-fields {
     display: grid;
-    gap: 1.4rem;
+    gap: 1.4rem 1.25rem;
+  }
+
+  .admin-cell {
+    min-width: 0;
+  }
+
+  /* Desktop: grid 12 kolom; isian pendek berbagi baris. Ponsel dan tablet: satu kolom. */
+  @media (min-width: 900px) {
+    .admin-fields {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .admin-cell {
+      grid-column: span 12;
+    }
+
+    .admin-cell[data-w="half"] {
+      grid-column: span 6;
+    }
+
+    .admin-cell[data-w="third"] {
+      grid-column: span 4;
+    }
+
+    .admin-cell[data-w="quarter"] {
+      grid-column: span 3;
+    }
+
+    /* Kotak centang sejajar dengan isian di sebelahnya (yang punya label di atas). */
+    .admin-cell .admin-check {
+      padding-top: 1.9rem;
+    }
   }
 
   .admin-field {
@@ -491,8 +524,9 @@
 
   .admin-date {
     display: grid;
-    grid-template-columns: 7rem 5rem 5rem;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
     gap: 0.6rem;
+    max-width: 20rem;
   }
 
   .admin-check label,
@@ -505,9 +539,19 @@
 
   .admin-check input,
   .admin-inline-check input {
+    flex: none;
     width: 1.1rem;
     height: 1.1rem;
     accent-color: var(--color-leaf);
+  }
+
+  /* Label kotak centang yang panjang turun ke baris kedua; kotaknya tetap sejajar baris pertama. */
+  .admin-check label {
+    align-items: flex-start;
+  }
+
+  .admin-check input {
+    margin-top: 0.2rem;
   }
 
   .admin-file {
