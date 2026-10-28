@@ -73,3 +73,12 @@ Jika DNS dikelola Cloudflare dan situs di Vercel, set record ke "DNS only" supay
 ## Aksesibilitas
 
 Tautan lompat ke konten, fokus keyboard terlihat, atribut `lang` per halaman, label untuk grafik dan plot, dan semua animasi (termasuk gambar README) mengikuti pengaturan "kurangi gerakan" di perangkat.
+
+## Rilis
+
+Versi mengikuti [Semantic Versioning](https://semver.org/lang/id/) dan dicatat di `CHANGELOG.md`.
+
+1. Tambahkan bagian versi baru di `CHANGELOG.md`
+2. Jalankan `npm version X.Y.Z --no-git-tag-version` untuk menaikkan versi di `package.json` dan `package-lock.json`
+3. Commit, lalu buat tag `vX.Y.Z` dan push beserta tagnya
+4. Buat rilis GitHub dari tag tersebut, isi catatannya dari `CHANGELOG.md`

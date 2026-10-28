@@ -24,6 +24,7 @@ Repo ini adalah `ahmadngiliyun00/ahmadngiliyun00`, jadi `README.md` di akar repo
 ```
 README.md                        profil GitHub
 docs/DEVELOPMENT.md              panduan pengembangan
+CHANGELOG.md                     catatan perubahan per versi rilis
 profile/                         banner.svg, marquee.svg, stats.svg, dan fonts/ untuk README
 scripts/fetch-github.mjs         ambil data GitHub (prebuild), fallback ke data lama bila gagal
 scripts/readme-assets.mjs        buat gambar SVG README dari data GitHub

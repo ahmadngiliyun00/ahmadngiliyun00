@@ -1,6 +1,6 @@
 {
   "name": "ngiliyun-portfolio",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Portofolio pribadi Ahmad Ngiliyun (ngiliyun.my.id)",
   "scripts": {
     "dev": "next dev",
