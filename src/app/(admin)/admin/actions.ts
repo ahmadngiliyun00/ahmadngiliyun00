@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getCollection, getSettingsConfig } from "@/content/collections";
 import type { FieldErrors } from "@/content/fields";
@@ -92,6 +93,9 @@ export async function saveEntryAction(_prev: FormState, form: FormData): Promise
   const res = await saveEntry(collection, id, form);
   if (!res.ok) return { message: res.message, errors: res.errors, values: rawValues(form) };
   if (id === null) redirect(`/admin/${collection}/${res.id}/?saved=1`);
+  // Muat ulang data halaman, supaya formulir menampilkan isi yang baru tersimpan
+  // (React mengosongkan formulir ke nilai awalnya setelah action berhasil).
+  revalidatePath("/admin", "layout");
   return { ok: true, message: "Tersimpan." };
 }
 
@@ -141,6 +145,7 @@ export async function saveSettingsAction(_prev: FormState, form: FormData): Prom
     }
     return { message: res.message, errors: res.errors, values };
   }
+  revalidatePath("/admin", "layout");
   return { ok: true, message: "Tersimpan." };
 }
 
