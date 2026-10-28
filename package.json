@@ -6,6 +6,7 @@
     "dev": "next dev",
     "data": "node scripts/fetch-github.mjs",
     "readme": "node scripts/readme-assets.mjs",
+    "test": "node --test tests/linkedin.test.mjs",
     "prebuild": "node scripts/fetch-github.mjs",
     "build": "next build",
     "typecheck": "tsc --noEmit",
