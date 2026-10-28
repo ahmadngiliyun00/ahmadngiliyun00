@@ -8,6 +8,9 @@ import { exchangeCode, fetchGithubUser, githubConfig, sameToken, STATE_COOKIE } 
 import { createSession } from "@/server/auth/session";
 
 // Kembali dari GitHub: cocokkan state, tukar kode dengan token, pastikan akunnya diizinkan.
+// Nama pengguna dicocokkan dengan GITHUB_ALLOWED_LOGIN, lalu ID numerik GitHub dikunci pada
+// login pertama. Bila akun pemilik berganti nama dan orang lain mendaftar nama lamanya,
+// ID-nya berbeda sehingga tetap ditolak.
 export async function GET(req: NextRequest) {
   const cfg = githubConfig();
   if (!cfg.enabled) redirect("/admin/login/?error=github-off");
@@ -23,10 +26,13 @@ export async function GET(req: NextRequest) {
 
   let login = "";
   let name = "";
+  let githubId = 0;
   try {
     const user = await fetchGithubUser(await exchangeCode(code));
     login = user.login.toLowerCase();
     name = user.name ?? user.login;
+    githubId = user.id;
+    if (!Number.isSafeInteger(githubId) || githubId <= 0) throw new Error("ID GitHub tidak valid");
   } catch {
     redirect("/admin/login/?error=github-failed");
   }
@@ -39,6 +45,7 @@ export async function GET(req: NextRequest) {
       name,
       email: `${login}@users.noreply.github.com`,
       githubLogin: login,
+      githubId,
       passwordHash: null,
       active: true,
       createdAt: new Date(),
@@ -47,6 +54,12 @@ export async function GET(req: NextRequest) {
   }
   const admin = rows[0];
   if (!admin?.active) redirect("/admin/login/?error=github-denied");
+  if (admin.githubId === null) {
+    // Akun lama sebelum kolom github_id ada: kunci ID pada login pertama ini.
+    await db.update(admins).set({ githubId }).where(eq(admins.id, admin.id));
+  } else if (admin.githubId !== githubId) {
+    redirect("/admin/login/?error=github-denied");
+  }
   await createSession(admin.id, "github");
   redirect("/admin/");
 }

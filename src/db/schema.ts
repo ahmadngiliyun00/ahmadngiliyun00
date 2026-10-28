@@ -81,10 +81,13 @@ export const admins = mysqlTable(
     // scrypt, format: scrypt$N$r$p$salt$hash (base64). Null bila hanya login lewat GitHub.
     passwordHash: varchar("password_hash", { length: 255 }),
     githubLogin: varchar("github_login", { length: 64 }),
+    // ID numerik akun GitHub, diisi pada login GitHub pertama. Nama pengguna GitHub bisa
+    // didaur ulang orang lain setelah berganti nama; ID tidak.
+    githubId: bigint("github_id", { mode: "number" }),
     active: boolean("active").notNull().default(true),
     createdAt: datetime("created_at").notNull(),
   },
-  (t) => [uniqueIndex("admins_email").on(t.email), uniqueIndex("admins_github").on(t.githubLogin)],
+  (t) => [uniqueIndex("admins_email").on(t.email), uniqueIndex("admins_github").on(t.githubLogin), uniqueIndex("admins_github_id").on(t.githubId)],
 );
 
 export const sessions = mysqlTable(
