@@ -465,7 +465,15 @@ export const settingsConfigs: SettingsConfig[] = [
         help: "Untuk Gmail: sandi aplikasi 16 huruf dari myaccount.google.com/apppasswords, bukan kata sandi akun. Tidak pernah ditampilkan ulang; kosongkan untuk tetap memakai sandi tersimpan.",
       },
       { name: "smtp.from", label: "Alamat pengirim", type: "text", placeholder: "nama@gmail.com", help: "Kosongkan untuk memakai nama pengguna SMTP. Gmail hanya mengizinkan alamat akunnya sendiri atau alias yang sudah diverifikasi." },
-      { name: "contactTo", label: "Penerima notifikasi pesan", type: "text", placeholder: "ahmad@ngiliyun.my.id", help: "Alamat yang menerima pesan baru, misalnya ahmad@ngiliyun.my.id yang diteruskan Cloudflare ke Gmail." },
+      { name: "contactTo", label: "Penerima notifikasi pesan", type: "text", placeholder: "ahmad@ngiliyun.my.id", help: "Alamat utama yang menerima pesan baru." },
+      {
+        name: "contactCopy",
+        width: "half",
+        label: "Teruskan juga ke",
+        type: "list",
+        placeholder: "nama@gmail.com",
+        help: "Satu alamat per baris, maksimal 3. Dikirim sebagai salinan tersembunyi (BCC), jadi tidak terlihat di email lain. Hanya tersimpan di CMS dan tidak pernah tampil di situs.",
+      },
     ],
   },
 ];

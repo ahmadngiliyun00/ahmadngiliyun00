@@ -102,12 +102,12 @@ Pesan dari form kontak selalu tersimpan di database dan bisa dibaca di `/admin/p
 
 1. Aktifkan Verifikasi 2 Langkah di akun Google, lalu buat Sandi Aplikasi di <https://myaccount.google.com/apppasswords>
 2. Server SMTP `smtp.gmail.com`, Port `465`, Keamanan SSL/TLS langsung, Nama pengguna = alamat Gmail, Kata sandi = sandi aplikasi 16 huruf
-3. Penerima notifikasi: `ahmad@ngiliyun.my.id` (diteruskan Cloudflare ke Gmail) atau langsung alamat Gmail
-4. Simpan, lalu klik **Kirim email uji** di bawah formulir
+3. Penerima notifikasi: `ahmad@ngiliyun.my.id`. Isi **Teruskan juga ke** dengan email pribadi (satu per baris, maksimal 3). Alamat ini dikirimi salinan tersembunyi (BCC), hanya tersimpan di CMS, dan tidak pernah tampil di situs
+4. Simpan, lalu klik **Kirim email uji** di bawah formulir. Email uji juga dikirim ke semua alamat salinan
 
 Kata sandi SMTP tersimpan di tabel `settings` dan tidak pernah ditampilkan ulang di CMS. Karena ikut masuk cadangan database, simpan berkas cadangan di tempat yang aman, dan cabut sandi aplikasinya di akun Google bila cadangan bocor.
 
-Email notifikasi memakai Reply-To pengunjung, jadi tombol Balas langsung menuju pengirim. Untuk membalas dengan nama pengirim `ahmad@ngiliyun.my.id`, tambahkan alamat itu di Gmail lewat Setelan, Akun, Kirim email sebagai (memakai SMTP Gmail yang sama). Bila nanti ingin mengirim langsung dari domain, ganti SMTP ke layanan yang mendukung domain sendiri (misalnya Resend atau Zoho Mail) tanpa mengubah kode.
+Email notifikasi berformat HTML (template di `src/lib/mail-template.ts`) dengan versi teks polos sebagai cadangan, dan memakai Reply-To pengunjung, jadi tombol Balas langsung menuju pengirim. Untuk membalas dengan nama pengirim `ahmad@ngiliyun.my.id`, tambahkan alamat itu di Gmail lewat Setelan, Akun, Kirim email sebagai (memakai SMTP Gmail yang sama). Bila nanti ingin mengirim langsung dari domain, ganti SMTP ke layanan yang mendukung domain sendiri (misalnya Resend atau Zoho Mail) tanpa mengubah kode.
 
 **c. Anti robot (opsional).** Dasbor Cloudflare, menu Turnstile, Add widget, domain `ngiliyun.my.id`, mode Managed. Isi `NEXT_PUBLIC_TURNSTILE_SITE_KEY` dan `TURNSTILE_SECRET_KEY`, lalu `npm run build` dan `pm2 reload ngiliyun` (kunci situs dibaca saat build). Tanpa Turnstile, form tetap dilindungi kolom jebakan, jebakan waktu 3 detik, batas 3 tautan, dan maksimal 5 pesan per IP per jam.
 

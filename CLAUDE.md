@@ -38,6 +38,7 @@ scripts/db/                      migrate, seed, create-admin, env, content (baca
 scripts/lib/load-ts.mjs          memuat berkas .ts dari skrip Node
 tests/linkedin.test.mjs          unit test URL LinkedIn dan teks siap tempel (npm test)
 tests/contact.test.mjs           unit test validasi form kontak (npm test)
+tests/mail.test.mjs              unit test template email: escape isian dan baris baru (npm test)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, sertifikat atau certificates, s/[token]
@@ -119,7 +120,7 @@ npm run admin:create -- --email anda@contoh.id --name "Nama"
 npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
-npm test               # unit test URL LinkedIn dan form kontak
+npm test               # unit test URL LinkedIn, form kontak, dan template email
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build

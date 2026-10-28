@@ -185,6 +185,7 @@ export type SeoSettings = {
 export type MailSettings = {
   smtp?: { host?: string; port?: number; security?: "ssl" | "starttls"; user?: string; pass?: string; from?: string };
   contactTo?: string; // penerima notifikasi pesan baru
+  contactCopy?: string[]; // salinan tersembunyi (BCC), misalnya email pribadi; tidak pernah tampil di situs
 };
 
 // Peta koleksi ke tipe datanya.

@@ -350,4 +350,13 @@ function checkMail(data: Doc, errors: FieldErrors) {
   if (to !== "") {
     if (!EMAIL.test(to)) errors.contactTo = "Penerima notifikasi: tulis satu alamat email.";
   }
+  const copy = Array.isArray(data.contactCopy) ? (data.contactCopy as string[]) : [];
+  if (copy.length > 3) errors.contactCopy = "Teruskan juga ke: maksimal 3 alamat.";
+  const bad = copy.find((a) => !EMAIL.test(a));
+  if (bad !== undefined) errors.contactCopy = `Teruskan juga ke: "${bad}" bukan alamat email.`;
+  if (to !== "") {
+    if (copy.some((a) => a.toLowerCase() === to.toLowerCase())) {
+      errors.contactCopy = "Teruskan juga ke: alamat ini sudah menjadi penerima utama.";
+    }
+  }
 }
