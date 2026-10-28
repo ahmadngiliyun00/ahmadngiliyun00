@@ -3,24 +3,13 @@
 import { useActionState, useEffect, useId, useRef, useState } from "react";
 import { useLocalTime } from "@/components/LiveClock";
 import { toast } from "@/components/Toaster";
+import { useTurnstile } from "@/components/useTurnstile";
 import type { Lang } from "@/data/profile";
 import type { ContactField, ContactFieldError, ContactFormError, ContactState } from "@/lib/contact";
 import { sendContactMessage } from "@/server/contact-action";
 
 // Form kontak: pesan dikirim ke server, disimpan di kotak masuk CMS, dan diteruskan ke email
 // Mas Ilyun. Pengunjung wajib mengisi emailnya supaya balasan bisa dikirim.
-
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
-const TURNSTILE_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-
-type Turnstile = {
-  render: (el: HTMLElement, opts: { sitekey: string; theme: "dark"; language: string }) => string;
-  reset: (id: string) => void;
-  remove: (id: string) => void;
-};
-interface TurnstileWindow extends Window {
-  turnstile?: Turnstile;
-}
 
 export type ContactLabels = {
   formTitle: string;
@@ -104,12 +93,11 @@ export default function ContactPanel({
   const [startedAt, setStartedAt] = useState("");
   const [dismissed, setDismissed] = useState(false);
   const [copied, setCopied] = useState(false);
-  const widgetRef = useRef<HTMLDivElement>(null);
-  const widgetId = useRef<string | null>(null);
   const time = useLocalTime(lang, timeZone);
 
   const errors = state.status === "error" ? (state.errors ?? {}) : {};
   const sent = state.status === "sent" ? !dismissed : false;
+  const { enabled: turnstileOn, widgetRef, reset: resetTurnstile } = useTurnstile(lang, !sent);
 
   // Alamat email dirakit di peramban supaya tidak tertulis utuh di HTML.
   useEffect(() => {
@@ -136,11 +124,8 @@ export default function ContactPanel({
       const first = FIELD_ORDER.find((f) => state.errors?.[f] !== undefined);
       if (first) document.getElementById(`${uid}-${first}`)?.focus();
     }
-    const ts = (window as TurnstileWindow).turnstile;
-    if (ts) {
-      if (widgetId.current) ts.reset(widgetId.current);
-    }
-  }, [state, uid]);
+    resetTurnstile();
+  }, [state, uid, resetTurnstile]);
 
   // Galat umum (captcha, terlalu sering, gagal kirim) tampil sebagai toast, sekali per kiriman.
   // Teksnya dihitung di luar efek supaya efek di atas tidak ikut berjalan ulang
@@ -149,40 +134,6 @@ export default function ContactPanel({
   useEffect(() => {
     if (formErrorText !== "") toast(formErrorText, "error");
   }, [state, formErrorText]);
-
-  // Cloudflare Turnstile hanya dimuat bila kunci situs diatur.
-  useEffect(() => {
-    if (TURNSTILE_SITE_KEY === "") return;
-    if (sent) return;
-    let cancelled = false;
-    const mount = () => {
-      const ts = (window as TurnstileWindow).turnstile;
-      if (cancelled) return;
-      if (!ts) return;
-      if (!widgetRef.current) return;
-      if (widgetId.current) return;
-      widgetId.current = ts.render(widgetRef.current, { sitekey: TURNSTILE_SITE_KEY, theme: "dark", language: lang });
-    };
-    const existing = document.querySelector<HTMLScriptElement>("script[data-turnstile]");
-    if ((window as TurnstileWindow).turnstile) mount();
-    else if (existing) existing.addEventListener("load", mount);
-    else {
-      const s = document.createElement("script");
-      s.src = TURNSTILE_SRC;
-      s.async = true;
-      s.dataset.turnstile = "1";
-      s.addEventListener("load", mount);
-      document.head.appendChild(s);
-    }
-    return () => {
-      cancelled = true;
-      const ts = (window as TurnstileWindow).turnstile;
-      if (ts) {
-        if (widgetId.current) ts.remove(widgetId.current);
-      }
-      widgetId.current = null;
-    };
-  }, [lang, sent]);
 
   const onCopy = async () => {
     try {
@@ -348,7 +299,7 @@ export default function ContactPanel({
             {errorText("body")}
           </div>
 
-          {TURNSTILE_SITE_KEY === "" ? null : <div ref={widgetRef} className="min-h-[65px]" />}
+          {turnstileOn ? <div ref={widgetRef} className="min-h-[65px]" /> : null}
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
             <button type="submit" className="btn btn-solid" disabled={pending} aria-disabled={pending}>

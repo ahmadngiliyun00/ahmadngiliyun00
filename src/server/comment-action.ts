@@ -7,10 +7,11 @@ import { clientIp, consumeAttempt } from "@/server/auth/rate-limit";
 import { createComment } from "@/server/comments";
 import { loadSite } from "@/server/content";
 import { sendCommentNotification } from "@/server/mail";
+import { verifyTurnstile } from "@/server/turnstile";
 
 // Server Action form komentar. Urutan: jebakan robot (diam-diam dianggap terkirim), validasi,
-// tulisan masih public dan komentar masih dibuka, batas per IP, simpan sebagai menunggu
-// persetujuan, lalu email notifikasi ke Mas Ilyun.
+// tulisan masih public dan komentar masih dibuka, batas per IP, Turnstile (bila diaktifkan),
+// simpan sebagai menunggu persetujuan, lalu email notifikasi ke Mas Ilyun.
 
 // Maksimal 3 komentar per IP per 10 menit.
 const LIMIT = { limit: 3, windowMs: 10 * 60 * 1000 };
@@ -35,6 +36,9 @@ export async function postComment(_prev: CommentState, form: FormData): Promise<
   const ip = await clientIp();
   const keys = [`comment:${ip}`];
   if (await consumeAttempt(keys, LIMIT)) return { status: "error", formError: "tooMany" };
+
+  const token = String(form.get("cf-turnstile-response") ?? "");
+  if (!(await verifyTurnstile(token, ip))) return { status: "error", formError: "captcha" };
 
   try {
     const id = await createComment(entry.id, input, lang, ip);

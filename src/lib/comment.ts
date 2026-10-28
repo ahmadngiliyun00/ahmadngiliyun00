@@ -17,7 +17,7 @@ export const COMMENT_LIMITS = {
 export type CommentInput = { name: string; email: string; body: string };
 export type CommentField = keyof CommentInput;
 export type CommentErrors = Partial<Record<CommentField, ContactFieldError>>;
-export type CommentFormError = "tooMany" | "closed" | "failed";
+export type CommentFormError = "captcha" | "tooMany" | "closed" | "failed";
 
 export type CommentState =
   | { status: "idle" }

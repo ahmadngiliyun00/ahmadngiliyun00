@@ -68,6 +68,7 @@ export type CommentLabels = {
     bodyTooShort: string;
     tooLong: string;
     tooManyLinks: string;
+    captcha: string;
     tooMany: string;
     closed: string;
     failed: string;
@@ -560,6 +561,7 @@ export const copy: Localized<Copy> = {
           bodyTooShort: "Komentar terlalu pendek.",
           tooLong: "Isian terlalu panjang.",
           tooManyLinks: "Terlalu banyak tautan. Maksimal dua.",
+          captcha: "Verifikasi keamanan belum selesai. Tunggu sebentar lalu coba lagi.",
           tooMany: "Terlalu banyak komentar dalam waktu singkat. Coba lagi beberapa menit lagi.",
           closed: "Komentar untuk tulisan ini sudah ditutup.",
           failed: "Komentar gagal dikirim. Coba lagi sebentar lagi.",
@@ -855,6 +857,7 @@ export const copy: Localized<Copy> = {
           bodyTooShort: "That comment is too short.",
           tooLong: "That is too long.",
           tooManyLinks: "Too many links. Two at most.",
+          captcha: "The security check has not finished yet. Wait a moment and try again.",
           tooMany: "Too many comments in a short time. Try again in a few minutes.",
           closed: "Comments are closed for this post.",
           failed: "Your comment could not be sent. Please try again shortly.",

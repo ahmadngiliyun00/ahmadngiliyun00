@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useId, useRef, useState } from "react";
 import { toast } from "@/components/Toaster";
+import { useTurnstile } from "@/components/useTurnstile";
 import type { CommentLabels, Lang } from "@/data/profile";
 import type { CommentField, CommentFormError, CommentState } from "@/lib/comment";
 import type { ContactFieldError } from "@/lib/contact";
@@ -21,6 +22,7 @@ function fieldMessage(field: CommentField, code: ContactFieldError, e: CommentLa
 }
 
 function formMessage(code: CommentFormError, e: CommentLabels["errors"]): string {
+  if (code === "captcha") return e.captcha;
   if (code === "tooMany") return e.tooMany;
   if (code === "closed") return e.closed;
   return e.failed;
@@ -32,14 +34,17 @@ export default function CommentForm({ slug, lang, labels }: { slug: string; lang
   const [startedAt, setStartedAt] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const uid = useId();
+  const { enabled: turnstileOn, widgetRef, reset: resetTurnstile } = useTurnstile(lang);
   const errors = state.status === "error" ? (state.errors ?? {}) : {};
 
   useEffect(() => {
     setStartedAt(String(Date.now()));
   }, []);
 
-  // Hasil kiriman: toast, kosongkan form bila terkirim, fokus ke isian pertama yang salah.
+  // Hasil kiriman: toast, kosongkan form bila terkirim, fokus ke isian pertama yang salah,
+  // dan minta token Turnstile baru (token sekali pakai).
   useEffect(() => {
+    if (state.status !== "idle") resetTurnstile();
     if (state.status === "sent") {
       toast(labels.sent, "success");
       formRef.current?.reset();
@@ -50,7 +55,7 @@ export default function CommentForm({ slug, lang, labels }: { slug: string; lang
     if (state.formError) toast(formMessage(state.formError, labels.errors), "error");
     const first = ORDER.find((f) => state.errors?.[f] !== undefined);
     if (first) document.getElementById(`${uid}-${first}`)?.focus();
-  }, [state, uid, labels]);
+  }, [state, uid, labels, resetTurnstile]);
 
   const describe = (f: CommentField) => (errors[f] === undefined ? undefined : `${uid}-${f}-err`);
   const errorText = (f: CommentField) => {
@@ -133,6 +138,8 @@ export default function CommentForm({ slug, lang, labels }: { slug: string; lang
         />
         {errorText("body")}
       </div>
+
+      {turnstileOn ? <div ref={widgetRef} className="min-h-[65px]" /> : null}
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         <button type="submit" className="btn btn-solid" disabled={pending} aria-disabled={pending}>
