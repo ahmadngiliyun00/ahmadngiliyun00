@@ -18,6 +18,8 @@ export interface EntryFormLabels extends FieldLabels {
   saving: string;
   saved: string;
   errorsTitle: string;
+  requiredNote: string;
+  slugPlaceholder: string;
 }
 
 // Formulir generik untuk satu data koleksi atau satu pengaturan.
@@ -108,6 +110,7 @@ export default function EntryForm({
                 name="slug"
                 className="field"
                 defaultValue={raw?.("slug")?.[0] ?? meta.slug}
+                placeholder={labels.slugPlaceholder}
                 aria-invalid={errors.slug ? true : undefined}
                 aria-describedby="fld-slug-help"
               />
@@ -126,6 +129,7 @@ export default function EntryForm({
                 type="number"
                 className="field"
                 defaultValue={raw?.("position")?.[0] ?? String(meta.position)}
+                placeholder="0"
                 aria-describedby="fld-position-help"
               />
               <p id="fld-position-help" className="admin-help">
@@ -134,6 +138,14 @@ export default function EntryForm({
             </div>
           </div>
         </fieldset>
+      ) : null}
+
+      {fields.some((f) => f.required) ? (
+        <p className="admin-help">
+          {labels.requiredNote.split("{mark}")[0]}
+          <span className="admin-required">*</span>
+          {labels.requiredNote.split("{mark}")[1]}
+        </p>
       ) : null}
 
       <div className="admin-card admin-fields">

@@ -10,9 +10,10 @@ interface Base {
   label: string;
   help?: string;
   required?: boolean;
+  placeholder?: string; // bila kosong, FieldInput membuat placeholder dari jenis dan label field
 }
 interface PlainField extends Base {
-  type: "text" | "url" | "textarea" | "boolean" | "date" | "list" | "localizedList" | "links" | "file";
+  type: "text" | "url" | "textarea" | "boolean" | "date" | "list" | "localizedList" | "links" | "file" | "secret";
 }
 interface LocalizedField extends Base {
   type: "localized";
@@ -211,6 +212,12 @@ export function readField(field: Field, form: FormData, errors: FieldErrors): un
       const v = str(form, key);
       return v === "" ? undefined : v;
     }
+    case "secret": {
+      // Rahasia (misalnya sandi SMTP) tidak pernah dikirim balik ke formulir. Kosong berarti
+      // tetap memakai nilai tersimpan; readFields tidak menimpanya.
+      const v = str(form, key);
+      return v === "" ? undefined : v;
+    }
   }
 }
 
@@ -219,6 +226,9 @@ export function readFields(fields: Field[], form: FormData, base: Doc = {}): { d
   const data: Doc = structuredClone(base);
   for (const field of fields) {
     const value = readField(field, form, errors);
+    if (field.type === "secret") {
+      if (value === undefined) continue;
+    }
     setPath(data, field.name, value);
     if (field.required) {
       const empty = value === undefined || value === null || value === "";
@@ -256,6 +266,9 @@ export function formValue(field: Field, doc: Doc): string | { id: string; en: st
       return (v ?? null) as PartialDate | null;
     case "number":
       return typeof v === "number" ? String(v) : "";
+    case "secret":
+      // Hanya penanda sudah tersimpan atau belum; nilainya tidak pernah dikirim ke browser.
+      return typeof v === "string" ? v !== "" : false;
     default:
       return typeof v === "string" ? v : "";
   }

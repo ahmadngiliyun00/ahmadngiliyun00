@@ -14,7 +14,57 @@ export type FieldLabels = {
   currentFile: string;
   openFile: string;
   removeFile: string;
+  required: string;
+  placeholder: {
+    write: string;
+    writeId: string;
+    writeEn: string;
+    url: string;
+    number: string;
+    list: string;
+    listEn: string;
+    links: string;
+    year: string;
+    month: string;
+    day: string;
+    secretKeep: string;
+    secretNew: string;
+  };
 };
+
+// Label di tengah kalimat: huruf pertama dikecilkan, kecuali singkatan seperti "URL" atau "ID".
+function inSentence(label: string): string {
+  const second = label.charAt(1);
+  if (second !== "" ? second === second.toUpperCase() : true) return label;
+  return label.charAt(0).toLowerCase() + label.slice(1);
+}
+
+// Placeholder bawaan per jenis field. Field boleh memberi placeholder sendiri di collections.ts.
+function placeholderFor(field: Field, labels: FieldLabels, part?: "id" | "en"): string {
+  const ph = labels.placeholder;
+  const name = inSentence(field.label);
+  if (part === undefined) {
+    if (field.placeholder) return field.placeholder;
+  } else if (field.placeholder) {
+    return part === "id" ? field.placeholder : `${field.placeholder} (English)`;
+  }
+  switch (field.type) {
+    case "url":
+      return ph.url;
+    case "number":
+      return field.min === undefined ? ph.number : `Contoh: ${field.min}`;
+    case "list":
+      return ph.list;
+    case "links":
+      return ph.links;
+    case "localizedList":
+      return part === "en" ? ph.listEn : ph.list;
+    case "localized":
+      return (part === "en" ? ph.writeEn : ph.writeId).replace("{label}", name);
+    default:
+      return ph.write.replace("{label}", name);
+  }
+}
 
 // Satu field formulir CMS. raw = isian mentah dari percobaan simpan yang gagal (bila ada).
 export default function FieldInput({
@@ -44,10 +94,18 @@ export default function FieldInput({
   const str = typeof value === "string" ? value : "";
   const pair = value !== null ? (typeof value === "object" ? (value as { id?: string; en?: string }) : {}) : {};
 
+  const required = field.required ? true : undefined;
   const label = (
     <span className="admin-label">
       {field.label}
-      {field.required ? <span aria-hidden="true"> *</span> : null}
+      {field.required ? (
+        <>
+          <span className="admin-required" aria-hidden="true">
+            {" *"}
+          </span>
+          <span className="sr-only"> ({labels.required})</span>
+        </>
+      ) : null}
     </span>
   );
   const foot = (
@@ -80,6 +138,8 @@ export default function FieldInput({
             step={field.type === "number" ? "any" : undefined}
             className="field"
             defaultValue={one(key, str)}
+            placeholder={placeholderFor(field, labels)}
+            aria-required={required}
             aria-invalid={invalid}
             aria-describedby={describedBy}
           />
@@ -98,6 +158,8 @@ export default function FieldInput({
             className="field"
             rows={field.type === "textarea" ? 4 : 5}
             defaultValue={one(key, str)}
+            placeholder={placeholderFor(field, labels)}
+            aria-required={required}
             aria-invalid={invalid}
             aria-describedby={describedBy}
           />
@@ -126,10 +188,20 @@ export default function FieldInput({
                       className="field"
                       rows={field.type === "localizedList" ? 5 : 3}
                       defaultValue={v}
+                      placeholder={placeholderFor(field, labels, lang)}
+                      aria-required={required}
                       aria-invalid={invalid}
                     />
                   ) : (
-                    <input id={`${id}-${lang}`} name={name} className="field" defaultValue={v} aria-invalid={invalid} />
+                    <input
+                      id={`${id}-${lang}`}
+                      name={name}
+                      className="field"
+                      defaultValue={v}
+                      placeholder={placeholderFor(field, labels, lang)}
+                      aria-required={required}
+                      aria-invalid={invalid}
+                    />
                   )}
                 </div>
               );
@@ -158,7 +230,15 @@ export default function FieldInput({
       return (
         <div className="admin-field">
           <label htmlFor={id}>{label}</label>
-          <select id={id} name={key} className="field" defaultValue={one(key, str)} aria-invalid={invalid} aria-describedby={describedBy}>
+          <select
+            id={id}
+            name={key}
+            className="field"
+            defaultValue={one(key, str)}
+            aria-required={required}
+            aria-invalid={invalid}
+            aria-describedby={describedBy}
+          >
             <option value="">{labels.choose}</option>
             {list.map((o) => (
               <option key={o.value} value={o.value}>
@@ -208,6 +288,8 @@ export default function FieldInput({
                   max={k === "year" ? 2100 : k === "month" ? 12 : 31}
                   className="field"
                   defaultValue={part(k)}
+                  placeholder={labels.placeholder[k]}
+                  aria-required={required ? (k === "year" ? true : undefined) : undefined}
                   aria-invalid={invalid}
                 />
               </div>
@@ -217,6 +299,25 @@ export default function FieldInput({
         </fieldset>
       );
     }
+    case "secret":
+      // value hanya penanda tersimpan (boolean); sandi lama tidak pernah dikirim ke browser.
+      return (
+        <div className="admin-field">
+          <label htmlFor={id}>{label}</label>
+          <input
+            id={id}
+            name={key}
+            type="password"
+            autoComplete="new-password"
+            className="field"
+            placeholder={value === true ? labels.placeholder.secretKeep : labels.placeholder.secretNew}
+            aria-required={required}
+            aria-invalid={invalid}
+            aria-describedby={describedBy}
+          />
+          {foot}
+        </div>
+      );
     case "file":
       return (
         <div className="admin-field">

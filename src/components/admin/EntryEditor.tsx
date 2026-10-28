@@ -50,7 +50,7 @@ export default async function EntryEditor({
       <h1 className="admin-title mt-3">{heading}</h1>
       {entry !== null ? <p className="admin-intro">{cfg.title(data)}</p> : null}
 
-      <div className="admin-editor">
+      <div className="admin-editor" data-side={entry !== null ? "" : undefined}>
         <EntryForm
           action={saveEntryAction}
           hidden={{ collection: cfg.key, id: entry === null ? "" : String(entry.id) }}

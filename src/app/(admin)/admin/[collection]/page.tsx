@@ -1,6 +1,10 @@
 import { notFound } from "next/navigation";
 import { moveEntryAction, setVisibilityAction } from "@/app/(admin)/admin/actions";
 import AdminShell from "@/components/admin/AdminShell";
+import Icon from "@/components/admin/Icon";
+import ListControls from "@/components/admin/ListControls";
+import Pagination from "@/components/admin/Pagination";
+import { paginate } from "@/components/admin/paginate";
 import { getCollection } from "@/content/collections";
 import type { Achievement } from "@/content/types";
 import { adminCopy as t } from "@/data/admin";
@@ -12,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ collection: string }>;
-  searchParams: Promise<{ q?: string; v?: string; deleted?: string; error?: string }>;
+  searchParams: Promise<{ q?: string; v?: string; per?: string; page?: string; deleted?: string; error?: string }>;
 };
 
 export default async function AdminList({ params, searchParams }: Props) {
@@ -32,6 +36,16 @@ export default async function AdminList({ params, searchParams }: Props) {
     .filter((e) => (q === "" ? true : `${e.slug} ${JSON.stringify(e.data)}`.toLowerCase().includes(q)));
   const canMove = cfg.order === "position" ? q === "" ? v === "all" : false : false;
   const base = `/admin/${cfg.key}/`;
+  const pg = paginate(filtered, sp.page, sp.per);
+  const hrefFor = (n: number) => {
+    const params = new URLSearchParams();
+    if (sp.q) params.set("q", sp.q);
+    if (v !== "all") params.set("v", v);
+    if (pg.per !== 10) params.set("per", String(pg.per));
+    if (n > 1) params.set("page", String(n));
+    const qs = params.toString();
+    return qs === "" ? base : `${base}?${qs}`;
+  };
 
   return (
     <AdminShell session={session} active={cfg.key}>
@@ -41,6 +55,7 @@ export default async function AdminList({ params, searchParams }: Props) {
           <p className="admin-intro">{cfg.description}</p>
         </div>
         <a href={`${base}new/`} className="btn btn-solid">
+          <Icon name="plus" />
           {t.list.add} {cfg.singular}
         </a>
       </div>
@@ -56,37 +71,28 @@ export default async function AdminList({ params, searchParams }: Props) {
         </p>
       ) : null}
 
-      <form className="admin-filter" method="get">
-        <div className="grid gap-1">
-          <label htmlFor="q" className="text-sm text-muted">
-            {t.list.search}
-          </label>
-          <input id="q" name="q" type="search" className="field" defaultValue={sp.q ?? ""} placeholder={t.list.searchPlaceholder} />
-        </div>
-        <div className="grid gap-1">
-          <label htmlFor="v" className="text-sm text-muted">
-            {t.form.visibility}
-          </label>
-          <select id="v" name="v" className="field" defaultValue={v}>
-            <option value="all">{t.list.all}</option>
-            <option value="public">{t.list.public}</option>
-            <option value="private">{t.list.private}</option>
-          </select>
-        </div>
-        <button type="submit" className="btn btn-line">
-          {t.list.search}
-        </button>
-      </form>
+      <ListControls
+        q={sp.q ?? ""}
+        per={pg.per}
+        visibility={v}
+        labels={{ ...t.list, visibility: t.form.visibility }}
+      />
 
       <p className="mt-6 text-sm text-muted" aria-live="polite">
-        {t.list.count.replace("{n}", String(filtered.length))}
+        {pg.total === 0
+          ? t.list.count.replace("{n}", "0")
+          : t.list.range
+              .replace("{from}", String(pg.from))
+              .replace("{to}", String(pg.to))
+              .replace("{total}", String(pg.total))}
       </p>
 
       {filtered.length === 0 ? (
         <p className="admin-empty">{t.list.empty}</p>
       ) : (
         <ul className="admin-rows">
-          {filtered.map((e, i) => {
+          {pg.items.map((e, idx) => {
+            const i = pg.from - 1 + idx;
             const data = e.data as Record<string, unknown>;
             const publicHref = cfg.publicPath ? (e.visibility === "public" ? `${cfg.publicPath.id}${e.slug}/` : null) : null;
             return (
@@ -109,6 +115,7 @@ export default async function AdminList({ params, searchParams }: Props) {
                     <input type="hidden" name="id" value={e.id} />
                     <input type="hidden" name="visibility" value={e.visibility === "public" ? "private" : "public"} />
                     <button type="submit" className="btn btn-line btn-small">
+                      <Icon name={e.visibility === "public" ? "eye-slash" : "eye"} />
                       {e.visibility === "public" ? t.list.unpublish : t.list.publish}
                     </button>
                   </form>
@@ -118,8 +125,13 @@ export default async function AdminList({ params, searchParams }: Props) {
                         <input type="hidden" name="collection" value={cfg.key} />
                         <input type="hidden" name="id" value={e.id} />
                         <input type="hidden" name="direction" value="up" />
-                        <button type="submit" className="btn btn-line btn-small" disabled={i === 0} aria-label={`${t.list.up}: ${cfg.title(data)}`}>
-                          ↑
+                        <button
+                          type="submit"
+                          className="btn btn-line btn-small btn-icon"
+                          disabled={i === 0}
+                          aria-label={`${t.list.up}: ${cfg.title(data)}`}
+                        >
+                          <Icon name="arrow-up" />
                         </button>
                       </form>
                       <form action={moveEntryAction}>
@@ -128,21 +140,23 @@ export default async function AdminList({ params, searchParams }: Props) {
                         <input type="hidden" name="direction" value="down" />
                         <button
                           type="submit"
-                          className="btn btn-line btn-small"
+                          className="btn btn-line btn-small btn-icon"
                           disabled={i === filtered.length - 1}
                           aria-label={`${t.list.down}: ${cfg.title(data)}`}
                         >
-                          ↓
+                          <Icon name="arrow-down" />
                         </button>
                       </form>
                     </>
                   ) : null}
                   {publicHref ? (
                     <a href={publicHref} className="btn btn-line btn-small" target="_blank" rel="noopener noreferrer">
+                      <Icon name="arrow-up-right-from-square" />
                       {t.list.view}
                     </a>
                   ) : null}
                   <a href={`${base}${e.id}/`} className="btn btn-solid btn-small">
+                    <Icon name="pen" />
                     {t.list.edit}
                   </a>
                 </div>
@@ -151,6 +165,8 @@ export default async function AdminList({ params, searchParams }: Props) {
           })}
         </ul>
       )}
+
+      <Pagination page={pg.page} pages={pg.pages} hrefFor={hrefFor} labels={t.pagination} />
     </AdminShell>
   );
 }

@@ -41,21 +41,55 @@
     letter-spacing: -0.01em;
   }
 
+  .admin-side-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .admin-menu {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .admin-side[data-open] .admin-menu {
+    display: flex;
+  }
+
+  @media (min-width: 1024px) {
+    .admin-menu {
+      display: flex;
+    }
+
+    .admin-menu-toggle {
+      display: none;
+    }
+  }
+
   .admin-nav {
     display: grid;
     gap: 0.15rem;
     font-size: 0.9rem;
   }
 
-  .admin-nav a {
-    display: block;
-    padding: 0.4rem 0.7rem;
+  .admin-nav a,
+  .admin-nav-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.45rem 0.7rem;
     border-radius: 0.6rem;
     color: var(--color-muted);
+    text-align: left;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  .admin-nav a:hover {
+  .admin-nav a:hover,
+  .admin-nav-toggle:hover {
     color: var(--color-fg);
     background: color-mix(in srgb, var(--color-line) 50%, transparent);
   }
@@ -65,17 +99,63 @@
     background: color-mix(in srgb, var(--color-leaf) 16%, transparent);
   }
 
-  .admin-nav-group {
-    display: grid;
-    gap: 0.1rem;
-    margin-top: 0.9rem;
+  .admin-nav-icon {
+    width: 1.1rem;
+    flex: none;
+    text-align: center;
+    color: var(--color-sky);
   }
 
-  .admin-nav-group > p {
-    padding: 0 0.7rem 0.2rem;
-    font-size: 0.75rem;
+  .admin-nav-toggle {
+    margin-top: 0.35rem;
     font-weight: 600;
-    color: var(--color-sky);
+    color: var(--color-fg);
+    cursor: pointer;
+  }
+
+  .admin-nav-chevron {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: var(--color-muted);
+    transition: transform 0.2s ease;
+  }
+
+  .admin-nav-toggle[aria-expanded="true"] .admin-nav-chevron {
+    transform: rotate(180deg);
+  }
+
+  .admin-nav-links {
+    display: grid;
+    gap: 0.1rem;
+    margin: 0.15rem 0 0.25rem 1.2rem;
+    padding-left: 0.6rem;
+    border-left: 1px solid var(--color-line);
+  }
+
+  .admin-nav-links[hidden] {
+    display: none;
+  }
+
+  /* Ikon di dalam tombol diberi jarak dari teksnya. */
+  .admin-shell .btn .fa-solid {
+    margin-right: 0.5rem;
+  }
+
+  .admin-shell .btn-icon .fa-solid {
+    margin-right: 0;
+  }
+
+  .admin-shell .btn .admin-icon-after {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+
+  .admin-shell .btn-icon {
+    padding: 0 0.85rem;
+  }
+
+  .admin-required {
+    color: #ff7a6b;
   }
 
   .admin-user {
@@ -174,9 +254,77 @@
 
   @media (min-width: 700px) {
     .admin-filter {
-      grid-template-columns: minmax(0, 1fr) 11rem auto;
+      grid-template-columns: minmax(0, 1fr) 11rem;
       align-items: end;
     }
+
+    .admin-filter[data-visibility] {
+      grid-template-columns: minmax(0, 1fr) 11rem 11rem;
+    }
+  }
+
+  .admin-filter[aria-busy="true"] .admin-search .fa-solid {
+    color: var(--color-leaf);
+  }
+
+  .admin-search {
+    position: relative;
+  }
+
+  .admin-search .fa-solid {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    color: var(--color-muted);
+    pointer-events: none;
+    transition: color 0.2s ease;
+  }
+
+  .admin-pages {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .admin-pages ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .admin-page {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.4rem;
+    height: 2.4rem;
+    padding: 0 0.6rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .admin-page:hover {
+    border-color: var(--color-sky);
+    color: var(--color-fg);
+  }
+
+  .admin-page[aria-current="page"] {
+    border-color: var(--color-leaf);
+    background: color-mix(in srgb, var(--color-leaf) 16%, transparent);
+    color: var(--color-fg);
+  }
+
+  .admin-pages-gap {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.5rem;
+    color: var(--color-muted);
   }
 
   .admin-rows {
@@ -250,8 +398,9 @@
     margin-top: 2rem;
   }
 
+  /* Kolom samping (tautan berbagi, hapus) hanya ada saat mengubah data; saat menambah, formulir selebar halaman. */
   @media (min-width: 1200px) {
-    .admin-editor {
+    .admin-editor[data-side] {
       grid-template-columns: minmax(0, 1fr) 20rem;
       align-items: start;
     }
@@ -441,7 +590,7 @@
     place-items: center;
     min-width: 1.35rem;
     height: 1.35rem;
-    margin-left: 0.45rem;
+    margin-left: auto;
     padding: 0 0.35rem;
     border-radius: 999px;
     background: var(--color-leaf);
@@ -556,4 +705,16 @@
     opacity: 0.6;
     cursor: progress;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .admin-nav-chevron,
+    .admin-search .fa-solid {
+      transition: none;
+    }
+  }
+}
+
+/* Di luar layer karena .field di globals.css juga di luar layer (gaya tanpa layer selalu menang). */
+.admin-search .field {
+  padding-left: 2.6rem;
 }

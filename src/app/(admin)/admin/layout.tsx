@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import RootShell from "@/components/RootShell";
 import { adminCopy } from "@/data/admin";
+import "@fortawesome/fontawesome-free/css/fontawesome.min.css";
+import "@fortawesome/fontawesome-free/css/solid.min.css";
 import "./admin.css";
 
 // Root layout CMS. Tidak diindeks mesin pencari.

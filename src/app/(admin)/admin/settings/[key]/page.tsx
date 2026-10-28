@@ -43,7 +43,7 @@ function SeoLinks({ htmlFile }: { htmlFile?: string }) {
   ];
   if (htmlFile) rows.push({ label: t.htmlFile, href: `${site.url}/${htmlFile}` });
   return (
-    <section className="admin-card mt-6 max-w-4xl" aria-labelledby="seo-links">
+    <section className="admin-card mt-6" aria-labelledby="seo-links">
       <h2 id="seo-links" className="font-display text-lg font-bold">
         {t.title}
       </h2>

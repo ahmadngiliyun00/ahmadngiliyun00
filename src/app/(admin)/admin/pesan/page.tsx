@@ -1,6 +1,10 @@
 import { deleteMessageAction, setMessageStatusAction } from "@/app/(admin)/admin/actions";
 import AdminShell from "@/components/admin/AdminShell";
 import ConfirmButton from "@/components/admin/ConfirmButton";
+import Icon from "@/components/admin/Icon";
+import ListControls from "@/components/admin/ListControls";
+import Pagination from "@/components/admin/Pagination";
+import { paginate } from "@/components/admin/paginate";
 import { adminCopy } from "@/data/admin";
 import { requireAdmin } from "@/server/auth/session";
 import { mailConfigured } from "@/server/mail";
@@ -17,7 +21,7 @@ const dateFormat = new Intl.DateTimeFormat("id-ID", {
   timeZone: "Asia/Jakarta",
 });
 
-type Props = { searchParams: Promise<{ f?: string; deleted?: string }> };
+type Props = { searchParams: Promise<{ f?: string; q?: string; per?: string; page?: string; deleted?: string }> };
 
 function toFilter(value: string | undefined): MessageFilter {
   return value === "new" ? "new" : value === "archived" ? "archived" : "inbox";
@@ -55,6 +59,17 @@ export default async function AdminMessages({ searchParams }: Props) {
     console.error("[admin] Gagal membaca pesan", err instanceof Error ? err.message : err);
     missing = true;
   }
+  const mailReady = await mailConfigured();
+  const q = (sp.q ?? "").trim().toLowerCase();
+  const found = q === "" ? list : list.filter((m) => `${m.name} ${m.email} ${m.topic} ${m.body}`.toLowerCase().includes(q));
+  const pg = paginate(found, sp.page, sp.per);
+  const hrefFor = (n: number) => {
+    const params = new URLSearchParams({ f: filter });
+    if (sp.q) params.set("q", sp.q);
+    if (pg.per !== 10) params.set("per", String(pg.per));
+    if (n > 1) params.set("page", String(n));
+    return `/admin/pesan/?${params.toString()}`;
+  };
   const tabCount: Record<MessageFilter, number> = {
     inbox: counts.new + counts.read,
     new: counts.new,
@@ -76,7 +91,14 @@ export default async function AdminMessages({ searchParams }: Props) {
           {t.tableMissing}
         </p>
       ) : null}
-      {missing ? null : mailConfigured() ? null : <p className="admin-note mt-6">{t.mailOff}</p>}
+      {missing ? null : mailReady ? null : (
+        <p className="admin-note mt-6">
+          {t.mailOff}{" "}
+          <a href="/admin/settings/mail/" className="link">
+            {t.mailOffLink}
+          </a>
+        </p>
+      )}
 
       <nav className="admin-tabs" aria-label={t.tabsLabel}>
         {FILTERS.map((f) => (
@@ -86,15 +108,27 @@ export default async function AdminMessages({ searchParams }: Props) {
         ))}
       </nav>
 
+      <ListControls
+        q={sp.q ?? ""}
+        per={pg.per}
+        keep={{ f: filter }}
+        labels={{ ...adminCopy.list, searchPlaceholder: t.searchPlaceholder }}
+      />
+
       <p className="mt-6 text-sm text-muted" aria-live="polite">
-        {t.count.replace("{n}", String(list.length))}
+        {pg.total === 0
+          ? t.count.replace("{n}", "0")
+          : t.range
+              .replace("{from}", String(pg.from))
+              .replace("{to}", String(pg.to))
+              .replace("{total}", String(pg.total))}
       </p>
 
-      {list.length === 0 ? (
+      {pg.total === 0 ? (
         <p className="admin-empty">{t.empty}</p>
       ) : (
         <ul className="admin-messages">
-          {list.map((m) => (
+          {pg.items.map((m) => (
             <li key={m.id} className="admin-card admin-message" data-status={m.status}>
               <div className="admin-message-head">
                 <div className="min-w-0">
@@ -122,6 +156,7 @@ export default async function AdminMessages({ searchParams }: Props) {
               <p className="admin-message-body">{m.body}</p>
               <div className="admin-row-actions mt-4">
                 <a className="btn btn-solid btn-small" href={replyHref(m)}>
+                  <Icon name="reply" />
                   {t.reply}
                 </a>
                 {m.status === "new" ? <StatusButton m={m} filter={filter} status="read" label={t.markRead} /> : null}
@@ -141,6 +176,8 @@ export default async function AdminMessages({ searchParams }: Props) {
           ))}
         </ul>
       )}
+
+      <Pagination page={pg.page} pages={pg.pages} hrefFor={hrefFor} labels={adminCopy.pagination} />
     </AdminShell>
   );
 }
