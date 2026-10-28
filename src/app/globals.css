@@ -2206,6 +2206,7 @@ select.field {
   height: min(46vw, 620px);
   background: var(--color-sky);
   opacity: 0.38;
+  animation: footer-drift-sky 26s ease-in-out infinite alternate;
 }
 
 .footer-glow-leaf {
@@ -2215,6 +2216,32 @@ select.field {
   height: min(30vw, 420px);
   background: var(--color-leaf);
   opacity: 0.28;
+  animation: footer-drift-leaf 34s ease-in-out infinite alternate;
+}
+
+/* Dua cahaya bergeser pelan dengan arah dan tempo berbeda, supaya tidak terlihat berulang. */
+@keyframes footer-drift-sky {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(18vw, -6%, 0) scale(1.12);
+  }
+  100% {
+    transform: translate3d(32vw, 4%, 0) scale(0.94);
+  }
+}
+
+@keyframes footer-drift-leaf {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-22vw, -10%, 0) scale(1.18);
+  }
+  100% {
+    transform: translate3d(-36vw, 2%, 0) scale(1.05);
+  }
 }
 
 /* Form kontak: galat per kolom, kolom jebakan robot, dan panel terkirim. */
@@ -2262,6 +2289,10 @@ select.field {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .footer-glow i {
+    animation: none;
   }
 
   .rise,
