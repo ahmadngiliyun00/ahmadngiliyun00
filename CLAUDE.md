@@ -37,6 +37,7 @@ scripts/readme-sections.mjs      bagian proyek, capaian, mengajar, perjalanan RE
 scripts/db/                      migrate, seed, create-admin, env, content (baca konten public)
 scripts/lib/load-ts.mjs          memuat berkas .ts dari skrip Node
 tests/linkedin.test.mjs          unit test URL LinkedIn dan teks siap tempel (npm test)
+tests/contact.test.mjs           unit test validasi form kontak (npm test)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, sertifikat atau certificates, s/[token]
@@ -55,6 +56,9 @@ src/
     content.ts                   baca konten; loadSite() dengan cache memori
     entries.ts                   tulis konten, aturan lintas data, tautan berbagi
     files.ts                     simpan dan baca berkas di UPLOAD_DIR
+    contact-action.ts            Server Action form kontak (anti spam, simpan, teruskan email)
+    messages.ts, mail.ts         pesan kontak di database, kirim email SMTP
+    turnstile.ts                 verifikasi Cloudflare Turnstile (opsional)
     auth/                        password, session, github, rate-limit
   data/
     profile.ts                   identitas situs dan teks antarmuka situs ID/EN
@@ -77,6 +81,8 @@ src/
 - Repo terbaru otomatis dari GitHub, atur lewat `recentRepos.exclude` di `profile.ts`
 - Gaya komponen ditulis di `globals.css` (situs) atau `admin.css` (CMS) di dalam `@layer components`
 - Jangan commit `.env.local`, `.env.production.local`, atau folder `storage/`
+- Pesan form kontak (tabel `messages`) selalu privat: hanya tampil di `/admin/pesan/`, tidak pernah di situs, sitemap, atau README
+- Kontak publik hanya lewat email (`ahmad@ngiliyun.my.id`). Jangan menambahkan WhatsApp atau nomor telepon (keputusan Mas Ilyun)
 
 ## Desain
 
@@ -109,7 +115,7 @@ npm run admin:create -- --email anda@contoh.id --name "Nama"
 npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
-npm test               # unit test URL LinkedIn
+npm test               # unit test URL LinkedIn dan form kontak
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build
@@ -126,7 +132,7 @@ VPS aaPanel dengan PM2 (satu instans) dan Nginx reverse proxy. Langkah lengkap d
 - Daftar keputusan otonom dan butir yang menunggu ada di `docs/PROMPT_KEPUTUSAN_OTONOM.md` (berkas privat, tidak di-commit)
 - Nomor pencatatan HKI, URL atau DOI artikel, dan berkas PDF sertifikat yang sudah disensor (isi lewat CMS)
 - Data privat di CMS: sertifikat folder lain yang belum dipilih, IKAPI (butuh bukti), Serenicare (penelitian orang lain). IDCamp tidak dimasukkan
-- Email publik sementara memakai Gmail, ganti ke alamat domain setelah aktif
+- Email publik `ahmad@ngiliyun.my.id`: aktifkan Cloudflare Email Routing dan ubah email di CMS (lihat `docs/DEPLOY.md` langkah 7)
 - Angka sentimen di ilustrasi DataCraft (62/24/14) dan peluang kelas di ilustrasi RupiahVision hanya ilustrasi, bukan hasil riset
 
 ## Yang belum selesai

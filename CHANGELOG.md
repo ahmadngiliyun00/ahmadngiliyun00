@@ -14,6 +14,8 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 - Unggah berkas sertifikat yang disimpan di luar repo dan disajikan dengan pemeriksaan izin
 - Tautan berbagi rahasia `/s/<token>/` untuk membagikan data, termasuk yang privat, tanpa diindeks
 - Panduan deploy VPS aaPanel di `docs/DEPLOY.md`
+- Form kontak yang mengirim ke server: pesan tersimpan di kotak masuk CMS `/admin/pesan/` dan diteruskan ke email lewat SMTP dengan Reply-To pengunjung. Perlindungan spam: kolom jebakan, jebakan waktu, batas tautan, batas per IP, dan Cloudflare Turnstile opsional
+- Logo "A di dalam N", wordmark "ngiliyun", dan footer dengan cahaya biru dan hijau yang bergerak pelan
 
 - Bagian "Sertifikat dan capaian" di beranda: baris indikator bertanggal (sitasi, h-index, skor SINTA, hak cipta, publikasi) dan sorotan dengan saringan sertifikat atau hak cipta
 - Arsip `/sertifikat/` dan `/en/certificates/` dengan pencarian, saringan kategori dan tahun, serta saringan yang tersimpan di URL

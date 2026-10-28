@@ -28,6 +28,10 @@ Isi `.env.production.local`:
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | dari OAuth App (langkah 6), boleh kosong bila hanya login email |
 | `GITHUB_ALLOWED_LOGIN` | `ahmadngiliyun00` |
 | `UPLOAD_DIR` | `/www/wwwroot/ngiliyun-storage/uploads` (di LUAR folder situs dan di luar `public/`) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | SMTP untuk meneruskan pesan form kontak (langkah 7), boleh kosong |
+| `CONTACT_TO` | `ahmad@ngiliyun.my.id` |
+| `CONTACT_IP_SALT` | teks acak panjang, misalnya hasil `openssl rand -hex 32` |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile (langkah 7), boleh kosong |
 
 ```bash
 mkdir -p /www/wwwroot/ngiliyun-storage/uploads
@@ -84,6 +88,29 @@ location / {
 4. Salin Client ID dan buat Client Secret, isi ke `.env.production.local`, lalu `pm2 reload ngiliyun`
 
 Akun admin untuk login GitHub dibuat otomatis saat akun yang diizinkan pertama kali masuk.
+
+## 7. Form kontak dan email
+
+Pesan dari form kontak selalu tersimpan di database dan bisa dibaca di `/admin/pesan/`. Tiga hal di bawah membuat alur email lengkap.
+
+**a. Alamat publik `ahmad@ngiliyun.my.id` (menerima email).** Pakai Cloudflare Email Routing (gratis):
+
+1. Dasbor Cloudflare, pilih domain `ngiliyun.my.id`, menu Email, lalu Email Routing, aktifkan. Cloudflare menambahkan record MX dan TXT sendiri
+2. Tambah alamat tujuan (Gmail pribadi) dan verifikasi lewat email konfirmasi
+3. Routing rules: buat alamat kustom `ahmad`, aksi Send to an email, tujuan Gmail tadi
+4. Di CMS, Pengaturan, Profil: isi Email nama `ahmad` dan Email domain `ngiliyun.my.id`
+
+**b. Penerusan pesan form ke email (mengirim email).** Isi variabel SMTP di `.env.production.local`, lalu `pm2 reload ngiliyun`. Pilihan paling cepat adalah Gmail:
+
+1. Aktifkan Verifikasi 2 Langkah di akun Google, lalu buat Sandi Aplikasi di <https://myaccount.google.com/apppasswords>
+2. `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_SECURE=true`, `SMTP_USER` dan `MAIL_FROM` = alamat Gmail, `SMTP_PASS` = sandi aplikasi 16 huruf
+3. `CONTACT_TO=ahmad@ngiliyun.my.id` (diteruskan Cloudflare ke Gmail) atau langsung alamat Gmail
+
+Email notifikasi memakai Reply-To pengunjung, jadi tombol Balas langsung menuju pengirim. Untuk membalas dengan nama pengirim `ahmad@ngiliyun.my.id`, tambahkan alamat itu di Gmail lewat Setelan, Akun, Kirim email sebagai (memakai SMTP Gmail yang sama). Bila nanti ingin mengirim langsung dari domain, ganti SMTP ke layanan yang mendukung domain sendiri (misalnya Resend atau Zoho Mail) tanpa mengubah kode.
+
+**c. Anti robot (opsional).** Dasbor Cloudflare, menu Turnstile, Add widget, domain `ngiliyun.my.id`, mode Managed. Isi `NEXT_PUBLIC_TURNSTILE_SITE_KEY` dan `TURNSTILE_SECRET_KEY`, lalu `npm run build` dan `pm2 reload ngiliyun` (kunci situs dibaca saat build). Tanpa Turnstile, form tetap dilindungi kolom jebakan, jebakan waktu 3 detik, batas 3 tautan, dan maksimal 5 pesan per IP per jam.
+
+Pembatas per IP membutuhkan IP asli pengunjung, jadi pastikan pengaturan `real_ip_header` di langkah 5 sudah terpasang bila DNS diproksikan Cloudflare.
 
 ## Memperbarui
 

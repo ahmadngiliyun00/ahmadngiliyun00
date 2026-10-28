@@ -66,6 +66,9 @@ Teks antarmuka (label tombol, judul bagian) tetap di kode: situs di `src/data/pr
 | `src/server/entries.ts` | Tulis konten, aturan lintas data, tautan berbagi |
 | `src/server/auth/` | Kata sandi (scrypt), sesi database, login GitHub, pembatas login |
 | `src/server/files.ts` | Simpan dan baca berkas unggahan di `UPLOAD_DIR` |
+| `src/server/contact-action.ts` | Server Action form kontak: anti spam, simpan ke tabel `messages`, teruskan ke email |
+| `src/server/messages.ts`, `mail.ts`, `turnstile.ts` | Baca dan tulis pesan, kirim email SMTP, verifikasi Cloudflare Turnstile |
+| `src/lib/contact.ts` | Aturan validasi form kontak (dipakai server dan `tests/contact.test.mjs`) |
 | `src/app/(admin)/admin/` | Halaman dan Server Action CMS |
 
 Setiap halaman dan Server Action admin memanggil `requireAdmin()`. Jangan mengandalkan layout saja untuk pemeriksaan login.
