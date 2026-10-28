@@ -1,4 +1,5 @@
 import AchievementArchive from "@/components/AchievementArchive";
+import Analytics from "@/components/Analytics";
 import ExternalLink from "@/components/ExternalLink";
 import Reveal from "@/components/Reveal";
 import SubpageShell from "@/components/SubpageShell";
@@ -29,6 +30,7 @@ export default async function ArchivePage({ lang }: { lang: Lang }) {
 
   return (
     <SubpageShell lang={lang} otherHref={archivePath(other)}>
+      <Analytics />
       <section aria-labelledby="archive-title" className="section subpage-section">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <nav aria-label={t.archive.crumbs} className="crumbs">

@@ -1,3 +1,4 @@
+import Analytics from "@/components/Analytics";
 import CopyButton from "@/components/CopyButton";
 import ExternalLink from "@/components/ExternalLink";
 import SubpageShell from "@/components/SubpageShell";
@@ -125,6 +126,7 @@ export default function DetailPage({
 
   return (
     <SubpageShell lang={lang} otherHref={otherHref ?? detailPath(other, item.id)}>
+      {shared ? null : <Analytics />}
       {structured === null ? null : (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured) }} />
       )}

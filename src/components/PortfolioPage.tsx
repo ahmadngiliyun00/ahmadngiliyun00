@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import AchievementHighlights from "@/components/AchievementHighlights";
+import Analytics from "@/components/Analytics";
 import AreaIcon from "@/components/AreaIcon";
 import ContactPanel from "@/components/ContactPanel";
 import ContributionGraph from "@/components/ContributionGraph";
@@ -774,6 +775,7 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
       </main>
 
       <SiteFooter lang={lang} />
+      <Analytics />
     </>
   );
 }
