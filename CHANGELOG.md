@@ -4,7 +4,17 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/) dan penomoran versi mengikuti
 [Semantic Versioning](https://semver.org/lang/id/).
 
-## [Belum dirilis]
+## [2.0.0] - 2026-10-29
+
+Versi besar karena cara menjalankan dan men-deploy situs berubah total: dari build statis menjadi server Node.js dengan database MySQL dan CMS di `/admin`.
+
+### Perubahan yang memutus kompatibilitas
+
+- Situs tidak lagi dibangun sebagai HTML statis (`output: "export"` dihapus). Deploy ke Vercel atau Cloudflare Pages sebagai situs statis tidak lagi didukung; situs berjalan dengan `next start` di VPS (PM2 dan Nginx), lihat `docs/DEPLOY.md`
+- Wajib database MySQL atau MariaDB serta berkas environment (`.env.local`, lihat `.env.example`). Jalankan `npm run db:migrate`, `npm run db:seed`, dan `npm run admin:create` sebelum situs pertama kali dipakai
+- Konten pindah dari `src/data/profile.ts` ke database dan dikelola lewat CMS; `profile.ts` kini hanya berisi identitas situs dan teks antarmuka
+- Versi Node.js minimum naik menjadi 22.23.4 atau 24.22.1
+- Beberapa bagian beranda pindah ke halaman dalam; jangkar lama seperti `/#research` dialihkan otomatis
 
 ### Ditambahkan
 
@@ -40,7 +50,6 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 - Email notifikasi form kontak dan email uji kini berdesain (HTML dengan versi teks polos), berisi rincian pengirim, isi pesan, serta tombol Balas dan Buka di CMS
 - Isian "Teruskan juga ke" di pengaturan Email dan SMTP: salinan tersembunyi (BCC) notifikasi ke email pribadi tanpa menampilkannya di situs
 - Notifikasi toast untuk CMS dan situs: muncul sebentar lalu hilang sendiri, berhenti saat disorot atau difokus, dan bisa ditutup. Menggantikan kotak notifikasi di halaman
-
 - Bagian "Sertifikat dan capaian" di beranda: baris indikator bertanggal (sitasi, h-index, skor SINTA, hak cipta, publikasi) dan sorotan dengan saringan sertifikat atau hak cipta
 - Arsip `/sertifikat/` dan `/en/certificates/` dengan pencarian, saringan kategori dan tahun, serta saringan yang tersimpan di URL
 - Halaman detail per capaian dengan tautan verifikasi resmi, tombol "Tambahkan ke LinkedIn", teks siap tempel, metadata, Open Graph, dan JSON-LD
@@ -62,7 +71,6 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 - Sitemap tidak lagi memuat pasangan bahasa `xhtml:link` (sudah ada di `<head>` tiap halaman), sehingga browser menampilkannya sebagai pohon XML yang rapi
 - Meta halaman beranda dan arsip kini memuat author dan Twitter card
 - Menu navigasi desktop tampil mulai lebar 1100px; di bawahnya memakai menu ponsel supaya sepuluh tautan tidak terpotong
-
 - Mengajar dipisah per kampus dengan "Semester ini" dan "Pernah diampu", ditambah bidang keahlian mengajar
 - Garis waktu dikoreksi: jalur S1 (STIKOM Poltek Cirebon lalu UNU Cirebon), S2 STMIK LIKMI Bandung, AWATARA Februari 2022, dan Dicoding 2020 sebagai "bergabung"
 - Klaim kelulusan IDCamp 2023 dihapus
@@ -122,4 +130,5 @@ Rilis pertama situs portofolio [ngiliyun.my.id](https://ngiliyun.my.id) beserta 
 - Tautan lompat ke konten, fokus keyboard terlihat, atribut `lang` per halaman, dan label untuk grafik
 - Semua animasi, termasuk gambar README, mengikuti pengaturan "kurangi gerakan"
 
+[2.0.0]: https://github.com/ahmadngiliyun00/ahmadngiliyun00/releases/tag/v2.0.0
 [1.0.0]: https://github.com/ahmadngiliyun00/ahmadngiliyun00/releases/tag/v1.0.0
