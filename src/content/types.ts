@@ -38,6 +38,7 @@ export type Achievement = {
   reference?: string;
   verifyUrl?: string;
   fileId?: string; // berkas unggahan di tabel files
+  driveUrl?: string; // berkas di Google Drive, bentuk baku .../file/d/<id>/view (src/lib/drive.ts)
   skills?: string[];
   authorship?: Authorship;
   related?: RelatedLink[];

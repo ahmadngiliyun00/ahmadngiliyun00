@@ -1,7 +1,7 @@
 import ExternalLink from "@/components/ExternalLink";
 import type { AchievementCard } from "@/lib/achievements";
 
-export type CredCardLabels = { verify: string; details: string; newTab: string };
+export type CredCardLabels = { verify: string; details: string; proof: string; newTab: string };
 
 // Kartu satu capaian. Dipakai di sorotan beranda dan halaman arsip.
 export default function CredCard({
@@ -32,12 +32,20 @@ export default function CredCard({
         <a href={item.href} className="link text-sm" aria-hidden="true" tabIndex={-1}>
           {labels.details}
         </a>
-        {item.verifyUrl ? (
-          <ExternalLink href={item.verifyUrl} newTab={labels.newTab} className="cred-verify">
-            {labels.verify}
-            <span className="sr-only">: {item.title}</span>
-          </ExternalLink>
-        ) : null}
+        <span className="cred-chips">
+          {item.proof ? (
+            <a href={`${item.href}#bukti`} className="cred-verify cred-proof">
+              {labels.proof}
+              <span className="sr-only">: {item.title}</span>
+            </a>
+          ) : null}
+          {item.verifyUrl ? (
+            <ExternalLink href={item.verifyUrl} newTab={labels.newTab} className="cred-verify">
+              {labels.verify}
+              <span className="sr-only">: {item.title}</span>
+            </ExternalLink>
+          ) : null}
+        </span>
       </div>
     </article>
   );

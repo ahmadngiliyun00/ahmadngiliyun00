@@ -4,6 +4,13 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/) dan penomoran versi mengikuti
 [Semantic Versioning](https://semver.org/lang/id/).
 
+## [Belum dirilis]
+
+### Ditambahkan
+
+- Bukti sertifikat dari Google Drive: isian "Tautan Google Drive" di formulir capaian menerima tautan berbagi atau kode sematan, menyimpan bentuk baku, dan menampilkan pratinjau berkas di halaman detail. Kartu di beranda dan arsip mendapat tombol "Lihat bukti" yang langsung menuju pratinjau
+- Ekspor dan impor lembar kerja untuk setiap koleksi CMS: unduh Excel berisi semua data dan lembar petunjuk, isi sel yang kosong, lalu unggah kembali (.xlsx atau .csv). Impor menampilkan pratinjau per baris sebelum menyimpan, sel kosong tidak mengubah data, dan semua validasi CMS tetap berlaku
+
 ## [2.0.0] - 2026-10-29
 
 Versi besar karena cara menjalankan dan men-deploy situs berubah total: dari build statis menjadi server Node.js dengan database MySQL dan CMS di `/admin`.

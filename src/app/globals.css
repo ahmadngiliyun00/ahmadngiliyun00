@@ -2104,6 +2104,22 @@ body::after {
   color: var(--color-ink);
 }
 
+.cred-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.cred-proof {
+  background: color-mix(in srgb, var(--color-leaf) 16%, transparent);
+  color: var(--color-leaf);
+}
+
+.cred-proof:hover {
+  background: var(--color-leaf);
+  color: var(--color-ink);
+}
+
 .profile-links {
   display: flex;
   flex-wrap: wrap;
@@ -2868,6 +2884,16 @@ select.field {
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* Pratinjau Google Drive: kotak tetap, karena tinggi isi iframe tidak bisa dibaca dari luar. */
+.file-preview iframe {
+  display: block;
+  width: 100%;
+  min-height: 20rem;
+  aspect-ratio: 1.414 / 1;
+  border: 0;
+  background: var(--color-paper);
 }
 
 /* ---------- Footer ---------- */

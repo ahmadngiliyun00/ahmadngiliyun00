@@ -848,6 +848,64 @@
     color: #ffc2b8;
   }
 
+  /* Impor lembar kerja: langkah, tombol, dan pratinjau per baris. */
+  .admin-steps {
+    margin-top: 1rem;
+    padding-left: 1.25rem;
+    list-style: decimal;
+    max-width: 70ch;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+
+  .admin-steps li + li {
+    margin-top: 0.35rem;
+  }
+
+  .admin-import-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+
+  .admin-import {
+    margin-top: 1rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .admin-import-row {
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .admin-import-row .admin-row-title {
+    margin-top: 0.35rem;
+  }
+
+  .admin-import-errors {
+    margin-top: 0.4rem;
+    padding-left: 1.1rem;
+    list-style: disc;
+    font-size: 0.85rem;
+    color: #ffc2b8;
+  }
+
+  .admin-badge[data-v="new"] {
+    border-color: color-mix(in srgb, var(--color-leaf) 60%, transparent);
+    color: var(--color-leaf);
+  }
+
+  .admin-badge[data-v="update"] {
+    border-color: color-mix(in srgb, var(--color-sky) 60%, transparent);
+    color: var(--color-sky);
+  }
+
+  .admin-badge[data-v="error"] {
+    border-color: color-mix(in srgb, #ff9b8a 55%, var(--color-line));
+    color: #ffc2b8;
+  }
+
   /* Editor rich text (isi tulisan). */
   .rte {
     border: 1px solid var(--color-line);

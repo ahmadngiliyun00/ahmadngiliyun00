@@ -15,6 +15,7 @@ import { saveUpload } from "@/server/files";
 import { sendTestMail } from "@/server/mail";
 import { deleteComment, setCommentReply, setCommentStatus, type CommentStatus } from "@/server/comments";
 import { deleteMessage, setMessageStatus, type MessageStatus } from "@/server/messages";
+import { applyImport, planImport, readUpload, type ImportPlan, type ImportResult } from "@/server/transfer";
 import {
   createShare,
   deleteEntry,
@@ -96,6 +97,42 @@ export async function saveEntryAction(_prev: FormState, form: FormData): Promise
   // (React mengosongkan formulir ke nilai awalnya setelah action berhasil).
   revalidatePath("/admin", "layout");
   return { ok: true, message: "Tersimpan." };
+}
+
+// ---------- Impor lembar kerja ----------
+
+export type ImportState = { message?: string; ok?: boolean; plan?: ImportPlan; result?: ImportResult } | undefined;
+
+function importFile(form: FormData): File {
+  const file = form.get("sheet");
+  if (!(file instanceof File)) throw new Error("Pilih berkas Excel (.xlsx) atau CSV lebih dulu.");
+  return file;
+}
+
+// Pratinjau: membaca berkas dan memvalidasi setiap baris tanpa menyimpan apa pun.
+export async function previewImportAction(_prev: ImportState, form: FormData): Promise<ImportState> {
+  await requireAdmin();
+  const cfg = getCollection(toCollection(form.get("collection")));
+  if (cfg === undefined) return { message: "Koleksi tidak dikenal." };
+  try {
+    const plan = await planImport(cfg, await readUpload(importFile(form)));
+    return { ok: true, plan };
+  } catch (err) {
+    return { message: (err as Error).message };
+  }
+}
+
+export async function applyImportAction(_prev: ImportState, form: FormData): Promise<ImportState> {
+  await requireAdmin();
+  const cfg = getCollection(toCollection(form.get("collection")));
+  if (cfg === undefined) return { message: "Koleksi tidak dikenal." };
+  try {
+    const result = await applyImport(cfg, await readUpload(importFile(form)));
+    if (result.saved > 0) revalidatePath("/admin", "layout");
+    return { ok: result.failed.length === 0, result };
+  } catch (err) {
+    return { message: (err as Error).message };
+  }
 }
 
 export async function deleteEntryAction(form: FormData) {

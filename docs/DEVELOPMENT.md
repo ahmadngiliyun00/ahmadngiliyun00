@@ -30,7 +30,7 @@ Buka <http://localhost:3000> untuk situs dan <http://localhost:3000/admin/> untu
 | `npm run build` | Ambil data GitHub, perbarui README, lalu build produksi |
 | `npm start` | Jalankan hasil build (produksi) |
 | `npm run typecheck` | Pemeriksaan TypeScript |
-| `npm test` | Unit test URL LinkedIn, form kontak, template email, rich text, hitungan pembaca, komentar, isian dua bahasa, JSON-LD, aturan beranda, dan teks SEO bawaan |
+| `npm test` | Unit test URL LinkedIn, form kontak, template email, rich text, hitungan pembaca, komentar, isian dua bahasa, JSON-LD, aturan beranda, teks SEO bawaan, tautan Google Drive, serta ekspor dan impor lembar kerja |
 | `npm run data` | Ambil data GitHub ke `src/data/github.json`, lalu buat ulang gambar dan teks README |
 | `npm run readme` | Buat ulang gambar README dan bagian teks README dari database |
 | `npm run errors` | Buat ulang halaman error statis untuk Nginx di `public/errors/` (500, 502, 503, 504) |
@@ -75,7 +75,7 @@ Semua memakai `ErrorView`: kode besar beranimasi, kalimat bahwa ini halaman erro
 
 | Bagian | Isi |
 | --- | --- |
-| Capaian | Sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, reviewer, keanggotaan |
+| Capaian | Sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, reviewer, keanggotaan. Bukti bisa berupa berkas unggahan atau tautan Google Drive |
 | Kabar | Berita dan tulisan: liputan media (wajib media dan tautan sumber), tulisan sendiri, kabar singkat. Isi lengkap (editor rich text) membuat halaman `/kabar/<slug>/`; tanpa isi, kartu menaut ke sumber. Statistik pembaca tampil di halaman ubah |
 | Komentar | Moderasi komentar tulisan di `/admin/komentar/`: menunggu, disetujui, spam. Membalas sekaligus menyetujui |
 | Proyek | Proyek unggulan (kode terbuka) dan sistem yang dikembangkan (repo privat) |
@@ -83,7 +83,7 @@ Semua memakai `ErrorView`: kode besar beranimasi, kalimat bahwa ini halaman erro
 | Profil | Perjalanan, yang saya kerjakan, di luar kode, jenis kerja sama (judulnya menjadi topik formulir, keterangannya tampil saat dipilih), rencana ke depan, prinsip kerja dengan AI, kanal kontak (tanda "Tampil di kontak beranda", bawaan LinkedIn, GitHub, ORCID, YouTube) |
 | Pengaturan | Profil (hero, Tentang, email, daftar teknologi, alat utama di beranda, topik, tema riset), metrik riset bertanggal, Bahasa (bahasa utama isian dua bahasa), SEO dan Search Console (judul, deskripsi, dan kata kunci beranda, arsip, Proyek, Riset, Mengajar, dan Perjalanan dengan pratinjau hasil Google, meta verifikasi Google dan Bing, berkas verifikasi HTML, ID GA4), serta Email dan SMTP untuk meneruskan pesan form kontak |
 
-Setiap data punya status public atau privat, slug (alamat), dan urutan. Tombol **Tampilkan** dan **Sembunyikan** di daftar langsung mengubah situs.
+Setiap data punya status public atau privat, slug (alamat), dan urutan. Tombol **Tampilkan** dan **Sembunyikan** di daftar langsung mengubah situs. **Ekspor Excel** dan **Impor** di setiap daftar memperbarui banyak data sekaligus lewat lembar kerja.
 
 Teks antarmuka (label tombol, judul bagian) tetap di kode: situs di `src/data/profile.ts`, CMS di `src/data/admin.ts`.
 
@@ -162,11 +162,32 @@ Di halaman ubah capaian, **Buat tautan berbagi** menghasilkan alamat `/s/<token>
 - **Sebelum mengunggah, tutup semua data pribadi secara manual:** NIK, alamat, nomor telepon, NIDN atau NUPTK, nomor anggota, dan kode QR keanggotaan. CMS tidak bisa mendeteksinya
 - Jangan memasukkan nomor kontrak hibah, anggaran, topologi atau alamat IP jaringan kampus, nama mahasiswa, nama kolega atau atasan, isi telaah naskah, atau penelitian yang belum terbit ke data public. Bila ragu, biarkan privat
 
+### Bukti sertifikat dari Google Drive
+
+Isian **Tautan Google Drive** di formulir capaian menampilkan pratinjau berkas di halaman detail (bagian `#bukti`), dan kartu di beranda serta arsip mendapat tombol **Lihat bukti**.
+
+- Terima tautan berbagi (`.../file/d/<id>/view?usp=sharing`), tautan pratinjau, bentuk lama `open?id=` dan `uc?id=`, atau kode `<iframe>` dari menu Sematkan item. Yang disimpan selalu `https://drive.google.com/file/d/<id>/view`, ditambah `resourcekey` untuk berkas lama. Tautan folder ditolak (`src/lib/drive.ts`)
+- Di Google Drive, atur akses berkas ke **Siapa saja yang memiliki link** (Pelihat). Bila hanya ingin bisa dilihat, buka Setelan berbagi lalu matikan **Pelihat dan pemberi komentar dapat melihat opsi untuk mendownload, mencetak, dan menyalin**. Pratinjau Drive tetap punya tombol buka di jendela baru; yang bisa dicegah hanya unduhan langsung
+- Berkas di Drive juga wajib sudah disensor dari data pribadi, sama seperti berkas unggahan
+- Bila satu capaian punya berkas unggahan dan tautan Drive, berkas unggahan yang tampil
+- Pratinjau disematkan sebagai iframe `drive.google.com/.../preview` dengan atribut `sandbox`; domain itu sudah ada di `frame-src` CSP
+
+### Ekspor dan impor lembar kerja
+
+Setiap koleksi punya tombol **Ekspor Excel** dan **Impor** di halaman daftarnya. Contoh untuk sertifikat: ekspor, isi kolom Tautan Google Drive yang masih kosong di Excel, Google Sheets, atau Numbers, lalu impor kembali.
+
+- Berkas ekspor (`/admin/<koleksi>/export/`) berisi semua data, public dan privat, di lembar Data, serta lembar Petunjuk yang menjelaskan setiap kolom. Semua sel berformat Teks supaya nomor panjang tidak berubah menjadi 1,23E+17. Pilihan (status, kategori, ya atau tidak) tersedia sebagai dropdown
+- Judul kolom berbentuk `Label [kunci]`; kunci sama dengan nama isian formulir (`title.id`, `issued.year`). Kolom `slug` mencocokkan baris dengan data di CMS; baris tanpa slug menjadi data baru (privat bila status kosong)
+- **Sel kosong tidak mengubah data.** Menghapus isian tetap lewat formulir CMS. Berkas unggahan dan isi rich text tidak ikut lembar kerja dan tidak pernah berubah karena impor
+- Impor menerima `.xlsx` atau `.csv` (koma atau titik koma), maksimal 5 MB dan 1000 baris. **Periksa berkas** menampilkan pratinjau per baris (baru, diubah, bermasalah, beserta isian yang berubah) tanpa menyimpan. **Terapkan** menghitung ulang dari data terbaru lalu menyimpan baris satu per satu lewat `saveEntry`, jadi validasi dan aturan CMS (misalnya batas sorotan beranda) tetap berlaku. Baris yang gagal dilaporkan, sisanya tetap tersimpan
+- Pembanding perubahan adalah hasil menyimpan ulang data lama tanpa perubahan, sehingga mengunggah berkas ekspor apa adanya selalu menghasilkan nol perubahan
+- Berkas Excel ditulis dan dibaca tanpa pustaka tambahan (`src/lib/xlsx.ts`, zlib bawaan Node). Konversi baris dan isian formulir di `src/lib/transfer.ts`, ekspor dan impor di `src/server/transfer.ts`
+
 ### Header keamanan
 
 `next.config.ts` mengirim header keamanan ke semua halaman: Content Security Policy, `X-Frame-Options: DENY` (CMS tidak bisa dibingkai situs lain), `nosniff`, `Referrer-Policy`, `Permissions-Policy`, dan HSTS bila `SITE_URL` memakai https. Berkas `/files/` hanya boleh dibingkai situs sendiri, untuk pratinjau PDF.
 
-CSP hanya mengizinkan skrip dari situs sendiri, Google Analytics, dan Cloudflare Turnstile. Skrip, gambar, iframe, atau tujuan `fetch` dari domain lain akan diblokir peramban sampai domainnya ditambahkan ke CSP. Periksa konsol peramban setelah menambah layanan pihak ketiga.
+CSP hanya mengizinkan skrip dari situs sendiri, Google Analytics, dan Cloudflare Turnstile, serta iframe dari Turnstile dan Google Drive (pratinjau sertifikat). Skrip, gambar, iframe, atau tujuan `fetch` dari domain lain akan diblokir peramban sampai domainnya ditambahkan ke CSP. Periksa konsol peramban setelah menambah layanan pihak ketiga.
 
 ## Data awal (seed)
 

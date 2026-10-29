@@ -64,7 +64,7 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
   const otherHome = lang === "id" ? "/en/" : "/";
   const contrib = getContributionModel(lang);
   const gh = getGithubMeta();
-  const cardLabels = { verify: t.achievements.verify, details: t.achievements.details, newTab: t.newTab };
+  const cardLabels = { verify: t.achievements.verify, details: t.achievements.details, proof: t.achievements.proof, newTab: t.newTab };
   const totalPublic = achievements.length;
   const posts = publicPosts(content.post);
   const latestPosts = posts.slice(0, HOME_POSTS);
