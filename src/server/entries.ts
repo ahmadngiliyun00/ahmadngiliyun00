@@ -101,11 +101,16 @@ function slugSource(collection: CollectionKey, data: Doc): string {
   return cfg ? cfg.title(data) : "";
 }
 
-export async function saveEntry(
+type Prepared = { data: Doc; existing: Doc; slug: string; visibility: Visibility; position: number };
+type Failed = { ok: false; errors: FieldErrors; message?: string };
+
+// Membaca dan memvalidasi isian formulir tanpa menulis apa pun. Dipakai saveEntry dan pratinjau
+// impor lembar kerja (src/server/transfer.ts), supaya keduanya memakai aturan yang sama.
+export async function prepareEntry(
   collection: CollectionKey,
   id: number | null,
   form: FormData,
-): Promise<SaveResult> {
+): Promise<{ ok: true; value: Prepared } | Failed> {
   const cfg = getCollection(collection);
   if (cfg === undefined) return { ok: false, errors: {}, message: "Koleksi tidak dikenal." };
 
@@ -148,13 +153,25 @@ export async function saveEntry(
   }
 
   await checkRules(collection, data, visibility, id, errors);
+  if (Object.keys(errors).length > 0) {
+    return { ok: false, errors, message: "Periksa kembali isian yang ditandai." };
+  }
+  return { ok: true, value: { data, existing, slug, visibility, position } };
+}
+
+export async function saveEntry(
+  collection: CollectionKey,
+  id: number | null,
+  form: FormData,
+): Promise<SaveResult> {
+  const prepared = await prepareEntry(collection, id, form);
+  if (!prepared.ok) return prepared;
+  const { data, existing, slug, visibility, position } = prepared.value;
+  const richFields = (getCollection(collection)?.fields ?? []).filter((f) => f.type === "richtext");
 
   // Berkas: unggahan baru menggantikan yang lama; centang "hapus berkas" melepasnya.
   const upload = form.get("upload");
   const hasUpload = upload instanceof File ? upload.size > 0 : false;
-  if (Object.keys(errors).length > 0) {
-    return { ok: false, errors, message: "Periksa kembali isian yang ditandai." };
-  }
 
   const oldFileId = typeof existing.fileId === "string" ? existing.fileId : undefined;
   if (hasUpload) {

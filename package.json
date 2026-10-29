@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/linkedin.test.mjs tests/contact.test.mjs tests/mail.test.mjs tests/richtext.test.mjs tests/views.test.mjs tests/comment.test.mjs tests/i18n.test.mjs tests/json-script.test.mjs tests/home.test.mjs tests/seo-text.test.mjs",
+    "test": "node --test tests/linkedin.test.mjs tests/contact.test.mjs tests/mail.test.mjs tests/richtext.test.mjs tests/views.test.mjs tests/comment.test.mjs tests/i18n.test.mjs tests/json-script.test.mjs tests/home.test.mjs tests/seo-text.test.mjs tests/drive.test.mjs tests/transfer.test.mjs",
     "data": "node scripts/fetch-github.mjs",
     "readme": "node scripts/readme-assets.mjs",
     "errors": "node scripts/error-pages.mjs",

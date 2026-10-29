@@ -62,10 +62,20 @@ export default async function AdminList({ params, searchParams }: Props) {
           <h1 className="admin-title">{cfg.label}</h1>
           <p className="admin-intro">{cfg.description}</p>
         </div>
-        <a href={`${base}new/`} className="btn btn-solid">
-          <Icon name="plus" />
-          {t.list.add} {cfg.singular}
-        </a>
+        <div className="flex flex-wrap gap-2">
+          <a href={`${base}export/`} className="btn btn-line" download>
+            <Icon name="file-arrow-down" />
+            {t.transfer.export}
+          </a>
+          <a href={`${base}import/`} className="btn btn-line">
+            <Icon name="file-arrow-up" />
+            {t.transfer.import}
+          </a>
+          <a href={`${base}new/`} className="btn btn-solid">
+            <Icon name="plus" />
+            {t.list.add} {cfg.singular}
+          </a>
+        </div>
       </div>
 
       {sp.deleted ? <FlashToast message={t.list.deleted} clear={["deleted"]} /> : null}

@@ -39,7 +39,7 @@ export default async function ArchivePage({ lang }: { lang: Lang }) {
             kinds={kindFilters(all, lang)}
             years={itemYears(all)}
             labels={t.archive}
-            cardLabels={{ verify: t.achievements.verify, details: t.achievements.details, newTab: t.newTab }}
+            cardLabels={{ verify: t.achievements.verify, details: t.achievements.details, proof: t.achievements.proof, newTab: t.newTab }}
           />
 
           <div className="archive-aside mt-20">

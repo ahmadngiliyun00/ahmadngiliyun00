@@ -205,6 +205,7 @@ export type Copy = {
     viewAll: string;
     verify: string;
     details: string;
+    proof: string;
     citations: string;
     hIndex: string;
     sinta: string;
@@ -253,6 +254,7 @@ export type Copy = {
     file: string;
     fileOpen: string;
     fileFallback: string;
+    fileDrive: string;
     linkedin: string;
     linkedinNote: string;
     linkedinPending: string;
@@ -533,6 +535,7 @@ export const copy: Localized<Copy> = {
       viewAll: "Lihat semua ({n})",
       verify: "Verifikasi",
       details: "Detail",
+      proof: "Lihat bukti",
       citations: "sitasi",
       hIndex: "h-index",
       sinta: "skor SINTA",
@@ -582,6 +585,7 @@ export const copy: Localized<Copy> = {
       file: "Berkas sertifikat",
       fileOpen: "Buka berkas",
       fileFallback: "Pratinjau tidak dapat ditampilkan di peramban ini.",
+      fileDrive: "Buka di Google Drive",
       linkedin: "Tambahkan ke LinkedIn",
       linkedinNote: "Membuka formulir LinkedIn yang sudah terisi. Masuk ke akun, periksa isiannya, lalu tekan simpan. LinkedIn tidak mengizinkan penambahan otomatis.",
       linkedinPending: "Bila formulir LinkedIn tidak terisi otomatis, salin teks di bawah lalu tempel ke formulir.",
@@ -923,6 +927,7 @@ export const copy: Localized<Copy> = {
       viewAll: "See all ({n})",
       verify: "Verify",
       details: "Details",
+      proof: "View proof",
       citations: "citations",
       hIndex: "h-index",
       sinta: "SINTA score",
@@ -972,6 +977,7 @@ export const copy: Localized<Copy> = {
       file: "Certificate file",
       fileOpen: "Open file",
       fileFallback: "The preview cannot be shown in this browser.",
+      fileDrive: "Open in Google Drive",
       linkedin: "Add to LinkedIn",
       linkedinNote: "Opens a prefilled LinkedIn form. Sign in, check the fields, then press save. LinkedIn does not allow adding it automatically.",
       linkedinPending: "If the LinkedIn form does not fill in by itself, copy the text below and paste it into the form.",

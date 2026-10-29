@@ -14,6 +14,7 @@ import {
   kindName,
   linkedInUrl,
 } from "@/lib/achievements";
+import { drivePreviewUrl, driveViewUrl, parseDriveUrl } from "@/lib/drive";
 import { jsonForScript } from "@/lib/json-script";
 import { formatPasteText } from "@/lib/linkedin";
 import { homePath } from "@/lib/nav";
@@ -124,6 +125,8 @@ export default function DetailPage({
 
   const isPdf = file ? file.mime === "application/pdf" : false;
   const fileHref = file ? file.url : "";
+  // Berkas unggahan (sudah disensor saat diunggah) didahulukan; tanpa itu, pratinjau Google Drive.
+  const drive = file ? null : item.driveUrl ? parseDriveUrl(item.driveUrl) : null;
 
   return (
     <SubpageShell lang={lang} current="certificates" otherHref={otherHref ?? detailPath(other, item.id)}>
@@ -180,7 +183,7 @@ export default function DetailPage({
               ) : null}
 
               {file ? (
-                <div className="mt-12">
+                <div id="bukti" className="mt-12">
                   <h2 className="sub-title">{t.detail.file}</h2>
                   <div className="file-preview mt-5">
                     {isPdf ? (
@@ -195,6 +198,26 @@ export default function DetailPage({
                   <p className="mt-4">
                     <ExternalLink href={fileHref} newTab={t.newTab} className="link text-sm">
                       {t.detail.fileOpen}
+                    </ExternalLink>
+                  </p>
+                </div>
+              ) : null}
+
+              {drive ? (
+                <div id="bukti" className="mt-12">
+                  <h2 className="sub-title">{t.detail.file}</h2>
+                  <div className="file-preview mt-5">
+                    <iframe
+                      src={drivePreviewUrl(drive)}
+                      title={`${t.detail.file}: ${title}`}
+                      loading="lazy"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+                    />
+                  </div>
+                  <p className="mt-4">
+                    <ExternalLink href={driveViewUrl(drive)} newTab={t.newTab} className="link text-sm">
+                      {t.detail.fileDrive}
                     </ExternalLink>
                   </p>
                 </div>

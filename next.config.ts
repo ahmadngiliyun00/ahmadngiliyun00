@@ -8,10 +8,12 @@ const dev = process.env.NODE_ENV !== "production";
 const https = (process.env.SITE_URL ?? "").startsWith("https://");
 
 // Content Security Policy. Skrip pihak ketiga hanya Google Analytics (bila diisi di CMS) dan
-// Cloudflare Turnstile (bila kuncinya diatur). 'unsafe-inline' masih dibutuhkan untuk skrip
+// Cloudflare Turnstile (bila kuncinya diatur). Pratinjau sertifikat dari Google Drive disematkan
+// sebagai iframe, jadi drive.google.com masuk frame-src. 'unsafe-inline' masih dibutuhkan untuk skrip
 // inline Next.js; nonce memaksa semua halaman dirender dinamis. Mode dev butuh eval dan websocket.
 const GA = "https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com";
 const TURNSTILE = "https://challenges.cloudflare.com";
+const DRIVE = "https://drive.google.com";
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com ${TURNSTILE}`,
@@ -19,7 +21,7 @@ const csp = [
   `img-src 'self' data: blob: ${GA}`,
   "font-src 'self' data:",
   `connect-src 'self' ${GA} ${TURNSTILE}${dev ? " ws: wss:" : ""}`,
-  `frame-src 'self' ${TURNSTILE}`,
+  `frame-src 'self' ${TURNSTILE} ${DRIVE}`,
   // Pratinjau PDF sertifikat memakai <object> dari /files/.
   "object-src 'self'",
   "base-uri 'self'",

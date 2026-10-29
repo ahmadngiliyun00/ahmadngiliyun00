@@ -48,11 +48,13 @@ tests/i18n.test.mjs              unit test isian dua bahasa dan isi cadangan (np
 tests/json-script.test.mjs       unit test JSON di dalam <script> (JSON-LD) tidak bisa menutup tag (npm test)
 tests/home.test.mjs              unit test aturan beranda: alat utama, tahun awal, kanal kontak (npm test)
 tests/seo-text.test.mjs          unit test panjang dan gaya judul serta deskripsi SEO bawaan (npm test)
+tests/drive.test.mjs             unit test tautan Google Drive untuk pratinjau sertifikat (npm test)
+tests/transfer.test.mjs          unit test ekspor dan impor lembar kerja: kolom, sel, Excel, CSV (npm test)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, proyek, riset, mengajar, perjalanan,
                                  sertifikat, kabar, s/[token] (EN: projects, research, teaching, journey, certificates, news)
-    (admin)/admin/               CMS: login, ringkasan, [collection], settings/[key], actions.ts
+    (admin)/admin/               CMS: login, ringkasan, [collection] (daftar, new, [id], export, import), settings/[key], actions.ts
     files/[id]/route.ts          sajikan berkas unggahan dengan pemeriksaan izin
     globals.css                  token warna, tekstur, animasi, gaya semua komponen situs
     robots.ts, sitemap.ts
@@ -71,6 +73,7 @@ src/
     entries.ts                   tulis konten, aturan lintas data, tautan berbagi
     files.ts                     simpan dan baca berkas di UPLOAD_DIR
     contact-action.ts            Server Action form kontak (anti spam, simpan, teruskan email)
+    transfer.ts                  ekspor dan impor lembar kerja koleksi CMS (pratinjau lalu terapkan)
     messages.ts, mail.ts         pesan kontak di database, kirim email SMTP
     turnstile.ts                 verifikasi Cloudflare Turnstile (opsional)
     auth/                        password, session, github, rate-limit
@@ -79,6 +82,8 @@ src/
     admin.ts                     teks antarmuka CMS
     github.json                  data GitHub hasil skrip (jangan diedit manual)
   lib/                           achievements, posts, linkedin, github, metadata, nav, home, mail-template
+  lib/drive.ts                   tautan Google Drive: terima tautan berbagi atau kode iframe, simpan bentuk baku
+  lib/xlsx.ts, lib/transfer.ts   tulis dan baca .xlsx (tanpa pustaka luar) dan konversi baris ke isian formulir
   lib/nav.ts                     alamat halaman dalam (pagePath), menu header dan footer, peta jangkar lama
 ```
 
@@ -95,6 +100,8 @@ src/
 - Hitungan pembaca tidak menyimpan IP (hanya hash harian) dan tidak memakai cookie. Komentar selalu menunggu persetujuan; email pengomentar tidak pernah tampil di situs
 - Berita dan tulisan (koleksi `post`): liputan media wajib media dan tautan sumber, dan ringkasannya ditulis sendiri tanpa menyalin detail sistem internal kampus dari artikel. Hanya tulisan dengan isi lengkap yang punya halaman `/kabar/<slug>/`
 - Metrik riset wajib bertanggal (`asOf`) dan bersumber
+- Bukti capaian: berkas unggahan atau tautan Google Drive (isian `driveUrl`, disematkan di `/sertifikat/<slug>/#bukti`). Berkas unggahan didahulukan. Berkas di Drive juga wajib sudah disensor
+- Ekspor dan impor lembar kerja (`src/server/transfer.ts`): sel kosong tidak mengubah data, impor selalu lewat pratinjau lalu `saveEntry`, jadi validasi CMS tetap berlaku. Field baru otomatis ikut lembar kerja, kecuali berkas, rahasia, dan rich text
 - Berkas unggahan disimpan di `UPLOAD_DIR` (di luar repo dan `public/`), disajikan lewat `/files/<id>/`
 - Bagian README di antara penanda `<!-- ...:mulai -->` dibangkitkan skrip, jangan diedit manual
 - `src/data/profile.ts`, `src/content/types.ts`, `src/lib/linkedin.ts`, dan `seed/` hanya boleh `import type` (dibaca skrip Node)
@@ -147,7 +154,7 @@ npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
 npm run errors         # buat ulang halaman error statis Nginx di public/errors/
-npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO
+npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build

@@ -9,6 +9,7 @@ import {
   type Visibility,
 } from "@/content/types";
 import { copy, site, type Lang } from "@/data/profile";
+import { parseDriveUrl } from "@/lib/drive";
 import { buildLinkedInAddUrl } from "@/lib/linkedin";
 
 // Batas tampilan beranda. Formulir CMS menolak lebih dari ini.
@@ -133,6 +134,11 @@ export function linkedInUrl(item: AchievementItem): string | null {
   });
 }
 
+// Ada bukti yang bisa dipratinjau di halaman detail: berkas unggahan atau tautan Google Drive.
+export function hasProof(item: Achievement): boolean {
+  return item.fileId ? true : item.driveUrl ? parseDriveUrl(item.driveUrl) !== null : false;
+}
+
 // Bentuk ringkas yang dikirim ke komponen klien (arsip, filter beranda).
 export type AchievementCard = {
   id: string;
@@ -145,6 +151,7 @@ export type AchievementCard = {
   year: number | null;
   href: string;
   verifyUrl: string | null;
+  proof: boolean; // ada berkas unggahan atau tautan Google Drive yang bisa dipratinjau di halaman detail
   authorship: string | null;
   search: string;
 };
@@ -169,6 +176,7 @@ export function toCards(items: AchievementItem[], lang: Lang): AchievementCard[]
       year: item.issued === null ? null : item.issued.year,
       href: detailPath(lang, item.id),
       verifyUrl: item.verifyUrl ?? null,
+      proof: hasProof(item),
       authorship: item.authorship ? authorshipLabels[item.authorship][lang] : null,
       search: [item.title[lang], item.title.id, item.issuer, summary, ...(item.skills ?? []), item.credentialId ?? ""]
         .join(" ")

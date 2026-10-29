@@ -2,6 +2,7 @@
 // Satu definisi dipakai tiga kali: merender formulir admin, membaca FormData, dan memvalidasi data.
 
 import type { Lang, PartialDate } from "@/content/types";
+import { isDriveFolder, normalizeDriveUrl } from "@/lib/drive";
 import { isBlank } from "@/lib/i18n";
 import { asHtml, htmlToText } from "@/lib/richtext";
 
@@ -17,6 +18,8 @@ interface Base {
 }
 interface PlainField extends Base {
   type: "text" | "url" | "textarea" | "boolean" | "date" | "list" | "localizedList" | "links" | "file" | "secret";
+  // Khusus url: hanya tautan berkas Google Drive, disimpan dalam bentuk baku (src/lib/drive.ts).
+  drive?: boolean;
 }
 interface LocalizedField extends Base {
   type: "localized";
@@ -139,6 +142,14 @@ export function readField(field: Field, form: FormData, errors: FieldErrors): un
     case "url": {
       const v = str(form, key);
       if (v === "") return undefined;
+      if (field.drive === true) {
+        const drive = normalizeDriveUrl(v);
+        if (drive !== null) return drive;
+        errors[field.name] = isDriveFolder(v)
+          ? `${label}: ini tautan folder. Buka berkasnya di Google Drive, lalu salin tautan berkas itu.`
+          : `${label}: bukan tautan berkas Google Drive, misalnya https://drive.google.com/file/d/.../view`;
+        return v;
+      }
       if (v.startsWith("#")) return v;
       if (!isHttps(v)) errors[field.name] = `${label}: harus URL https, misalnya https://contoh.id`;
       return v;
