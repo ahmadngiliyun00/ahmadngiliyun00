@@ -310,7 +310,7 @@ export const adminCopy = {
       linkedin: {
         title: "LinkedIn",
         intro:
-          "LinkedIn tidak mengizinkan aplikasi membaca postingan profil pribadi, jadi postingan LinkedIn diimpor dari ekspor data. Buka LinkedIn, Settings, Data privacy, Get a copy of your data, pilih Download larger data archive. LinkedIn mengirim arsip Basic lebih dulu (tanpa postingan), lalu arsip Complete sampai 24 jam kemudian. Setelah email arsip Complete datang, unggah ZIP-nya di kartu Impor dari ekspor data, atau ekstrak lalu unggah berkas Shares.csv di sini. Postingan yang sudah ada tidak dobel.",
+          "LinkedIn tidak mengizinkan aplikasi membaca postingan profil pribadi, jadi postingan LinkedIn diimpor dari ekspor data. Buka LinkedIn, Settings, Data privacy, Get a copy of your data, pilih Download larger data archive. LinkedIn mengirim arsip Basic lebih dulu (tanpa postingan), lalu arsip Complete 24 sampai 48 jam kemudian (tautan unduhnya berlaku 72 jam). Setelah email arsip Complete datang, unggah ZIP-nya di kartu Impor dari ekspor data, atau ekstrak lalu unggah berkas Shares.csv di sini. Postingan yang sudah ada tidak dobel.",
         file: "Berkas Shares.csv",
         submit: "Impor postingan LinkedIn",
         submitting: "Mengimpor...",
