@@ -294,6 +294,7 @@ export type Copy = {
     title: string;
     homeTitle: string;
     intro: string;
+    introSocial: string; // pengantar Kabar terbaru beranda bila ada postingan media sosial
     all: string;
     readOn: string;
     read: string;
@@ -646,6 +647,7 @@ export const copy: Localized<Copy> = {
       title: "Kabar dan liputan",
       homeTitle: "Kabar terbaru",
       intro: "Liputan media tentang kerja saya, tulisan saya sendiri, dan kabar terbaru.",
+      introSocial: "Liputan media, tulisan saya sendiri, dan kegiatan terbaru yang saya bagikan di media sosial.",
       all: "Lihat semua kabar",
       readOn: "Baca di {outlet}",
       read: "Baca selengkapnya",
@@ -1054,6 +1056,7 @@ export const copy: Localized<Copy> = {
       title: "News and press",
       homeTitle: "Latest news",
       intro: "Press coverage of my work, my own writing, and recent updates.",
+      introSocial: "Press coverage, my own writing, and recent activities I shared on social media.",
       all: "See all news",
       readOn: "Read on {outlet}",
       read: "Read more",

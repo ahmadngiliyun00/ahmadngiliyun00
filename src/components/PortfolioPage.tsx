@@ -11,6 +11,7 @@ import LegacyAnchors from "@/components/LegacyAnchors";
 import LiveClock from "@/components/LiveClock";
 import Marquee from "@/components/Marquee";
 import NewsCard from "@/components/NewsCard";
+import SocialCard from "@/components/SocialCard";
 import ProjectFeature from "@/components/ProjectFeature";
 import Reveal from "@/components/Reveal";
 import Section from "@/components/Section";
@@ -20,7 +21,7 @@ import type { Lang } from "@/content/types";
 import { copy, site } from "@/data/profile";
 import { archivePath, countKind, homeCopyrights, homeFeatured, publicItems, toCards } from "@/lib/achievements";
 import { formatDate, formatNumber, getContributionModel, getGithubMeta } from "@/lib/github";
-import { firstYear, mainTools, showsInContact } from "@/lib/home";
+import { dateValue, firstYear, homeSocial, mainTools, showsInContact } from "@/lib/home";
 import { jsonForScript } from "@/lib/json-script";
 import { navItems, pagePath } from "@/lib/nav";
 import { isoPartialDate, postsPath, publicPosts } from "@/lib/posts";
@@ -68,6 +69,12 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
   const totalPublic = achievements.length;
   const posts = publicPosts(content.post);
   const latestPosts = posts.slice(0, HOME_POSTS);
+  // Kabar terbaru: paling banyak 2 kabar dan 2 postingan media sosial, terbaru di atas.
+  const socialPosts = homeSocial(content.social.map((e) => ({ ...e.data, slug: e.slug })));
+  const latest = [
+    ...latestPosts.map((post) => ({ key: `post-${post.slug}`, date: post.date, post, social: null })),
+    ...socialPosts.map((item) => ({ key: `social-${item.slug}`, date: item.date, post: null, social: item })),
+  ].sort((a, b) => dateValue(b.date) - dateValue(a.date));
   const tools = mainTools(profile.homeTools, areas.map((a) => a.tools));
   const since = firstYear(content.milestone.map((e) => e.data.when.id));
 
@@ -339,11 +346,11 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
         </Section>
 
         {/* Kabar terbaru */}
-        {latestPosts.length === 0 ? null : (
+        {latest.length === 0 ? null : (
           <Section
             id="news"
             title={t.news.homeTitle}
-            intro={t.news.intro}
+            intro={socialPosts.length > 0 ? t.news.introSocial : t.news.intro}
             className="section-home"
             action={
               <a href={postsPath(lang)} className="btn btn-line btn-small">
@@ -353,10 +360,14 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
           >
             <Spotlight>
               <ul className="cred-grid news-home snap-row">
-                {latestPosts.map((post, i) => (
-                  <li key={post.slug}>
+                {latest.map((item, i) => (
+                  <li key={item.key}>
                     <Reveal delay={i * 70} className="h-full">
-                      <NewsCard post={post} lang={lang} />
+                      {item.post ? (
+                        <NewsCard post={item.post} lang={lang} />
+                      ) : item.social ? (
+                        <SocialCard post={item.social} lang={lang} profiles={content.socialProfiles} />
+                      ) : null}
                     </Reveal>
                   </li>
                 ))}

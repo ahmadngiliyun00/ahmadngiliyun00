@@ -3124,6 +3124,16 @@ select.field {
     background: var(--color-ink);
   }
 
+  /* Kartu media sosial di Kabar terbaru beranda: gambar lebih pendek, teks lebih ringkas. */
+  .news-home .social-post .social-image {
+    aspect-ratio: 16 / 9;
+  }
+
+  .news-home .social-caption {
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+  }
+
   .social-caption {
     display: -webkit-box;
     margin-top: 0.75rem;

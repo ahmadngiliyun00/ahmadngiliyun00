@@ -270,7 +270,11 @@ export const adminCopy = {
         saving: "Menyimpan postingan...",
         uploading: "Mengunggah gambar {n} dari {total}...",
         done: "{added} postingan baru masuk sebagai data privat, {existing} sudah ada, {ignored} pernah dihapus. {images} gambar tersalin.",
-        imagesFailed: "{n} gambar gagal disalin; unggah manual lewat formulir.",
+        imagesFailed: "{n} gambar gagal disalin.",
+        serverError:
+          "Server membalas tidak terduga saat menyimpan postingan. Muat ulang halaman ini (Ctrl+Shift+R), lalu impor ulang ZIP yang sama; postingan tidak akan dobel.",
+        retryHint:
+          "Server membalas tidak terduga. Muat ulang halaman (Ctrl+Shift+R), lalu impor ulang ZIP yang sama untuk melengkapi gambar postingan yang masih privat. Bila terulang, kirim status permintaan yang gagal dari tab Network dan pm2 logs ngiliyun.",
         unsupported: "Peramban ini belum bisa membaca ZIP. Pakai Chrome, Edge, Firefox, atau Safari versi terbaru.",
         platforms: { instagram: "Instagram:", facebook: "Facebook:" },
       },

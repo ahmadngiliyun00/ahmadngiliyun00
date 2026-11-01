@@ -35,3 +35,20 @@ test("kanal Kontak beranda mengikuti penanda, lalu daftar bawaan", () => {
   assert.equal(showsInContact("instagram", true), true);
   assert.equal(showsInContact("linkedin", false), false);
 });
+
+test("Kabar terbaru: postingan media sosial bertanda didahulukan, kalau tidak ada yang terbaru", async () => {
+  const { homeSocial, dateValue } = await importTs(new URL("../src/lib/home.ts", import.meta.url));
+  const d = (year, month, day) => ({ year, month, day });
+  const items = [
+    { slug: "a", date: d(2026, 1, 5) },
+    { slug: "b", date: d(2026, 9, 1) },
+    { slug: "c", date: d(2025, 3, 2), onHome: true },
+    { slug: "d", date: null },
+    { slug: "e", date: d(2026, 10, 2) },
+  ];
+  assert.deepEqual(homeSocial(items).map((i) => i.slug), ["c"]);
+  assert.deepEqual(homeSocial(items.map((i) => ({ ...i, onHome: false }))).map((i) => i.slug), ["e", "b"]);
+  assert.deepEqual(homeSocial([]), []);
+  assert.ok(dateValue(d(2026, 10, 2)) > dateValue(d(2026, 9, 30)));
+  assert.equal(dateValue(null), 0);
+});

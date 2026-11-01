@@ -117,6 +117,7 @@ src/
 - `src/data/profile.ts`, `src/content/types.ts`, `src/lib/linkedin.ts`, dan `seed/` hanya boleh `import type` (dibaca skrip Node)
 - Repo terbaru otomatis dari GitHub, atur lewat `recentRepos.exclude` di `profile.ts`
 - Beranda paling banyak tujuh bagian, tiap bagian berjudul dengan satu kalimat pengantar, paling banyak 3 sampai 4 item, dan satu tautan "Lihat semua". Isi yang lebih dalam masuk ke halaman dalam, bukan ke beranda
+- Kabar terbaru beranda: paling banyak 2 kabar (`HOME_POSTS`) dan 2 postingan media sosial (`homeSocial` dan `HOME_SOCIAL_LIMIT` di `src/lib/home.ts`), diurutkan tanggal. Postingan bertanda `onHome` didahulukan (maksimal 2 public, diperiksa `checkRules`), kalau tidak ada diambil yang terbaru
 - Halaman dalam baru: tambah kunci di `PageKey` dan `PAGE_SLUGS` (`src/lib/nav.ts`), teks di `copy.pages` (`profile.ts`), komponen dengan `SubpageShell` dan `PageHead` (breadcrumb, satu h1, BreadcrumbList), rute ID dan EN dengan `buildPageMetadata`. Sitemap, menu header, footer, dan isian SEO CMS mengikuti `PAGE_KEYS`
 - Jangkar beranda yang dipindah ke halaman dalam dicatat di `LEGACY_ANCHORS` (`src/lib/nav.ts`) supaya tautan lama tetap bekerja
 - Judul SEO bawaan paling banyak 60 karakter, deskripsi 120 sampai 160, kalimat naratif tanpa titik dua, tanpa strip pemisah, tanpa nama kota (diuji `tests/seo-text.test.mjs`)

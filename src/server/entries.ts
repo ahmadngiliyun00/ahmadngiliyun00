@@ -13,6 +13,7 @@ import { deleteEntryFiles, deleteFile, saveUpload, syncInlineFiles } from "@/ser
 import { sanitizeRichText } from "@/server/richtext";
 import { ignorePost } from "@/server/social/store";
 import { parseTopicRules } from "@/lib/social";
+import { HOME_SOCIAL_LIMIT } from "@/lib/home";
 
 // Lapisan tulis konten untuk CMS. Pemanggil (Server Action) WAJIB sudah memanggil requireAdmin().
 
@@ -56,6 +57,10 @@ async function checkRules(
       const caption = (data.caption ?? {}) as Record<string, string>;
       const primary = await primaryLang();
       if ((caption[primary] ?? "").trim() === "") errors.caption = "Teks postingan wajib diisi sebelum dijadikan public.";
+      if (data.onHome === true) {
+        const n = (await publicSiblings("social", id)).filter((d) => d.onHome === true).length;
+        if (n >= HOME_SOCIAL_LIMIT) errors.onHome = `Sudah ada ${n} postingan di Kabar terbaru beranda, maksimal ${HOME_SOCIAL_LIMIT}. Lepas salah satu dulu.`;
+      }
       // Tanpa tautan postingan, kartu menaut ke profil akun; profil itu wajib ada (Pengaturan, Media sosial).
       if (data.url === undefined) {
         const settings = (await getSettingDoc("social")) as SocialSettings;

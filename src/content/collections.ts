@@ -246,6 +246,13 @@ export const collections: CollectionConfig[] = [
         help: "Teks asli dari platform, tanpa emoji dan blok tagar. Rapikan atau ringkas sebelum dijadikan public; versi Inggris boleh menyusul.",
       },
       {
+        name: "onHome",
+        width: "full",
+        label: "Tampil di Kabar terbaru beranda",
+        type: "boolean",
+        help: "Maksimal 2 postingan public. Bila tidak ada yang dicentang, beranda menampilkan 2 postingan public terbaru.",
+      },
+      {
         name: "importNote",
         label: "Catatan impor",
         type: "textarea",

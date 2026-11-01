@@ -1,55 +1,16 @@
 import Analytics from "@/components/Analytics";
-import ExternalLink from "@/components/ExternalLink";
 import PageHead from "@/components/PageHead";
 import Reveal from "@/components/Reveal";
 import Section from "@/components/Section";
 import Spotlight from "@/components/Spotlight";
 import SubpageShell from "@/components/SubpageShell";
-import { socialPlatformLabels, type SocialPlatform, type SocialPost } from "@/content/types";
+import SocialCard, { type SocialItem, type SocialProfiles } from "@/components/SocialCard";
 import { copy, type Lang } from "@/data/profile";
-import { formatPartialDate } from "@/lib/achievements";
 import { pagePath } from "@/lib/nav";
 import { groupByTopic } from "@/lib/social";
 import { loadSite } from "@/server/content";
 
-interface Item extends SocialPost {
-  slug: string;
-}
-
-type Profiles = Partial<Record<SocialPlatform, string>>;
-
-// Satu postingan: gambar (bila ada), platform dan tanggal, teks, dan tautan ke postingan asli.
-// Postingan hasil impor ekspor tidak punya tautan sendiri, jadi menaut ke profil akunnya.
-// Teks dipotong beberapa baris; versi lengkap ada di platform asalnya.
-function SocialCard({ post, lang, profiles }: { post: Item; lang: Lang; profiles: Profiles }) {
-  const t = copy[lang];
-  const platform = socialPlatformLabels[post.platform];
-  const caption = post.caption[lang];
-  const href = post.url ?? profiles[post.platform];
-  const label = (post.url ? t.social.viewOn : t.social.profileOn).replace("{platform}", platform);
-  return (
-    <article className="cred social-post" data-spot data-platform={post.platform}>
-      {post.fileId ? (
-        // Gambar disajikan dari /files/ (UPLOAD_DIR), bukan dari CDN Meta yang tautannya kedaluwarsa.
-        <img src={`/files/${post.fileId}/`} alt={post.imageAlt?.[lang] ?? ""} loading="lazy" decoding="async" className="social-image" />
-      ) : null}
-      <p className="cred-meta">
-        <span className="cred-kind">{platform}</span>
-        {post.date ? <span>{formatPartialDate(post.date, lang)}</span> : null}
-      </p>
-      {caption ? <p className="social-caption">{caption}</p> : null}
-      {href ? (
-        <div className="cred-actions">
-          <ExternalLink href={href} newTab={t.newTab} className="link text-sm">
-            {label}
-          </ExternalLink>
-        </div>
-      ) : null}
-    </article>
-  );
-}
-
-function Grid({ items, lang, profiles }: { items: Item[]; lang: Lang; profiles: Profiles }) {
+function Grid({ items, lang, profiles }: { items: SocialItem[]; lang: Lang; profiles: SocialProfiles }) {
   return (
     <Spotlight>
       <ul className="cred-grid social-grid-public mt-8">

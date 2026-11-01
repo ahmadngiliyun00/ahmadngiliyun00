@@ -165,6 +165,7 @@ export type SocialPost = {
   imageAlt?: Localized<string>;
   sourceId?: string; // ID postingan di platform asal, mencegah tarikan ganda
   importNote?: string; // peringatan dari impor untuk diperiksa di CMS, tidak pernah tampil di situs
+  onHome?: boolean; // tampil di Kabar terbaru beranda (maksimal HOME_SOCIAL_LIMIT di src/lib/home.ts)
 };
 
 // Pengaturan Media sosial yang boleh diubah lewat formulir CMS.

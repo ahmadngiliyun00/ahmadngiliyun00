@@ -47,7 +47,7 @@ Beranda sengaja ringkas: tujuh bagian yang menjawab siapa, keahlian apa, bukti t
 
 | Halaman | Indonesia | Inggris | Isi |
 | --- | --- | --- | --- |
-| Beranda | `/` | `/en/` | Hero dengan plot K-Means, Tentang singkat (empat bidang kerja, alat utama), Jelajahi, tiga proyek unggulan, sorotan capaian, dua kabar terbaru, Kontak |
+| Beranda | `/` | `/en/` | Hero dengan plot K-Means, Tentang singkat (empat bidang kerja, alat utama), Jelajahi, tiga proyek unggulan, sorotan capaian, Kabar terbaru (dua kabar dan dua postingan media sosial), Kontak |
 | Proyek | `/proyek/` | `/en/projects/` | Proyek unggulan lengkap, sistem yang dikembangkan, terbaru di GitHub, kontribusi dan di luar kode, teknologi dan topik |
 | Riset dan Publikasi | `/riset/` | `/en/research/` | Angka sitasi bertanggal, tema, profil riset, hibah, reviewer jurnal, publikasi per tahun |
 | Mengajar | `/mengajar/` | `/en/teaching/` | Dua kampus, mata kuliah semester ini dan yang pernah diampu, materi, bidang keahlian mengajar |

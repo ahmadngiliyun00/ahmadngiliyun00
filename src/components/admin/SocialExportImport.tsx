@@ -22,6 +22,8 @@ export type ExportImportLabels = {
   uploading: string;
   done: string;
   imagesFailed: string;
+  serverError: string;
+  retryHint: string;
   unsupported: string;
   platforms: { instagram: string; facebook: string };
 };
@@ -29,6 +31,7 @@ export type ExportImportLabels = {
 const MAX_BYTES = 5 * 1024 * 1024;
 const MAX_SIDE = 2048;
 const BATCH = 200;
+const MAX_STREAK = 3;
 const TYPES: Record<string, string> = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp" };
 
 const fill = (text: string, values: Record<string, string | number>) =>
@@ -122,15 +125,29 @@ export default function SocialExportImport({ labels }: { labels: ExportImportLab
       let ignored = 0;
       const pending: { id: number; sourceId: string; path: string }[] = [];
       for (let i = 0; i < parsed.posts.length; i += BATCH) {
-        const res = await importExportAction({ platform: parsed.platform, posts: parsed.posts.slice(i, i + BATCH) });
+        let res: Awaited<ReturnType<typeof importExportAction>>;
+        try {
+          res = await importExportAction({ platform: parsed.platform, posts: parsed.posts.slice(i, i + BATCH) });
+        } catch {
+          // Balasan bukan dari Server Action (misalnya halaman error Nginx atau Cloudflare).
+          throw new Error(labels.serverError);
+        }
         if (!res.ok) throw new Error(res.message);
         added += res.added;
         existing += res.existing;
         ignored += res.ignored;
         pending.push(...res.images);
       }
+      // Gambar yang gagal dilewati supaya gambar lain tetap terunggah; impor ulang ZIP yang sama
+      // melengkapi yang terlewat. Setelah beberapa kegagalan beruntun, unggahan dihentikan.
       let failed = 0;
+      let streak = 0;
+      let serverIssue = false;
       for (const [n, item] of pending.entries()) {
+        if (streak >= MAX_STREAK) {
+          failed += pending.length - n;
+          break;
+        }
         setStatus(fill(labels.uploading, { n: n + 1, total: pending.length }));
         const entry = findEntry(entries, item.path);
         const name = item.path.split("/").pop() ?? "gambar.jpg";
@@ -143,11 +160,21 @@ export default function SocialExportImport({ labels }: { labels: ExportImportLab
         form.set("id", String(item.id));
         form.set("sourceId", item.sourceId);
         form.set("image", image);
-        const res = await attachExportImageAction(form);
-        if (!res.ok) failed++;
+        let ok = false;
+        try {
+          ok = (await attachExportImageAction(form)).ok;
+        } catch {
+          serverIssue = true;
+        }
+        if (ok) streak = 0;
+        else {
+          failed++;
+          streak++;
+        }
       }
       const summary = fill(labels.done, { added, existing, ignored, images: pending.length - failed });
-      toast(failed > 0 ? `${summary} ${fill(labels.imagesFailed, { n: failed })}` : summary, failed > 0 ? "error" : "success");
+      const problem = failed === 0 ? "" : ` ${fill(labels.imagesFailed, { n: failed })}${serverIssue ? ` ${labels.retryHint}` : ""}`;
+      toast(`${summary}${problem}`, failed > 0 ? "error" : "success");
       setLoaded(null);
       if (input.current) input.current.value = "";
       router.refresh();

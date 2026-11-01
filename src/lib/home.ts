@@ -37,3 +37,19 @@ export function showsInContact(slug: string, onHome: boolean | undefined): boole
   if (onHome !== undefined) return onHome;
   return DEFAULT_CONTACT_CHANNELS.includes(slug);
 }
+
+// Postingan media sosial di Kabar terbaru beranda: yang bertanda "Tampil di Kabar terbaru beranda"
+// bila ada, kalau tidak postingan public terbaru. Masukan sudah public saja.
+export const HOME_SOCIAL_LIMIT = 2;
+
+type Dated = { date: { year: number; month?: number; day?: number } | null; onHome?: boolean };
+
+export function dateValue(d: Dated["date"]): number {
+  return d === null ? 0 : d.year * 10000 + (d.month ?? 0) * 100 + (d.day ?? 0);
+}
+
+export function homeSocial<T extends Dated>(items: T[], limit = HOME_SOCIAL_LIMIT): T[] {
+  const newest = [...items].sort((a, b) => dateValue(b.date) - dateValue(a.date));
+  const picked = newest.filter((i) => i.onHome === true);
+  return (picked.length > 0 ? picked : newest).slice(0, limit);
+}

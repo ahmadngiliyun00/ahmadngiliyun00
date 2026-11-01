@@ -12,6 +12,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 - ZIP arsip LinkedIn bisa diunggah langsung (Shares.csv dibaca dari dalamnya); arsip tanpa postingan ditolak dengan pesan cara memintanya ulang
 - Catatan impor pada postingan media sosial untuk hal yang perlu diperiksa, misalnya audiens Facebook yang tidak tercatat di ekspor
 - Tautan profil Instagram, Facebook, dan LinkedIn di Pengaturan, Media sosial sebagai tujuan kartu yang tidak punya tautan postingan
+- Postingan media sosial di Kabar terbaru beranda: paling banyak 2 kabar dan 2 postingan, terbaru di atas. Pilih lewat centang "Tampil di Kabar terbaru beranda" (maksimal 2); bila tidak ada yang dicentang, beranda menampilkan 2 postingan public terbaru
 
 - Bukti sertifikat dari Google Drive: isian "Tautan Google Drive" di formulir capaian menerima tautan berbagi atau kode sematan, menyimpan bentuk baku, dan menampilkan pratinjau berkas di halaman detail. Kartu di beranda dan arsip mendapat tombol "Lihat bukti" yang langsung menuju pratinjau
 - Halaman Media sosial (`/media-sosial/`, `/en/social/`) berisi postingan Instagram, Facebook, dan LinkedIn yang dikelompokkan per topik, misalnya program yang sedang didampingi
@@ -22,6 +23,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- Impor ekspor tidak lagi berhenti di gambar pertama yang gagal: gambar yang gagal dilewati, sisanya tetap diunggah, dan pesan menjelaskan cara melengkapinya (muat ulang halaman lalu impor ulang ZIP yang sama). Balasan server yang tidak terduga (misalnya halaman error Nginx) dilaporkan dengan pesan yang jelas
 - Tautan postingan media sosial kini opsional, karena ekspor Meta tidak memuatnya. Postingan tanpa tautan hanya bisa dijadikan public bila tautan profil platformnya terisi
 - Tarikan lewat API Meta tidak dipakai lagi: aplikasi Meta baru diarahkan ke Unified login yang mewajibkan portofolio bisnis, dan Instagram Login tidak lagi tersedia untuk aplikasi baru. Kode OAuth tetap ada dan hanya aktif bila variabel `INSTAGRAM_*` atau `FACEBOOK_*` diisi
 
