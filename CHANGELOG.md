@@ -23,6 +23,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- Pesan dan panduan impor LinkedIn diperbaiki: postingan (`Shares.csv`) hanya ada di arsip Complete dari pilihan Download larger data archive, bukan di arsip Basic yang dikirim lebih dulu. Pilihan per berkas di LinkedIn tidak punya opsi Posts
 - Impor ekspor tidak lagi berhenti di gambar pertama yang gagal: gambar yang gagal dilewati, sisanya tetap diunggah, dan pesan menjelaskan cara melengkapinya (muat ulang halaman lalu impor ulang ZIP yang sama). Balasan server yang tidak terduga (misalnya halaman error Nginx) dilaporkan dengan pesan yang jelas
 - Tautan postingan media sosial kini opsional, karena ekspor Meta tidak memuatnya. Postingan tanpa tautan hanya bisa dijadikan public bila tautan profil platformnya terisi
 - Tarikan lewat API Meta tidak dipakai lagi: aplikasi Meta baru diarahkan ke Unified login yang mewajibkan portofolio bisnis, dan Instagram Login tidak lagi tersedia untuk aplikasi baru. Kode OAuth tetap ada dan hanya aktif bila variabel `INSTAGRAM_*` atau `FACEBOOK_*` diisi

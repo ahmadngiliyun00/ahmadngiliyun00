@@ -192,4 +192,4 @@ VPS aaPanel dengan PM2 (satu instans) dan Nginx reverse proxy. Langkah lengkap d
 - Foto pribadi belum dipasang
 - Tautan ke ngiliyun.my.id di README baru berfungsi setelah situs di-deploy dan DNS diarahkan
 - Deploy ke VPS (database produksi, akun admin, OAuth App GitHub) belum dilakukan
-- Media sosial: isi tautan profil Instagram, Facebook, dan LinkedIn di CMS, impor ZIP ekspor, lalu periksa Catatan impor sebelum public. Arsip LinkedIn yang ada baru berisi Profile.csv; minta ulang dengan Posts (`docs/DEPLOY.md` bagian 9)
+- Media sosial: isi tautan profil Instagram, Facebook, dan LinkedIn di CMS, impor ZIP ekspor, lalu periksa Catatan impor sebelum public. Postingan LinkedIn menunggu arsip Complete (Download larger data archive) yang memuat Shares.csv; arsip Basic tidak memuatnya (`docs/DEPLOY.md` bagian 9)

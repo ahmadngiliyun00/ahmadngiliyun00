@@ -162,7 +162,7 @@ Postingan Instagram, Facebook, dan LinkedIn Mas Ilyun dimasukkan ke CMS lalu dit
 | --- | --- | --- |
 | Instagram | Impor ZIP ekspor data (format JSON) | Postingan feed dan carousel; story dan repost tidak ikut |
 | Facebook | Impor ZIP ekspor data (format JSON) | Ekspor tidak mencatat audiens, jadi setiap postingan diberi peringatan |
-| LinkedIn | Impor ZIP arsip data, atau `Shares.csv` saja | Arsip harus memuat Posts |
+| LinkedIn | Impor ZIP arsip Complete, atau `Shares.csv` saja | Arsip Basic yang datang lebih dulu tidak memuat postingan |
 
 **Status API (November 2026).** Aplikasi Meta baru diarahkan ke Unified login yang mewajibkan portofolio bisnis, dan **Instagram Login (Instagram API with Instagram Login) tidak lagi tersedia untuk aplikasi baru**. Karena itu tarikan otomatis lewat API tidak dipakai dan keempat variabel `INSTAGRAM_*` dan `FACEBOOK_*` dibiarkan kosong. Kode OAuth tetap ada dan hanya aktif bila variabel itu diisi (lihat **Lampiran: tarikan lewat API** di akhir bagian ini).
 
@@ -182,7 +182,7 @@ Setelah notifikasi dari Meta datang (biasanya beberapa menit sampai sehari), und
 - Instagram memakai ID postingan dari ekspor. Facebook tidak punya ID postingan, jadi ID dibuat dari waktu posting dan nama berkas media pertama (atau hash teks untuk postingan tanpa media). Impor ulang ZIP yang sama tidak membuat data ganda, melengkapi gambar yang belum tersalin (hanya data yang masih privat), dan postingan yang pernah dihapus di CMS tidak masuk lagi
 - Facebook: postingan yang ditulis di profil orang lain, postingan orang lain, serta berbagi tanpa teks dan tanpa gambar sendiri dilewati. Sisanya diberi **Catatan impor** (terlihat di formulir dan ditandai "perlu diperiksa" di daftar): audiens tidak tercatat, dibagikan ke grup, tautan yang dibagikan, atau teksnya sama dengan postingan Instagram yang sudah ada
 
-**c. LinkedIn.** LinkedIn, Settings, Data privacy, **Get a copy of your data**. Pilih arsip lengkap, atau centang **Posts**. Arsip yang hanya memuat Articles dan Profile (berkas `Profile.csv` saja) ditolak karena tidak berisi postingan. Unggah ZIP-nya di kartu yang sama, atau ekstrak dan unggah `Shares.csv` di kartu LinkedIn. Gambar LinkedIn tidak ikut; unggah manual bila perlu.
+**c. LinkedIn.** LinkedIn, Settings, Data privacy, **Get a copy of your data**, pilih **Download larger data archive**, lalu Request archive. Pilihan per berkas (Articles, Invitations, Profile, Recommendations, Registration) tidak memuat postingan. LinkedIn mengirim dua email: arsip **Basic** lebih dulu (profil, posisi, sertifikat, koneksi, `Rich_Media.csv`, tanpa postingan), lalu arsip **Complete** sampai 24 jam kemudian yang memuat `Shares.csv`. Unggah arsip Complete di kartu **Impor dari ekspor data**, atau ekstrak dan unggah `Shares.csv` saja di kartu LinkedIn; arsip Basic ditolak dengan pesan yang menjelaskan hal ini. Arsip LinkedIn juga memuat data pribadi (koneksi, email, nomor telepon), tetapi CMS hanya membaca `Shares.csv` di peramban dan tidak mengunggah berkas lain. Gambar LinkedIn tidak ikut; unggah manual bila perlu.
 
 **d. Tautan profil dan aturan topik.** Ekspor Meta tidak memuat tautan postingan, jadi isian Tautan postingan boleh kosong. Isi **Tautan profil Instagram**, **Facebook**, dan **LinkedIn** di Pengaturan, Media sosial: kartu tanpa tautan postingan menaut ke profil itu. Postingan tanpa tautan postingan hanya bisa dijadikan public bila tautan profil platformnya terisi. Tautan postingan asli tetap bisa ditempel kapan saja (Bagikan, Salin tautan di aplikasi).
 

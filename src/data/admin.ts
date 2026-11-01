@@ -250,7 +250,7 @@ export const adminCopy = {
       exportImport: {
         title: "Impor dari ekspor data",
         intro:
-          "Cara utama memasukkan postingan. Di Instagram atau Facebook: Pusat Akun, Informasi dan izin Anda, Ekspor informasi Anda, pilih Ekspor ke perangkat, format JSON, lalu centang Postingan atau Media. Untuk LinkedIn, arsip harus memuat Posts. Unggah ZIP-nya di sini tanpa diekstrak.",
+          "Cara utama memasukkan postingan. Di Instagram atau Facebook: Pusat Akun, Informasi dan izin Anda, Ekspor informasi Anda, pilih Ekspor ke perangkat, format JSON, lalu centang Postingan atau Media. Untuk LinkedIn, pakai arsip Complete yang memuat Shares.csv. Unggah ZIP-nya di sini tanpa diekstrak.",
         file: "Arsip ZIP ekspor (Instagram, Facebook, atau LinkedIn)",
         help: "ZIP dibaca di peramban dan tidak dikirim utuh ke server; hanya teks postingan dan gambar sampul yang diunggah, satu per satu. Impor ulang tidak membuat data ganda dan melengkapi gambar yang belum tersalin.",
         reading: "Membaca arsip...",
@@ -310,7 +310,7 @@ export const adminCopy = {
       linkedin: {
         title: "LinkedIn",
         intro:
-          "LinkedIn tidak mengizinkan aplikasi membaca postingan profil pribadi, jadi postingan LinkedIn diimpor dari ekspor data. Buka LinkedIn, Settings, Data privacy, Get a copy of your data, pilih Posts (atau semua data). Setelah email dari LinkedIn datang, unggah ZIP-nya di kartu Impor dari ekspor data, atau ekstrak lalu unggah berkas Shares.csv di sini. Postingan yang sudah ada tidak dobel.",
+          "LinkedIn tidak mengizinkan aplikasi membaca postingan profil pribadi, jadi postingan LinkedIn diimpor dari ekspor data. Buka LinkedIn, Settings, Data privacy, Get a copy of your data, pilih Download larger data archive. LinkedIn mengirim arsip Basic lebih dulu (tanpa postingan), lalu arsip Complete sampai 24 jam kemudian. Setelah email arsip Complete datang, unggah ZIP-nya di kartu Impor dari ekspor data, atau ekstrak lalu unggah berkas Shares.csv di sini. Postingan yang sudah ada tidak dobel.",
         file: "Berkas Shares.csv",
         submit: "Impor postingan LinkedIn",
         submitting: "Mengimpor...",

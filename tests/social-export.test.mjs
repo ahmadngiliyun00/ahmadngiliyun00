@@ -38,7 +38,7 @@ test("jenis arsip dikenali dari daftar isi ZIP", () => {
 
 test("arsip yang salah ditolak dengan pesan yang menjelaskan langkah berikutnya", () => {
   assert.throws(() => ex.detectExport(["your_instagram_activity/media/posts_1.html"]), /HTML.*JSON/);
-  assert.throws(() => ex.detectExport(["Profile.csv"]), /Shares\.csv.*Posts/);
+  assert.throws(() => ex.detectExport(["Profile.csv", "Connections.csv", "Rich_Media.csv"]), /Shares\.csv.*Basic.*Complete/);
   assert.throws(() => ex.detectExport(["your_instagram_activity/messages/inbox/a.json"]), /tidak memuat postingan/);
   assert.throws(() => ex.detectExport(["foto.jpg"]), /tidak dikenali/);
 });

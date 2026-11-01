@@ -121,9 +121,11 @@ export function detectExport(paths: string[]): ExportKind {
   if (li !== undefined) return { kind: "linkedin", file: li };
   const html = paths.some((p) => /(your_instagram_activity|your_facebook_activity|posts)\/.*\.html$/.test(p));
   if (html) throw new Error("Ekspor ini berformat HTML. Minta ekspor ulang di Pusat Akun Meta dan pilih format JSON.");
+  // LinkedIn mengirim arsip "Basic" lebih dulu (profil, koneksi, sertifikat), lalu arsip lengkap
+  // "Complete" yang memuat Shares.csv sampai 24 jam kemudian. Pilihan per berkas tidak memuat postingan.
   if (paths.some((p) => /(^|\/)Profile\.csv$/i.test(p))) {
     throw new Error(
-      "Arsip LinkedIn ini tidak memuat postingan (Shares.csv). Minta arsip baru di LinkedIn: Settings, Data privacy, Get a copy of your data, lalu centang Posts.",
+      "Arsip LinkedIn ini belum memuat postingan (Shares.csv). Ini biasanya arsip Basic yang dikirim lebih dulu. Di LinkedIn (Settings, Data privacy, Get a copy of your data) pilih Download larger data archive, lalu tunggu email kedua berisi arsip Complete (sampai 24 jam) dan unggah arsip itu.",
     );
   }
   if (paths.some((p) => /your_(instagram|facebook)_activity\//.test(p))) {
