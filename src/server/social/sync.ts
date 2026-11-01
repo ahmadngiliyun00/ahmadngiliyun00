@@ -22,9 +22,9 @@ const MAX_NEW = 30;
 const MAX_PAGES = 20;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-const key = (platform: SocialPlatform, sourceId: string) => `${platform}:${sourceId}`;
+export const key = (platform: SocialPlatform, sourceId: string) => `${platform}:${sourceId}`;
 
-async function knownKeys(): Promise<Set<string>> {
+export async function knownKeys(): Promise<Set<string>> {
   const rows = await db.select({ data: entries.data }).from(entries).where(eq(entries.collection, "social"));
   const known = await ignoredKeys();
   for (const r of rows) {
@@ -36,7 +36,7 @@ async function knownKeys(): Promise<Set<string>> {
   return known;
 }
 
-async function socialSettings(): Promise<{ topics: ReturnType<typeof parseTopicRules>["rules"]; facebookAll: boolean }> {
+export async function socialSettings(): Promise<{ topics: ReturnType<typeof parseTopicRules>["rules"]; facebookAll: boolean }> {
   const s = (await getSetting<SocialSettings>("social")) ?? {};
   return { topics: parseTopicRules(s.topicRules ?? []).rules, facebookAll: s.facebookAll === true };
 }
@@ -59,22 +59,33 @@ async function downloadImage(url: string): Promise<Buffer | null> {
   }
 }
 
-type NewPost = { platform: SocialPlatform; sourceId: string; url: string; text: string; date: SocialPost["date"]; imageUrl?: string };
+export type NewPost = {
+  platform: SocialPlatform;
+  sourceId: string;
+  url?: string;
+  text: string;
+  date: SocialPost["date"];
+  note?: string;
+  imageUrl?: string;
+};
 
-// Menyimpan satu postingan baru sebagai data privat, lalu menyalin gambarnya ke UPLOAD_DIR.
-// Mengembalikan true bila gambar berhasil disalin.
-async function insertPost(post: NewPost, primary: Lang, topics: ReturnType<typeof parseTopicRules>["rules"]): Promise<boolean> {
+export type TopicRules = ReturnType<typeof parseTopicRules>["rules"];
+
+// Menyimpan satu postingan baru sebagai data privat: caption lewat cleanCaption, topik lewat
+// matchTopic. Mengembalikan ID data. Gambar disalin terpisah (attachRemoteImage atau impor ekspor).
+export async function insertPost(post: NewPost, primary: Lang, topics: TopicRules): Promise<number> {
   const { caption, tags } = cleanCaption(post.text);
   const data: Doc = {
     platform: post.platform,
     date: post.date,
     caption: localized(primary, caption),
-    url: post.url,
     sourceId: post.sourceId,
   };
+  if (post.url !== undefined) data.url = post.url;
   if (tags.length > 0) data.tags = tags;
   const topic = matchTopic(topics, caption, tags);
   if (topic !== undefined) data.topic = topic;
+  if (post.note) data.importNote = post.note;
 
   const now = new Date();
   const res = await db.insert(entries).values({
@@ -86,17 +97,26 @@ async function insertPost(post: NewPost, primary: Lang, topics: ReturnType<typeo
     createdAt: now,
     updatedAt: now,
   });
-  const id = Number(res[0].insertId);
-  if (post.imageUrl === undefined) return false;
-  const buf = await downloadImage(post.imageUrl);
-  if (buf === null) return false;
+  return Number(res[0].insertId);
+}
+
+// Menyimpan gambar sebagai berkas milik data itu (fileId). Gagal diam-diam: postingan tetap ada.
+export async function attachImage(id: number, buf: Buffer, name: string): Promise<boolean> {
   try {
-    const meta = await saveUpload(buf, `${post.platform}-${post.sourceId}.jpg`, id, { imagesOnly: true });
-    await db.update(entries).set({ data: { ...data, fileId: meta.id } }).where(and(eq(entries.id, id), eq(entries.collection, "social")));
+    const meta = await saveUpload(buf, name, id, { imagesOnly: true });
+    const rows = await db.select({ data: entries.data }).from(entries).where(and(eq(entries.id, id), eq(entries.collection, "social"))).limit(1);
+    if (rows.length === 0) return false;
+    await db.update(entries).set({ data: { ...(rows[0].data as Doc), fileId: meta.id }, updatedAt: new Date() }).where(eq(entries.id, id));
     return true;
   } catch {
     return false;
   }
+}
+
+async function attachRemoteImage(id: number, post: NewPost): Promise<boolean> {
+  if (post.imageUrl === undefined) return false;
+  const buf = await downloadImage(post.imageUrl);
+  return buf === null ? false : attachImage(id, buf, `${post.platform}-${post.sourceId}.jpg`);
 }
 
 // Token Instagram diperpanjang otomatis paling sering sekali sehari.
@@ -149,11 +169,15 @@ export async function syncPlatform(platform: AutoPlatform): Promise<SyncReport> 
           report.more = true;
           break;
         }
-        const withImage = await insertPost(
-          { platform, sourceId: item.sourceId, url: item.url, text: item.text, date: partialDateFrom(item.timestamp), imageUrl: item.imageUrl },
-          primary,
-          topics,
-        );
+        const post: NewPost = {
+          platform,
+          sourceId: item.sourceId,
+          url: item.url,
+          text: item.text,
+          date: partialDateFrom(item.timestamp),
+          imageUrl: item.imageUrl,
+        };
+        const withImage = await attachRemoteImage(await insertPost(post, primary, topics), post);
         known.add(key(platform, item.sourceId));
         report.added++;
         if (withImage) report.images++;

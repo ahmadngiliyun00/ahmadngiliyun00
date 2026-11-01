@@ -5,7 +5,7 @@ import Reveal from "@/components/Reveal";
 import Section from "@/components/Section";
 import Spotlight from "@/components/Spotlight";
 import SubpageShell from "@/components/SubpageShell";
-import { socialPlatformLabels, type SocialPost } from "@/content/types";
+import { socialPlatformLabels, type SocialPlatform, type SocialPost } from "@/content/types";
 import { copy, type Lang } from "@/data/profile";
 import { formatPartialDate } from "@/lib/achievements";
 import { pagePath } from "@/lib/nav";
@@ -16,12 +16,17 @@ interface Item extends SocialPost {
   slug: string;
 }
 
+type Profiles = Partial<Record<SocialPlatform, string>>;
+
 // Satu postingan: gambar (bila ada), platform dan tanggal, teks, dan tautan ke postingan asli.
+// Postingan hasil impor ekspor tidak punya tautan sendiri, jadi menaut ke profil akunnya.
 // Teks dipotong beberapa baris; versi lengkap ada di platform asalnya.
-function SocialCard({ post, lang }: { post: Item; lang: Lang }) {
+function SocialCard({ post, lang, profiles }: { post: Item; lang: Lang; profiles: Profiles }) {
   const t = copy[lang];
   const platform = socialPlatformLabels[post.platform];
   const caption = post.caption[lang];
+  const href = post.url ?? profiles[post.platform];
+  const label = (post.url ? t.social.viewOn : t.social.profileOn).replace("{platform}", platform);
   return (
     <article className="cred social-post" data-spot data-platform={post.platform}>
       {post.fileId ? (
@@ -33,23 +38,25 @@ function SocialCard({ post, lang }: { post: Item; lang: Lang }) {
         {post.date ? <span>{formatPartialDate(post.date, lang)}</span> : null}
       </p>
       {caption ? <p className="social-caption">{caption}</p> : null}
-      <div className="cred-actions">
-        <ExternalLink href={post.url} newTab={t.newTab} className="link text-sm">
-          {t.social.viewOn.replace("{platform}", platform)}
-        </ExternalLink>
-      </div>
+      {href ? (
+        <div className="cred-actions">
+          <ExternalLink href={href} newTab={t.newTab} className="link text-sm">
+            {label}
+          </ExternalLink>
+        </div>
+      ) : null}
     </article>
   );
 }
 
-function Grid({ items, lang }: { items: Item[]; lang: Lang }) {
+function Grid({ items, lang, profiles }: { items: Item[]; lang: Lang; profiles: Profiles }) {
   return (
     <Spotlight>
       <ul className="cred-grid social-grid-public mt-8">
         {items.map((post) => (
           <li key={post.slug}>
             <Reveal className="h-full">
-              <SocialCard post={post} lang={lang} />
+              <SocialCard post={post} lang={lang} profiles={profiles} />
             </Reveal>
           </li>
         ))}
@@ -92,12 +99,12 @@ export default async function SocialPage({ lang }: { lang: Lang }) {
       ) : titled ? (
         groups.map((g) => (
           <Section key={g.id} id={g.id} title={g.topic ?? t.social.other}>
-            <Grid items={g.items} lang={lang} />
+            <Grid items={g.items} lang={lang} profiles={content.socialProfiles} />
           </Section>
         ))
       ) : (
         <div className="mx-auto max-w-6xl px-5 pb-16 sm:px-8">
-          <Grid items={groups[0].items} lang={lang} />
+          <Grid items={groups[0].items} lang={lang} profiles={content.socialProfiles} />
         </div>
       )}
     </SubpageShell>

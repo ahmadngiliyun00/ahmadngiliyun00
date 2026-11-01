@@ -51,6 +51,7 @@ tests/seo-text.test.mjs          unit test panjang dan gaya judul serta deskrips
 tests/drive.test.mjs             unit test tautan Google Drive untuk pratinjau sertifikat (npm test)
 tests/transfer.test.mjs          unit test ekspor dan impor lembar kerja: kolom, sel, Excel, CSV (npm test)
 tests/social.test.mjs            unit test caption, tagar, topik, tanggal, CDN gambar, Shares.csv LinkedIn (npm test)
+tests/social-export.test.mjs     unit test impor ekspor Instagram dan Facebook, mojibake, pembaca ZIP (npm test, fixture buatan)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, proyek, riset, mengajar, perjalanan,
@@ -80,7 +81,8 @@ src/
     transfer.ts                  ekspor dan impor lembar kerja koleksi CMS (pratinjau lalu terapkan)
     messages.ts, mail.ts         pesan kontak di database, kirim email SMTP
     turnstile.ts                 verifikasi Cloudflare Turnstile (opsional)
-    social/                      media sosial: config (env Meta), store (token terenkripsi), meta (Graph API), oauth, sync
+    social/                      media sosial: import (impor ekspor), sync (simpan postingan, LinkedIn), serta config, store,
+                                 meta, oauth untuk tarikan API yang tidak aktif
     auth/                        password, session, github, rate-limit
   data/
     profile.ts                   identitas situs dan teks antarmuka situs ID/EN
@@ -91,6 +93,8 @@ src/
   lib/xlsx.ts, lib/transfer.ts   tulis dan baca .xlsx (tanpa pustaka luar) dan konversi baris ke isian formulir
   lib/nav.ts                     alamat halaman dalam (pagePath), menu header dan footer, peta jangkar lama
   lib/social.ts                  aturan murni media sosial: cleanCaption, aturan topik, groupByTopic, Shares.csv LinkedIn
+  lib/social-export.ts           baca ekspor Instagram dan Facebook (JSON): detectExport, parser, fixMetaText, derivedSourceId
+  lib/zip-reader.ts              baca ZIP besar di peramban per berkas (Blob.slice, DecompressionStream, ZIP64)
 ```
 
 ## Aturan kerja
@@ -125,7 +129,8 @@ src/
 - Formulir harus tetap terisi setelah disimpan. Server Action simpan memanggil `revalidatePath("/admin", "layout")`; formulir tambah data dialihkan ke halaman ubah
 - Judul, deskripsi, dan kata kunci SEO beranda, arsip, dan empat halaman dalam diatur di CMS (Pengaturan, SEO dan Search Console) dan dibaca `src/lib/metadata.ts`; teks di `profile.ts` hanya cadangan
 - Jangan commit `.env.local`, `.env.production.local`, atau folder `storage/`
-- Media sosial (koleksi `social`, Pengaturan, Media sosial): hanya MEMBACA postingan akun sendiri, tidak pernah memposting. Hasil tarikan dan impor selalu `private`; Mas Ilyun memeriksa sebelum public. Token hanya di `settings` kunci `social-auth` (terenkripsi, tanpa formulir, tidak ikut `loadSite()`), jangan pernah dikirim ke browser atau situs. Gambar hanya diunduh dari CDN Meta (`isAllowedMediaUrl`) dan disimpan di `UPLOAD_DIR`. Caption wajib lewat `cleanCaption`. LinkedIn hanya lewat `Shares.csv` atau isian manual (tanpa scraping)
+- Media sosial (koleksi `social`, Pengaturan, Media sosial): cara utama impor ZIP ekspor data (Instagram dan Facebook format JSON, LinkedIn `Shares.csv`), dibaca di peramban; ZIP tidak pernah dikirim utuh ke server dan gambar diunggah satu per satu (maksimal 5 MB). Hasil impor selalu `private`, lewat `cleanCaption`, `matchTopic`, dan `sourceId` (impor ulang tidak dobel, yang dihapus diingat di `social-auth.ignored`). Teks Meta wajib lewat `fixMetaText`. Peringatan untuk diperiksa di isian `importNote`, tidak pernah dirender di situs. `url` opsional; tanpa `url` kartu menaut ke `profiles.<platform>` dan public ditolak bila keduanya kosong. Fixture uji wajib data buatan; jangan commit berkas ekspor atau isinya. Tanpa scraping
+- Tarikan lewat API Meta tidak dipakai: aplikasi Meta baru diarahkan ke Unified login (wajib portofolio bisnis) dan Instagram Login tidak lagi tersedia untuk aplikasi baru. Variabel `INSTAGRAM_*` dan `FACEBOOK_*` dibiarkan kosong. Kode OAuth tetap ada; jangan dihapus tanpa persetujuan Mas Ilyun. Bila dipakai: hanya membaca, token terenkripsi di `settings` kunci `social-auth`, gambar hanya dari CDN Meta (`isAllowedMediaUrl`)
 - Pesan form kontak (tabel `messages`) selalu privat: hanya tampil di `/admin/pesan/`, tidak pernah di situs, sitemap, atau README
 - Kontak publik hanya lewat email (`ahmad@ngiliyun.my.id`). Jangan menambahkan WhatsApp atau nomor telepon (keputusan Mas Ilyun)
 
@@ -186,4 +191,4 @@ VPS aaPanel dengan PM2 (satu instans) dan Nginx reverse proxy. Langkah lengkap d
 - Foto pribadi belum dipasang
 - Tautan ke ngiliyun.my.id di README baru berfungsi setelah situs di-deploy dan DNS diarahkan
 - Deploy ke VPS (database produksi, akun admin, OAuth App GitHub) belum dilakukan
-- Media sosial: Instagram belum diubah ke akun Creator, aplikasi Meta belum dibuat, dan cron `/cron/social/` belum dijadwalkan (`docs/DEPLOY.md` bagian 9)
+- Media sosial: isi tautan profil Instagram, Facebook, dan LinkedIn di CMS, impor ZIP ekspor, lalu periksa Catatan impor sebelum public. Arsip LinkedIn yang ada baru berisi Profile.csv; minta ulang dengan Posts (`docs/DEPLOY.md` bagian 9)

@@ -158,18 +158,21 @@ export type SocialPost = {
   platform: SocialPlatform;
   date: PartialDate | null;
   caption: Localized<string>; // teks postingan, sudah dibersihkan dari emoji, em dash, dan ampersand
-  url: string; // tautan ke postingan asli
+  url?: string; // tautan ke postingan asli; ekspor Meta tidak memuatnya, kartu lalu menaut ke profil akun
   topic?: string; // pengelompokan di halaman Media sosial, misalnya nama program
   tags?: string[]; // tagar dari postingan asli, tanpa tanda pagar
   fileId?: string; // gambar postingan, disalin ke UPLOAD_DIR
   imageAlt?: Localized<string>;
   sourceId?: string; // ID postingan di platform asal, mencegah tarikan ganda
+  importNote?: string; // peringatan dari impor untuk diperiksa di CMS, tidak pernah tampil di situs
 };
 
 // Pengaturan Media sosial yang boleh diubah lewat formulir CMS.
 export type SocialSettings = {
   topicRules?: string[]; // "kata kunci | Nama topik", satu aturan per baris
   facebookAll?: boolean; // tarik juga postingan Facebook yang tidak publik (bawaan: hanya publik)
+  // Tautan profil akun, tujuan kartu postingan yang tidak punya tautan postingan sendiri.
+  profiles?: Partial<Record<SocialPlatform, string>>;
 };
 
 // onHome: tampil di Kontak beranda. Bila belum pernah disimpan, LinkedIn, GitHub, ORCID, dan YouTube

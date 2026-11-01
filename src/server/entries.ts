@@ -3,12 +3,12 @@ import { randomBytes } from "node:crypto";
 import { and, asc, eq, ne } from "drizzle-orm";
 import { getCollection, getSettingsConfig } from "@/content/collections";
 import { getPath, readFields, setPath, slugify, SLUG_PATTERN, type Doc, type FieldErrors } from "@/content/fields";
-import type { CollectionKey, Visibility } from "@/content/types";
+import { socialPlatformLabels, type CollectionKey, type SocialPlatform, type SocialSettings, type Visibility } from "@/content/types";
 import { db } from "@/db";
 import { comments, entries, postViews, settings } from "@/db/schema";
 import { fileIdsIn, htmlToText } from "@/lib/richtext";
 import { sha256 } from "@/server/auth/session";
-import { invalidateSite, primaryLang, rowToEntry } from "@/server/content";
+import { getSettingDoc, invalidateSite, primaryLang, rowToEntry } from "@/server/content";
 import { deleteEntryFiles, deleteFile, saveUpload, syncInlineFiles } from "@/server/files";
 import { sanitizeRichText } from "@/server/richtext";
 import { ignorePost } from "@/server/social/store";
@@ -56,6 +56,14 @@ async function checkRules(
       const caption = (data.caption ?? {}) as Record<string, string>;
       const primary = await primaryLang();
       if ((caption[primary] ?? "").trim() === "") errors.caption = "Teks postingan wajib diisi sebelum dijadikan public.";
+      // Tanpa tautan postingan, kartu menaut ke profil akun; profil itu wajib ada (Pengaturan, Media sosial).
+      if (data.url === undefined) {
+        const settings = (await getSettingDoc("social")) as SocialSettings;
+        const platform = String(data.platform ?? "") as SocialPlatform;
+        if ((settings.profiles?.[platform] ?? "") === "") {
+          errors.url = `Isi tautan postingan, atau isi Tautan profil ${socialPlatformLabels[platform] ?? platform} di Pengaturan, Media sosial.`;
+        }
+      }
     }
     return;
   }

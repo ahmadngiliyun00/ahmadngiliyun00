@@ -18,6 +18,7 @@ import { deleteMessage, setMessageStatus, type MessageStatus } from "@/server/me
 import { applyImport, planImport, readUpload, type ImportPlan, type ImportResult } from "@/server/transfer";
 import { isAutoPlatform } from "@/server/social/config";
 import { removeConnection } from "@/server/social/store";
+import { attachExportImage, importExportPosts, validatePayload, type PendingImage } from "@/server/social/import";
 import { importLinkedin, syncPlatform } from "@/server/social/sync";
 import {
   createShare,
@@ -253,6 +254,32 @@ export async function importLinkedinAction(_prev: FormState, form: FormData): Pr
   } catch (err) {
     return { message: (err as Error).message };
   }
+}
+
+// Impor ekspor Instagram atau Facebook, tahap 1: daftar postingan (tanpa gambar) dari peramban.
+// Hasilnya selalu data privat. Mengembalikan gambar sampul yang perlu diunggah pada tahap 2.
+export type ExportImportResult =
+  | { ok: true; added: number; existing: number; ignored: number; images: PendingImage[] }
+  | { ok: false; message: string };
+
+export async function importExportAction(payload: unknown): Promise<ExportImportResult> {
+  await requireAdmin();
+  try {
+    const report = await importExportPosts(validatePayload(payload));
+    if (report.added > 0) revalidatePath("/admin", "layout");
+    return { ok: true, ...report };
+  } catch (err) {
+    return { ok: false, message: (err as Error).message };
+  }
+}
+
+// Tahap 2: satu gambar sampul per permintaan (maksimal 5 MB), jadi batas Server Action dan Nginx aman.
+export async function attachExportImageAction(form: FormData): Promise<{ ok: boolean; message?: string }> {
+  await requireAdmin();
+  const file = form.get("image");
+  if (!(file instanceof File)) return { ok: false, message: "Tidak ada gambar." };
+  const message = await attachExportImage(toId(form.get("id")), String(form.get("sourceId") ?? ""), file);
+  return message === null ? { ok: true } : { ok: false, message };
 }
 
 // ---------- Pesan masuk ----------

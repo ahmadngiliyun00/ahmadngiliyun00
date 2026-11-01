@@ -601,8 +601,29 @@
     }
   }
 
+  @media (min-width: 64rem) {
+    .social-grid-import .social-card-wide {
+      grid-column: span 2;
+    }
+  }
+
   .social-card .admin-help {
     margin-top: 0.5rem;
+  }
+
+  .social-preview {
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+  }
+
+  .social-api summary {
+    cursor: pointer;
+  }
+
+  .social-api summary:focus-visible {
+    outline: 2px solid var(--color-leaf);
+    outline-offset: 4px;
   }
 
   .social-card .admin-warn {

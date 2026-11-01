@@ -9,6 +9,8 @@ import type {
   MetricsSettings,
   ProfileSettings,
   SeoSettings,
+  SocialPlatform,
+  SocialSettings,
   Visibility,
 } from "@/content/types";
 import { db } from "@/db";
@@ -95,6 +97,8 @@ export type SiteContent = {
   principle: Entry<"principle">[];
   post: Entry<"post">[];
   social: Entry<"social">[];
+  // Hanya tautan profil dari Pengaturan, Media sosial; aturan topik dan lainnya tidak ikut.
+  socialProfiles: Partial<Record<SocialPlatform, string>>;
 };
 
 const TTL_MS = 5 * 60 * 1000;
@@ -106,11 +110,12 @@ async function fetchSite(): Promise<SiteContent> {
     .from(entries)
     .where(eq(entries.visibility, "public"))
     .orderBy(asc(entries.position), asc(entries.id));
-  const [profile, metrics, seo, primary] = await Promise.all([
+  const [profile, metrics, seo, primary, social] = await Promise.all([
     getSetting<ProfileSettings>("profile"),
     getSetting<MetricsSettings>("metrics"),
     getSetting<SeoSettings>("seo"),
     primaryLang(),
+    getSetting<SocialSettings>("social"),
   ]);
   if (profile === undefined || metrics === undefined) {
     throw new Error("Pengaturan profil atau metrik belum ada. Jalankan npm run db:seed.");
@@ -142,6 +147,7 @@ async function fetchSite(): Promise<SiteContent> {
     principle: pick("principle"),
     post: pick("post"),
     social: pick("social"),
+    socialProfiles: social?.profiles ?? {},
   };
 }
 

@@ -244,9 +244,36 @@ export const adminCopy = {
   settings: {
     title: "Pengaturan",
     social: {
-      title: "Akun terhubung",
+      title: "Tarik otomatis lewat API",
       intro:
-        "Koneksi hanya untuk membaca postingan Anda sendiri. CMS tidak pernah memposting apa pun, dan token disimpan terenkripsi di database. Postingan yang ditarik masuk ke Kabar, Postingan media sosial sebagai data privat.",
+        "Tidak aktif untuk aplikasi Meta baru: Instagram Login kini mewajibkan portofolio bisnis. Pakai impor ekspor di atas. Bagian ini hanya berfungsi bila variabel INSTAGRAM_* atau FACEBOOK_* diisi di server.",
+      exportImport: {
+        title: "Impor dari ekspor data",
+        intro:
+          "Cara utama memasukkan postingan. Di Instagram atau Facebook: Pusat Akun, Informasi dan izin Anda, Ekspor informasi Anda, pilih Ekspor ke perangkat, format JSON, lalu centang Postingan atau Media. Untuk LinkedIn, arsip harus memuat Posts. Unggah ZIP-nya di sini tanpa diekstrak.",
+        file: "Arsip ZIP ekspor (Instagram, Facebook, atau LinkedIn)",
+        help: "ZIP dibaca di peramban dan tidak dikirim utuh ke server; hanya teks postingan dan gambar sampul yang diunggah, satu per satu. Impor ulang tidak membuat data ganda dan melengkapi gambar yang belum tersalin.",
+        reading: "Membaca arsip...",
+        found: "{n} postingan siap diimpor,",
+        withImage: "{n} dengan gambar.",
+        skipped: "Dilewati: {list}.",
+        reasons: {
+          draft: "draf atau belum terbit",
+          empty: "tanpa teks dan gambar sendiri",
+          "other-profile": "ditulis di profil orang lain",
+          "not-owner": "bukan milik Anda",
+          duplicate: "ganda",
+        },
+        warning:
+          "Ekspor Facebook tidak mencatat audiens. Setiap postingan diberi Catatan impor; periksa audiens, orang yang disebut, dan foto peserta sebelum dijadikan public.",
+        submit: "Impor {n} postingan",
+        saving: "Menyimpan postingan...",
+        uploading: "Mengunggah gambar {n} dari {total}...",
+        done: "{added} postingan baru masuk sebagai data privat, {existing} sudah ada, {ignored} pernah dihapus. {images} gambar tersalin.",
+        imagesFailed: "{n} gambar gagal disalin; unggah manual lewat formulir.",
+        unsupported: "Peramban ini belum bisa membaca ZIP. Pakai Chrome, Edge, Firefox, atau Safari versi terbaru.",
+        platforms: { instagram: "Instagram:", facebook: "Facebook:" },
+      },
       platforms: {
         instagram: {
           name: "Instagram",
@@ -279,7 +306,7 @@ export const adminCopy = {
       linkedin: {
         title: "LinkedIn",
         intro:
-          "LinkedIn tidak mengizinkan aplikasi membaca postingan profil pribadi, jadi postingan LinkedIn diimpor dari ekspor data. Buka LinkedIn, Settings, Data privacy, Get a copy of your data, pilih Posts (atau semua data). Setelah email dari LinkedIn datang, unduh arsipnya, ekstrak, lalu unggah berkas Shares.csv di sini. Postingan yang sudah ada tidak dobel.",
+          "LinkedIn tidak mengizinkan aplikasi membaca postingan profil pribadi, jadi postingan LinkedIn diimpor dari ekspor data. Buka LinkedIn, Settings, Data privacy, Get a copy of your data, pilih Posts (atau semua data). Setelah email dari LinkedIn datang, unggah ZIP-nya di kartu Impor dari ekspor data, atau ekstrak lalu unggah berkas Shares.csv di sini. Postingan yang sudah ada tidak dobel.",
         file: "Berkas Shares.csv",
         submit: "Impor postingan LinkedIn",
         submitting: "Mengimpor...",

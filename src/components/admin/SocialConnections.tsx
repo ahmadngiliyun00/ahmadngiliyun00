@@ -2,6 +2,7 @@ import { disconnectSocialAction } from "@/app/(admin)/admin/actions";
 import ConfirmButton from "@/components/admin/ConfirmButton";
 import Icon from "@/components/admin/Icon";
 import { LinkedinImport, SocialSync } from "@/components/admin/SocialActions";
+import SocialExportImport from "@/components/admin/SocialExportImport";
 import FlashToast from "@/components/FlashToast";
 import { adminCopy } from "@/data/admin";
 import { appConfig, AUTO_PLATFORMS, isAutoPlatform, type AutoPlatform } from "@/server/social/config";
@@ -104,35 +105,48 @@ function PlatformCard({ platform, status }: { platform: AutoPlatform; status: Co
   );
 }
 
-// Panel di atas formulir Pengaturan, Media sosial. Tidak pernah mengirim token ke browser.
+// Panel di atas formulir Pengaturan, Media sosial. Impor ekspor adalah cara utama; tarikan lewat
+// API hanya tampil terbuka bila aplikasi Meta diatur di server. Tidak pernah mengirim token ke browser.
 export default async function SocialConnections({ flash }: { flash: { social?: string; platform?: string; message?: string } }) {
   const statuses = await connectionStatuses();
   const cron = (process.env.SOCIAL_CRON_SECRET ?? "").trim().length >= 32;
+  const apiActive = AUTO_PLATFORMS.some((p) => (appConfig(p).enabled ? true : statuses[p] !== undefined));
   return (
-    <section className="mt-6" aria-labelledby="social-title">
+    <>
       <Flash {...flash} />
-      <h2 id="social-title" className="font-display text-lg font-bold">
-        {t.title}
-      </h2>
-      <p className="mt-1 text-sm text-muted">{t.intro}</p>
-      <div className="social-grid mt-4">
-        {AUTO_PLATFORMS.map((platform) => (
-          <PlatformCard key={platform} platform={platform} status={statuses[platform]} />
-        ))}
-        <section className="admin-card social-card" aria-labelledby="social-linkedin">
-          <h3 id="social-linkedin" className="font-display text-base font-bold">
-            {t.linkedin.title}
-          </h3>
-          <p className="admin-help">{t.linkedin.intro}</p>
-          <LinkedinImport labels={t.linkedin} />
-        </section>
-      </div>
-      <p className="mt-4 text-sm text-muted">
-        {cron ? t.cron : t.cronOff}{" "}
-        <a href="/admin/social/" className="link">
-          {t.manage}
-        </a>
-      </p>
-    </section>
+      <section className="mt-6" aria-labelledby="social-export-title">
+        <div className="social-grid social-grid-import">
+          <section className="admin-card social-card social-card-wide" aria-labelledby="social-export-title">
+            <h2 id="social-export-title" className="font-display text-lg font-bold">
+              {t.exportImport.title}
+            </h2>
+            <p className="admin-help">{t.exportImport.intro}</p>
+            <SocialExportImport labels={t.exportImport} />
+          </section>
+          <section className="admin-card social-card" aria-labelledby="social-linkedin">
+            <h2 id="social-linkedin" className="font-display text-lg font-bold">
+              {t.linkedin.title}
+            </h2>
+            <p className="admin-help">{t.linkedin.intro}</p>
+            <LinkedinImport labels={t.linkedin} />
+          </section>
+        </div>
+        <p className="mt-4 text-sm text-muted">
+          <a href="/admin/social/" className="link">
+            {t.manage}
+          </a>
+        </p>
+      </section>
+      <details className="social-api mt-8" open={apiActive}>
+        <summary className="font-display text-lg font-bold">{t.title}</summary>
+        <p className="mt-1 text-sm text-muted">{t.intro}</p>
+        <div className="social-grid mt-4">
+          {AUTO_PLATFORMS.map((platform) => (
+            <PlatformCard key={platform} platform={platform} status={statuses[platform]} />
+          ))}
+        </div>
+        {apiActive ? <p className="mt-4 text-sm text-muted">{cron ? t.cron : t.cronOff}</p> : null}
+      </details>
+    </>
   );
 }

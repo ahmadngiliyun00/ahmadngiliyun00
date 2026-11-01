@@ -101,7 +101,7 @@ export type Copy = {
     { title: string; intro: string; metaTitle: string; metaDescription: string }
   >;
   // Halaman Media sosial: kelompok topik dan tautan ke postingan asli.
-  social: { topicsLabel: string; other: string; empty: string; viewOn: string; noImage: string };
+  social: { topicsLabel: string; other: string; empty: string; viewOn: string; profileOn: string; noImage: string };
   hero: {
     primary: string;
     secondary: string;
@@ -441,6 +441,7 @@ export const copy: Localized<Copy> = {
       other: "Lainnya",
       empty: "Belum ada postingan.",
       viewOn: "Lihat di {platform}",
+      profileOn: "Profil {platform}",
       noImage: "Tanpa gambar",
     },
     hero: {
@@ -848,6 +849,7 @@ export const copy: Localized<Copy> = {
       other: "Other posts",
       empty: "No posts yet.",
       viewOn: "View on {platform}",
+      profileOn: "{platform} profile",
       noImage: "No image",
     },
     hero: {

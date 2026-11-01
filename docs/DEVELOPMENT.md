@@ -186,13 +186,18 @@ Setiap koleksi punya tombol **Ekspor Excel** dan **Impor** di halaman daftarnya.
 
 ### Media sosial
 
-Postingan Instagram, Facebook, dan LinkedIn milik Mas Ilyun masuk ke koleksi `social` (Kabar, Postingan media sosial) dan tampil di halaman `/media-sosial/`. Langkah menyiapkan aplikasi Meta ada di `docs/DEPLOY.md` bagian 9.
+Postingan Instagram, Facebook, dan LinkedIn milik Mas Ilyun masuk ke koleksi `social` (Kabar, Postingan media sosial) dan tampil di halaman `/media-sosial/`. Cara utamanya impor ZIP ekspor data; tarikan lewat API tidak dipakai karena Instagram Login tidak lagi tersedia untuk aplikasi Meta baru (`docs/DEPLOY.md` bagian 9).
 
-- Koneksi akun: Pengaturan, Media sosial (`/admin/settings/social/`, panel `SocialConnections`). OAuth di `/admin/auth/instagram/` dan `/admin/auth/facebook/` (beserta `callback/`), wajib login admin dan memakai state acak di cookie. Kredensial aplikasi dari variabel lingkungan (`src/server/social/config.ts`)
+- Impor ekspor (`SocialExportImport`, kartu Impor dari ekspor data): peramban membaca ZIP lewat `src/lib/zip-reader.ts` (Blob.slice dan `DecompressionStream`, mendukung ZIP64), mengenali jenis arsip dan membaca postingan lewat `src/lib/social-export.ts` (`detectExport`, `parseInstagramExport`, `parseFacebookExport`, `fixMetaText`). Server Action `importExportAction` menerima daftar postingan per 200 (divalidasi ulang `validatePayload` di `src/server/social/import.ts`), lalu `attachExportImageAction` menerima gambar sampul satu per satu. ZIP tidak pernah dikirim ke server
+- Instagram: `posts.json` berlabel (ID `fbid`, Caption, Published, Draft) digabung dengan `posts_1.json` format lama (daftar gambar carousel lengkap) bila waktunya berselisih paling banyak 5 detik. Facebook tidak punya ID, jadi `derivedSourceId` memakai waktu dan nama berkas media pertama, atau hash teks. Pemilik akun dibaca dari awalan judul (`ownerName`); postingan di profil orang lain dan berbagi tanpa isi sendiri dilewati
+- Peringatan untuk diperiksa disimpan di isian `importNote` (hanya CMS). Isian `url` opsional; kartu tanpa `url` menaut ke `profiles.<platform>` di Pengaturan, Media sosial, dan `checkRules` menolak public bila keduanya kosong
+- Semua aturan murni ini diuji `tests/social-export.test.mjs` dengan fixture buatan. Jangan menyalin isi ekspor asli ke repo
+
+- Tarikan lewat API (tidak aktif, kode tetap ada): Pengaturan, Media sosial (`/admin/settings/social/`, panel `SocialConnections`). OAuth di `/admin/auth/instagram/` dan `/admin/auth/facebook/` (beserta `callback/`), wajib login admin dan memakai state acak di cookie. Kredensial aplikasi dari variabel lingkungan (`src/server/social/config.ts`)
 - Token disimpan di tabel `settings` kunci `social-auth`, dienkripsi AES-256-GCM dengan kunci HKDF dari rahasia aplikasi (`src/server/social/store.ts`). Kunci ini tidak terdaftar di `settingsConfigs`, jadi tidak punya formulir dan tidak ikut `loadSite()`. Panggilan Facebook memakai `appsecret_proof`
 - Tarikan (`src/server/social/sync.ts`): hasil selalu data privat, paling banyak 30 postingan baru per tarikan, postingan yang sudah ada tidak ditimpa, dan postingan yang dihapus di CMS dicatat di `social-auth.ignored` supaya tidak masuk lagi. Gambar hanya diunduh dari CDN Meta (`isAllowedMediaUrl`) lalu disimpan lewat `saveUpload` sebagai `fileId`
 - Caption dibersihkan `cleanCaption` (`src/lib/social.ts`): emoji dibuang, em dash dan ampersand diganti, tagar dipindah ke isian `tags`. Aturan topik (`kata kunci | Nama topik`) di Pengaturan, Media sosial mengisi isian `topic`. Semua aturan murni ini diuji `tests/social.test.mjs`
-- LinkedIn tidak punya API baca untuk profil pribadi, jadi diimpor dari `Shares.csv` ekspor data (`parseLinkedinShares`), atau diisi manual di CMS
+- LinkedIn tidak punya API baca untuk profil pribadi, jadi diimpor dari `Shares.csv` ekspor data (`parseLinkedinShares`), lewat ZIP arsip di kartu impor ekspor atau berkas CSV-nya saja, atau diisi manual di CMS
 - Tarikan terjadwal: `POST /cron/social/` dengan `Authorization: Bearer <SOCIAL_CRON_SECRET>`. Sekaligus memperpanjang token Instagram (paling sering sekali sehari)
 
 ### Header keamanan

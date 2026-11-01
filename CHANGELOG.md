@@ -8,12 +8,22 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Ditambahkan
 
+- Impor ZIP ekspor data Instagram dan Facebook (format JSON) di Pengaturan, Media sosial. ZIP dibaca di peramban, jadi arsip ratusan MB tidak melewati batas unggah; server hanya menerima daftar postingan lalu gambar sampul satu per satu. Hasil impor selalu privat, teks rusak dari Meta diperbaiki, impor ulang tidak membuat data ganda, dan postingan yang pernah dihapus tidak masuk lagi
+- ZIP arsip LinkedIn bisa diunggah langsung (Shares.csv dibaca dari dalamnya); arsip tanpa postingan ditolak dengan pesan cara memintanya ulang
+- Catatan impor pada postingan media sosial untuk hal yang perlu diperiksa, misalnya audiens Facebook yang tidak tercatat di ekspor
+- Tautan profil Instagram, Facebook, dan LinkedIn di Pengaturan, Media sosial sebagai tujuan kartu yang tidak punya tautan postingan
+
 - Bukti sertifikat dari Google Drive: isian "Tautan Google Drive" di formulir capaian menerima tautan berbagi atau kode sematan, menyimpan bentuk baku, dan menampilkan pratinjau berkas di halaman detail. Kartu di beranda dan arsip mendapat tombol "Lihat bukti" yang langsung menuju pratinjau
 - Halaman Media sosial (`/media-sosial/`, `/en/social/`) berisi postingan Instagram, Facebook, dan LinkedIn yang dikelompokkan per topik, misalnya program yang sedang didampingi
 - Koneksi Instagram (akun Creator atau Business) dan Facebook (profil pribadi) di Pengaturan, Media sosial lewat OAuth. Postingan dan gambarnya ditarik ke koleksi baru Postingan media sosial sebagai data privat, lewat tombol Tarik sekarang atau cron harian `POST /cron/social/`. Token disimpan terenkripsi dan tidak pernah tampil di situs
 - Impor postingan LinkedIn dari `Shares.csv` hasil ekspor data LinkedIn
 - Aturan topik otomatis (`kata kunci | Nama topik`) dan pembersihan caption: emoji, em dash, ampersand, dan blok tagar
 - Ekspor dan impor lembar kerja untuk setiap koleksi CMS: unduh Excel berisi semua data dan lembar petunjuk, isi sel yang kosong, lalu unggah kembali (.xlsx atau .csv). Impor menampilkan pratinjau per baris sebelum menyimpan, sel kosong tidak mengubah data, dan semua validasi CMS tetap berlaku
+
+### Diubah
+
+- Tautan postingan media sosial kini opsional, karena ekspor Meta tidak memuatnya. Postingan tanpa tautan hanya bisa dijadikan public bila tautan profil platformnya terisi
+- Tarikan lewat API Meta tidak dipakai lagi: aplikasi Meta baru diarahkan ke Unified login yang mewajibkan portofolio bisnis, dan Instagram Login tidak lagi tersedia untuk aplikasi baru. Kode OAuth tetap ada dan hanya aktif bila variabel `INSTAGRAM_*` atau `FACEBOOK_*` diisi
 
 ## [2.0.0] - 2026-10-29
 

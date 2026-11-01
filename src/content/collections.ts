@@ -207,7 +207,8 @@ export const collections: CollectionConfig[] = [
     title: (d) => captionTitle(loc(d.caption)) || s(d.url),
     subtitle: (d) => {
       const platform = s(d.platform) as SocialPlatform;
-      return [socialPlatformLabels[platform] ?? platform, s(d.topic), dateText(d.date)].filter((x) => x !== "").join(" | ");
+      const review = s(d.importNote) !== "" ? "perlu diperiksa" : "";
+      return [socialPlatformLabels[platform] ?? platform, s(d.topic), dateText(d.date), review].filter((x) => x !== "").join(" | ");
     },
     fields: [
       {
@@ -227,7 +228,13 @@ export const collections: CollectionConfig[] = [
         placeholder: "Program PIJAK",
         help: "Pengelompokan di halaman Media sosial. Diisi otomatis oleh aturan topik di Pengaturan, Media sosial.",
       },
-      { name: "url", label: "Tautan postingan", type: "url", required: true, placeholder: "https://www.instagram.com/p/..." },
+      {
+        name: "url",
+        label: "Tautan postingan",
+        type: "url",
+        placeholder: "https://www.instagram.com/p/...",
+        help: "Ekspor Instagram dan Facebook tidak memuat tautan postingan. Bila kosong, kartu di situs menaut ke tautan profil di Pengaturan, Media sosial.",
+      },
       { name: "sourceId", label: "ID sumber", type: "text", help: "Diisi otomatis saat ditarik, mencegah postingan yang sama masuk dua kali. Biarkan apa adanya." },
       {
         name: "caption",
@@ -237,6 +244,12 @@ export const collections: CollectionConfig[] = [
         rows: 6,
         required: true,
         help: "Teks asli dari platform, tanpa emoji dan blok tagar. Rapikan atau ringkas sebelum dijadikan public; versi Inggris boleh menyusul.",
+      },
+      {
+        name: "importNote",
+        label: "Catatan impor",
+        type: "textarea",
+        help: "Diisi otomatis saat impor ekspor, misalnya audiens Facebook yang tidak tercatat. Hanya terlihat di CMS. Kosongkan setelah diperiksa.",
       },
       { name: "tags", label: "Tagar", type: "list", help: "Tanpa tanda pagar, satu per baris. Hanya untuk aturan topik, tidak tampil di situs." },
       { name: "fileId", label: "Gambar", type: "file", help: "Disalin otomatis dari postingan saat ditarik. PNG, JPG, atau WebP, maksimal 5 MB." },
@@ -641,8 +654,32 @@ export const settingsConfigs: SettingsConfig[] = [
     key: "social",
     label: "Media sosial",
     description:
-      "Hubungkan Instagram dan Facebook supaya postingan Anda bisa ditarik ke CMS, atau impor postingan LinkedIn dari ekspor data. Koneksi dan token hanya tersimpan di CMS dan tidak pernah tampil di situs. Postingan yang ditarik selalu masuk sebagai data privat.",
+      "Impor postingan Instagram, Facebook, dan LinkedIn dari berkas ekspor data. Hasil impor selalu masuk sebagai data privat; periksa lalu jadikan public satu per satu. Tautan profil di bawah menjadi tujuan kartu postingan yang tidak punya tautan sendiri.",
     fields: [
+      {
+        name: "profiles.instagram",
+        width: "third",
+        label: "Tautan profil Instagram",
+        type: "url",
+        placeholder: "https://www.instagram.com/ahmadngiliyun00/",
+        help: "Tujuan kartu Instagram yang tidak punya tautan postingan.",
+      },
+      {
+        name: "profiles.facebook",
+        width: "third",
+        label: "Tautan profil Facebook",
+        type: "url",
+        placeholder: "https://www.facebook.com/...",
+        help: "Tujuan kartu Facebook yang tidak punya tautan postingan.",
+      },
+      {
+        name: "profiles.linkedin",
+        width: "third",
+        label: "Tautan profil LinkedIn",
+        type: "url",
+        placeholder: "https://www.linkedin.com/in/...",
+        help: "Tujuan kartu LinkedIn yang tidak punya tautan postingan.",
+      },
       {
         name: "topicRules",
         label: "Aturan topik",
@@ -653,7 +690,7 @@ export const settingsConfigs: SettingsConfig[] = [
       {
         name: "facebookAll",
         width: "full",
-        label: "Tarik juga postingan Facebook yang tidak publik",
+        label: "Tarikan API: tarik juga postingan Facebook yang tidak publik",
         type: "boolean",
         help: "Bawaan hanya postingan dengan audiens Publik. Postingan untuk teman saja sebaiknya tidak dipajang di situs.",
       },

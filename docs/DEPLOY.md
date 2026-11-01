@@ -156,24 +156,50 @@ Biarkan isian verifikasi tetap terpasang setelah berhasil, karena Google memerik
 
 ## 9. Media sosial (opsional)
 
-Postingan Instagram, Facebook, dan LinkedIn Mas Ilyun bisa ditarik ke CMS lalu ditampilkan di halaman `/media-sosial/` (`/en/social/`). Koneksi hanya untuk membaca postingan milik sendiri, tidak pernah memposting. Token disimpan terenkripsi di tabel `settings` dan tidak pernah tampil di situs. Semua postingan yang ditarik masuk sebagai data **privat**; Mas Ilyun memeriksa dan menjadikannya public satu per satu.
+Postingan Instagram, Facebook, dan LinkedIn Mas Ilyun dimasukkan ke CMS lalu ditampilkan di halaman `/media-sosial/` (`/en/social/`). Semua hasil impor masuk sebagai data **privat**; Mas Ilyun memeriksa dan menjadikannya public satu per satu.
 
-| Platform | Cara | Syarat |
+| Platform | Cara | Catatan |
 | --- | --- | --- |
-| Instagram | Tarik otomatis (Instagram API with Instagram Login) | Akun Creator atau Business |
-| Facebook | Tarik otomatis (Facebook Login, izin `user_posts`) | Profil pribadi; token berlaku sekitar 60 hari lalu dihubungkan ulang |
-| LinkedIn | Impor `Shares.csv` dari ekspor data | LinkedIn tidak mengizinkan aplikasi membaca postingan profil pribadi |
+| Instagram | Impor ZIP ekspor data (format JSON) | Postingan feed dan carousel; story dan repost tidak ikut |
+| Facebook | Impor ZIP ekspor data (format JSON) | Ekspor tidak mencatat audiens, jadi setiap postingan diberi peringatan |
+| LinkedIn | Impor ZIP arsip data, atau `Shares.csv` saja | Arsip harus memuat Posts |
 
-Callback OAuth Meta wajib https, jadi langkah a sampai d dilakukan setelah situs bisa dibuka di `https://ngiliyun.my.id`. Nama menu di dasbor Meta kadang berubah; bila berbeda, cari padanannya.
+**Status API (November 2026).** Aplikasi Meta baru diarahkan ke Unified login yang mewajibkan portofolio bisnis, dan **Instagram Login (Instagram API with Instagram Login) tidak lagi tersedia untuk aplikasi baru**. Karena itu tarikan otomatis lewat API tidak dipakai dan keempat variabel `INSTAGRAM_*` dan `FACEBOOK_*` dibiarkan kosong. Kode OAuth tetap ada dan hanya aktif bila variabel itu diisi (lihat **Lampiran: tarikan lewat API** di akhir bagian ini).
 
-**a. Ubah Instagram menjadi akun Creator (gratis).** Di aplikasi Instagram: Profil, menu garis tiga, Pengaturan dan aktivitas, **Jenis akun dan alat**, **Beralih ke akun profesional**, pilih **Kreator**, lalu pilih kategori (misalnya Pendidik). Catatan: akun profesional selalu publik dan tidak bisa dikunci. Bisa dikembalikan ke akun pribadi kapan saja, tetapi koneksi ke situs akan berhenti.
+**a. Minta ekspor dari Instagram dan Facebook.** Di aplikasi atau situs Instagram atau Facebook: **Pusat Akun**, **Informasi dan izin Anda**, **Ekspor informasi Anda**, **Buat ekspor**. Pilih akun, **Ekspor ke perangkat**, lalu:
 
-**b. Buat aplikasi Meta.** Buka <https://developers.facebook.com/apps>, **Create app**. Satu aplikasi cukup untuk keduanya. Biarkan mode aplikasi **Development**: akun yang menjadi admin aplikasi boleh memakai izinnya tanpa App Review, dan itu cukup karena yang dibaca hanya akun Mas Ilyun sendiri.
+- Informasi: cukup **Postingan** atau **Media** (untuk Facebook: Posts). Tidak perlu pesan, komentar, atau aktivitas lain
+- Format: **JSON** (bukan HTML). Ekspor HTML ditolak CMS dengan pesan yang menjelaskan hal ini
+- Kualitas media: bebas. Rentang tanggal: sesuai kebutuhan
+
+Setelah notifikasi dari Meta datang (biasanya beberapa menit sampai sehari), unduh ZIP-nya dalam 4 hari. Jangan diekstrak.
+
+**b. Impor di CMS.** Pengaturan, **Media sosial**, kartu **Impor dari ekspor data**: pilih ZIP-nya. Peramban membaca isi ZIP dan menampilkan ringkasan (jumlah postingan, yang bergambar, dan yang dilewati), lalu klik **Impor**.
+
+- ZIP dibaca di peramban dan tidak dikirim utuh ke server, jadi arsip ratusan MB tetap aman terhadap batas Server Action (6 MB) dan Nginx (8 MB). Server hanya menerima daftar postingan (teks, waktu, ID) lalu gambar sampul satu per satu, paling besar 5 MB. Gambar yang lebih besar atau berformat lain diperkecil ke JPEG di peramban. Butuh Chrome, Edge, Firefox, atau Safari versi terbaru
+- Gambar sampul disimpan lewat `saveUpload` ke `UPLOAD_DIR`. Carousel hanya menyalin gambar pertama; video hanya dicatat tanpa berkas (unggah sampul manual bila perlu)
+- Teks rusak dari Meta (UTF-8 yang di-escape per byte, terlihat seperti `Ã°ÂŸÂš€`) diperbaiki dulu, lalu lewat pembersihan caption (emoji, em dash, ampersand, blok tagar) dan aturan topik
+- Instagram memakai ID postingan dari ekspor. Facebook tidak punya ID postingan, jadi ID dibuat dari waktu posting dan nama berkas media pertama (atau hash teks untuk postingan tanpa media). Impor ulang ZIP yang sama tidak membuat data ganda, melengkapi gambar yang belum tersalin (hanya data yang masih privat), dan postingan yang pernah dihapus di CMS tidak masuk lagi
+- Facebook: postingan yang ditulis di profil orang lain, postingan orang lain, serta berbagi tanpa teks dan tanpa gambar sendiri dilewati. Sisanya diberi **Catatan impor** (terlihat di formulir dan ditandai "perlu diperiksa" di daftar): audiens tidak tercatat, dibagikan ke grup, tautan yang dibagikan, atau teksnya sama dengan postingan Instagram yang sudah ada
+
+**c. LinkedIn.** LinkedIn, Settings, Data privacy, **Get a copy of your data**. Pilih arsip lengkap, atau centang **Posts**. Arsip yang hanya memuat Articles dan Profile (berkas `Profile.csv` saja) ditolak karena tidak berisi postingan. Unggah ZIP-nya di kartu yang sama, atau ekstrak dan unggah `Shares.csv` di kartu LinkedIn. Gambar LinkedIn tidak ikut; unggah manual bila perlu.
+
+**d. Tautan profil dan aturan topik.** Ekspor Meta tidak memuat tautan postingan, jadi isian Tautan postingan boleh kosong. Isi **Tautan profil Instagram**, **Facebook**, dan **LinkedIn** di Pengaturan, Media sosial: kartu tanpa tautan postingan menaut ke profil itu. Postingan tanpa tautan postingan hanya bisa dijadikan public bila tautan profil platformnya terisi. Tautan postingan asli tetap bisa ditempel kapan saja (Bagikan, Salin tautan di aplikasi).
+
+Isi **Aturan topik** supaya postingan langsung terkelompok, misalnya `pijak | Program PIJAK`. Postingan yang tagar atau teksnya memuat kata kunci itu mendapat topik tersebut dan tampil sebagai bagian sendiri di halaman Media sosial. Aturan berlaku untuk postingan yang baru diimpor.
+
+**e. Sebelum menjadikan public.** Buka Kabar, **Postingan media sosial**. Periksa setiap postingan: baca Catatan impor lalu kosongkan setelah diperiksa, rapikan teks (postingan tanpa teks wajib diberi teks), isi teks alternatif gambar, dan pastikan tidak ada data mahasiswa atau peserta yang belum setuju dipublikasikan, orang yang disebut namanya, urusan internal kampus, atau detail sistem internal (lihat aturan privasi di `CLAUDE.md`). Postingan yang dihapus di CMS diingat dan tidak diimpor lagi.
+
+**Lampiran: tarikan lewat API (tidak aktif).** Hanya untuk aplikasi Meta yang masih punya akses Instagram Login atau Facebook Login dengan izin `user_posts`. Callback OAuth wajib https. Nama menu di dasbor Meta sering berubah.
+
+**API 1. Ubah Instagram menjadi akun Creator (gratis).** Di aplikasi Instagram: Profil, menu garis tiga, Pengaturan dan aktivitas, **Jenis akun dan alat**, **Beralih ke akun profesional**, pilih **Kreator**, lalu pilih kategori (misalnya Pendidik). Catatan: akun profesional selalu publik dan tidak bisa dikunci. Bisa dikembalikan ke akun pribadi kapan saja, tetapi koneksi ke situs akan berhenti.
+
+**API 2. Buat aplikasi Meta.** Buka <https://developers.facebook.com/apps>, **Create app**. Satu aplikasi cukup untuk keduanya. Biarkan mode aplikasi **Development**: akun yang menjadi admin aplikasi boleh memakai izinnya tanpa App Review, dan itu cukup karena yang dibaca hanya akun Mas Ilyun sendiri.
 
 1. Instagram: tambahkan use case **Manage messaging and content on Instagram**, buka **API setup with Instagram login**. Salin **Instagram app ID** dan **Instagram app secret** (berbeda dari App ID Facebook). Di **Set up Instagram business login**, isi Redirect URL `https://ngiliyun.my.id/admin/auth/instagram/callback/` (dengan garis miring di akhir). Tambahkan akun Instagram Mas Ilyun sebagai **Instagram Tester** di App roles, lalu terima undangannya di Instagram (Pengaturan, Izin situs web, Undangan penguji)
 2. Facebook: tambahkan use case **Authenticate and request data from users with Facebook Login**, lalu di Permissions tambahkan `user_posts`. Di **Facebook Login, Settings**, isi Valid OAuth Redirect URIs `https://ngiliyun.my.id/admin/auth/facebook/callback/`. App ID dan App secret ada di **App settings, Basic**
 
-**c. Isi `.env.production.local`, lalu `pm2 reload ngiliyun --update-env`.**
+**API 3. Isi `.env.production.local`, lalu `pm2 reload ngiliyun --update-env`.**
 
 ```
 INSTAGRAM_APP_ID=...
@@ -185,21 +211,15 @@ SOCIAL_CRON_SECRET=   # openssl rand -hex 32
 
 Kunci enkripsi token diturunkan dari rahasia aplikasi. Bila rahasia aplikasi diganti (Reset di dasbor Meta), token lama tidak bisa dibaca lagi; cukup klik Hubungkan ulang di CMS.
 
-**d. Hubungkan dan tarik.** CMS, Pengaturan, **Media sosial**: klik **Hubungkan** di kartu Instagram dan Facebook, setujui di layar izin, lalu klik **Tarik sekarang**. Satu kali tarik mengambil paling banyak 30 postingan baru beserta gambarnya (disalin ke `UPLOAD_DIR`, karena tautan gambar dari Meta kedaluwarsa); tekan lagi untuk postingan yang lebih lama. Facebook bawaannya hanya menarik postingan berpemirsa Publik.
+**API 4. Hubungkan dan tarik.** CMS, Pengaturan, **Media sosial**, bagian **Tarik otomatis lewat API**: klik **Hubungkan** di kartu Instagram dan Facebook, setujui di layar izin, lalu klik **Tarik sekarang**. Satu kali tarik mengambil paling banyak 30 postingan baru beserta gambarnya (disalin ke `UPLOAD_DIR`, karena tautan gambar dari Meta kedaluwarsa); tekan lagi untuk postingan yang lebih lama. Facebook bawaannya hanya menarik postingan berpemirsa Publik.
 
-Isi **Aturan topik** supaya postingan langsung terkelompok, misalnya `pijak | Program PIJAK`. Postingan yang tagar atau teksnya memuat kata kunci itu mendapat topik tersebut dan tampil sebagai bagian sendiri di halaman Media sosial.
-
-**e. Tarikan otomatis harian (disarankan).** Selain mengambil postingan baru, cron ini memperpanjang token Instagram sehingga koneksinya tidak pernah kedaluwarsa. aaPanel: Cron, Shell Script, setiap hari:
+**API 5. Tarikan otomatis harian.** Selain mengambil postingan baru, cron ini memperpanjang token Instagram sehingga koneksinya tidak pernah kedaluwarsa. aaPanel: Cron, Shell Script, setiap hari:
 
 ```bash
 curl -fsS -X POST -H "Authorization: Bearer ISI_SOCIAL_CRON_SECRET" https://ngiliyun.my.id/cron/social/
 ```
 
 Rute `/cron/social/` mati bila `SOCIAL_CRON_SECRET` kosong atau kurang dari 32 karakter, dan diblokir di `robots.txt`.
-
-**f. LinkedIn.** LinkedIn, Settings, Data privacy, **Get a copy of your data**, pilih Posts (atau semua data). Setelah email dari LinkedIn datang (biasanya beberapa menit sampai sehari), unduh arsipnya, ekstrak, lalu unggah `Shares.csv` di kartu LinkedIn pada Pengaturan, Media sosial. Ulangi kapan saja; postingan yang sudah ada tidak dobel. Gambar LinkedIn tidak ikut, unggah manual bila perlu.
-
-**g. Sebelum menjadikan public.** Buka Kabar, **Postingan media sosial**. Periksa setiap postingan: rapikan teks, isi teks alternatif gambar, dan pastikan tidak ada data mahasiswa atau peserta yang belum setuju dipublikasikan, urusan internal kampus, atau detail sistem internal (lihat aturan privasi di `CLAUDE.md`). Emoji, em dash, dan ampersand sudah dibersihkan otomatis saat ditarik. Postingan yang dihapus di CMS diingat dan tidak ditarik lagi.
 
 ## Memperbarui
 
