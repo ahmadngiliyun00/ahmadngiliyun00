@@ -148,6 +148,30 @@ export type Post = {
   comments?: boolean; // kolom komentar di halaman tulisan
 };
 
+// ---------- Media sosial ----------
+
+// Postingan dari akun media sosial Mas Ilyun sendiri. Instagram dan Facebook ditarik otomatis
+// lewat koneksi di Pengaturan, Media sosial; LinkedIn lewat impor CSV ekspor data atau diisi manual.
+export type SocialPlatform = "instagram" | "facebook" | "linkedin";
+
+export type SocialPost = {
+  platform: SocialPlatform;
+  date: PartialDate | null;
+  caption: Localized<string>; // teks postingan, sudah dibersihkan dari emoji, em dash, dan ampersand
+  url: string; // tautan ke postingan asli
+  topic?: string; // pengelompokan di halaman Media sosial, misalnya nama program
+  tags?: string[]; // tagar dari postingan asli, tanpa tanda pagar
+  fileId?: string; // gambar postingan, disalin ke UPLOAD_DIR
+  imageAlt?: Localized<string>;
+  sourceId?: string; // ID postingan di platform asal, mencegah tarikan ganda
+};
+
+// Pengaturan Media sosial yang boleh diubah lewat formulir CMS.
+export type SocialSettings = {
+  topicRules?: string[]; // "kata kunci | Nama topik", satu aturan per baris
+  facebookAll?: boolean; // tarik juga postingan Facebook yang tidak publik (bawaan: hanya publik)
+};
+
 // onHome: tampil di Kontak beranda. Bila belum pernah disimpan, LinkedIn, GitHub, ORCID, dan YouTube
 // tampil (DEFAULT_CONTACT_CHANNELS di src/lib/home.ts).
 export type Channel = { label: string; handle: string; href: string; note: Localized<string>; onHome?: boolean };
@@ -199,6 +223,7 @@ export type SeoSettings = {
   research?: PageSeo; // /riset/ dan /en/research/
   teaching?: PageSeo; // /mengajar/ dan /en/teaching/
   journey?: PageSeo; // /perjalanan/ dan /en/journey/
+  social?: PageSeo; // /media-sosial/ dan /en/social/
   keywords?: Localized<string[]>;
   googleVerification?: string; // isi content dari meta google-site-verification
   googleHtmlFile?: string; // nama berkas verifikasi HTML, misalnya google1a2b3c4d5e6f7a8b.html
@@ -230,6 +255,7 @@ export type CollectionData = {
   plan: Plan;
   principle: Principle;
   post: Post;
+  social: SocialPost;
 };
 
 export type CollectionKey = keyof CollectionData;
@@ -278,6 +304,12 @@ export const postKindLabels: Record<PostKind, Localized<string>> = {
   liputan: { id: "Liputan media", en: "Press coverage" },
   tulisan: { id: "Tulisan", en: "Article" },
   kabar: { id: "Kabar", en: "Update" },
+};
+
+export const socialPlatformLabels: Record<SocialPlatform, string> = {
+  instagram: "Instagram",
+  facebook: "Facebook",
+  linkedin: "LinkedIn",
 };
 
 export const authorshipLabels: Record<Authorship, Localized<string>> = {

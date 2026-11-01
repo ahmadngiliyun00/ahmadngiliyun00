@@ -22,6 +22,7 @@ function pages(lang) {
     research: { title: t.pages.research.metaTitle, description: t.pages.research.metaDescription },
     teaching: { title: t.pages.teaching.metaTitle, description: t.pages.teaching.metaDescription },
     journey: { title: t.pages.journey.metaTitle, description: t.pages.journey.metaDescription },
+    social: { title: t.pages.social.metaTitle, description: t.pages.social.metaDescription },
   };
 }
 

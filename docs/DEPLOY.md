@@ -154,6 +154,53 @@ Biarkan isian verifikasi tetap terpasang setelah berhasil, karena Google memerik
 
 **d. Bing Webmaster (opsional).** Di <https://www.bing.com/webmasters>, cara tercepat adalah Import dari Google Search Console. Bila memilih tag meta, tempel tag `msvalidate.01` ke isian Bing Webmaster di CMS.
 
+## 9. Media sosial (opsional)
+
+Postingan Instagram, Facebook, dan LinkedIn Mas Ilyun bisa ditarik ke CMS lalu ditampilkan di halaman `/media-sosial/` (`/en/social/`). Koneksi hanya untuk membaca postingan milik sendiri, tidak pernah memposting. Token disimpan terenkripsi di tabel `settings` dan tidak pernah tampil di situs. Semua postingan yang ditarik masuk sebagai data **privat**; Mas Ilyun memeriksa dan menjadikannya public satu per satu.
+
+| Platform | Cara | Syarat |
+| --- | --- | --- |
+| Instagram | Tarik otomatis (Instagram API with Instagram Login) | Akun Creator atau Business |
+| Facebook | Tarik otomatis (Facebook Login, izin `user_posts`) | Profil pribadi; token berlaku sekitar 60 hari lalu dihubungkan ulang |
+| LinkedIn | Impor `Shares.csv` dari ekspor data | LinkedIn tidak mengizinkan aplikasi membaca postingan profil pribadi |
+
+Callback OAuth Meta wajib https, jadi langkah a sampai d dilakukan setelah situs bisa dibuka di `https://ngiliyun.my.id`. Nama menu di dasbor Meta kadang berubah; bila berbeda, cari padanannya.
+
+**a. Ubah Instagram menjadi akun Creator (gratis).** Di aplikasi Instagram: Profil, menu garis tiga, Pengaturan dan aktivitas, **Jenis akun dan alat**, **Beralih ke akun profesional**, pilih **Kreator**, lalu pilih kategori (misalnya Pendidik). Catatan: akun profesional selalu publik dan tidak bisa dikunci. Bisa dikembalikan ke akun pribadi kapan saja, tetapi koneksi ke situs akan berhenti.
+
+**b. Buat aplikasi Meta.** Buka <https://developers.facebook.com/apps>, **Create app**. Satu aplikasi cukup untuk keduanya. Biarkan mode aplikasi **Development**: akun yang menjadi admin aplikasi boleh memakai izinnya tanpa App Review, dan itu cukup karena yang dibaca hanya akun Mas Ilyun sendiri.
+
+1. Instagram: tambahkan use case **Manage messaging and content on Instagram**, buka **API setup with Instagram login**. Salin **Instagram app ID** dan **Instagram app secret** (berbeda dari App ID Facebook). Di **Set up Instagram business login**, isi Redirect URL `https://ngiliyun.my.id/admin/auth/instagram/callback/` (dengan garis miring di akhir). Tambahkan akun Instagram Mas Ilyun sebagai **Instagram Tester** di App roles, lalu terima undangannya di Instagram (Pengaturan, Izin situs web, Undangan penguji)
+2. Facebook: tambahkan use case **Authenticate and request data from users with Facebook Login**, lalu di Permissions tambahkan `user_posts`. Di **Facebook Login, Settings**, isi Valid OAuth Redirect URIs `https://ngiliyun.my.id/admin/auth/facebook/callback/`. App ID dan App secret ada di **App settings, Basic**
+
+**c. Isi `.env.production.local`, lalu `pm2 reload ngiliyun --update-env`.**
+
+```
+INSTAGRAM_APP_ID=...
+INSTAGRAM_APP_SECRET=...
+FACEBOOK_APP_ID=...
+FACEBOOK_APP_SECRET=...
+SOCIAL_CRON_SECRET=   # openssl rand -hex 32
+```
+
+Kunci enkripsi token diturunkan dari rahasia aplikasi. Bila rahasia aplikasi diganti (Reset di dasbor Meta), token lama tidak bisa dibaca lagi; cukup klik Hubungkan ulang di CMS.
+
+**d. Hubungkan dan tarik.** CMS, Pengaturan, **Media sosial**: klik **Hubungkan** di kartu Instagram dan Facebook, setujui di layar izin, lalu klik **Tarik sekarang**. Satu kali tarik mengambil paling banyak 30 postingan baru beserta gambarnya (disalin ke `UPLOAD_DIR`, karena tautan gambar dari Meta kedaluwarsa); tekan lagi untuk postingan yang lebih lama. Facebook bawaannya hanya menarik postingan berpemirsa Publik.
+
+Isi **Aturan topik** supaya postingan langsung terkelompok, misalnya `pijak | Program PIJAK`. Postingan yang tagar atau teksnya memuat kata kunci itu mendapat topik tersebut dan tampil sebagai bagian sendiri di halaman Media sosial.
+
+**e. Tarikan otomatis harian (disarankan).** Selain mengambil postingan baru, cron ini memperpanjang token Instagram sehingga koneksinya tidak pernah kedaluwarsa. aaPanel: Cron, Shell Script, setiap hari:
+
+```bash
+curl -fsS -X POST -H "Authorization: Bearer ISI_SOCIAL_CRON_SECRET" https://ngiliyun.my.id/cron/social/
+```
+
+Rute `/cron/social/` mati bila `SOCIAL_CRON_SECRET` kosong atau kurang dari 32 karakter, dan diblokir di `robots.txt`.
+
+**f. LinkedIn.** LinkedIn, Settings, Data privacy, **Get a copy of your data**, pilih Posts (atau semua data). Setelah email dari LinkedIn datang (biasanya beberapa menit sampai sehari), unduh arsipnya, ekstrak, lalu unggah `Shares.csv` di kartu LinkedIn pada Pengaturan, Media sosial. Ulangi kapan saja; postingan yang sudah ada tidak dobel. Gambar LinkedIn tidak ikut, unggah manual bila perlu.
+
+**g. Sebelum menjadikan public.** Buka Kabar, **Postingan media sosial**. Periksa setiap postingan: rapikan teks, isi teks alternatif gambar, dan pastikan tidak ada data mahasiswa atau peserta yang belum setuju dipublikasikan, urusan internal kampus, atau detail sistem internal (lihat aturan privasi di `CLAUDE.md`). Emoji, em dash, dan ampersand sudah dibersihkan otomatis saat ditarik. Postingan yang dihapus di CMS diingat dan tidak ditarik lagi.
+
 ## Memperbarui
 
 ```bash

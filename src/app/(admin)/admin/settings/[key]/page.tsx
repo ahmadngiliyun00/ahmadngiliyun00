@@ -4,6 +4,7 @@ import AdminShell from "@/components/admin/AdminShell";
 import EntryForm from "@/components/admin/EntryForm";
 import MailTest from "@/components/admin/MailTest";
 import SeoPreview from "@/components/admin/SeoPreview";
+import SocialConnections from "@/components/admin/SocialConnections";
 import type { FieldValue } from "@/components/admin/FieldInput";
 import { formLabels } from "@/components/admin/labels";
 import { getSettingsConfig } from "@/content/collections";
@@ -19,9 +20,9 @@ export const dynamic = "force-dynamic";
 type SeoPaths = Record<SeoPage, Record<"id" | "en", string>>;
 type SeoDefaults = Record<SeoPage, Record<"id" | "en", { title: string; description: string }>>;
 
-type Props = { params: Promise<{ key: string }> };
+type Props = { params: Promise<{ key: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> };
 
-export default async function AdminSettings({ params }: Props) {
+export default async function AdminSettings({ params, searchParams }: Props) {
   const session = await requireAdmin();
   const cfg = getSettingsConfig((await params).key);
   if (cfg === undefined) notFound();
@@ -46,6 +47,7 @@ export default async function AdminSettings({ params }: Props) {
           labels={adminCopy.settings.seo.preview}
         />
       ) : null}
+      {cfg.key === "social" ? <SocialConnections flash={flashParams(await searchParams)} /> : null}
       <div className="mt-8">
         <EntryForm
           action={saveSettingsAction}
@@ -60,6 +62,12 @@ export default async function AdminSettings({ params }: Props) {
       {cfg.key === "mail" ? <MailTest labels={adminCopy.settings.mail} /> : null}
     </AdminShell>
   );
+}
+
+// Penanda toast setelah kembali dari layar izin media sosial.
+function flashParams(sp: Record<string, string | string[] | undefined>) {
+  const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : undefined);
+  return { social: one(sp.social), platform: one(sp.platform), message: one(sp.message) };
 }
 
 // Alamat yang diminta Search Console, supaya tidak perlu diketik ulang.

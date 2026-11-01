@@ -16,6 +16,9 @@ import { sendTestMail } from "@/server/mail";
 import { deleteComment, setCommentReply, setCommentStatus, type CommentStatus } from "@/server/comments";
 import { deleteMessage, setMessageStatus, type MessageStatus } from "@/server/messages";
 import { applyImport, planImport, readUpload, type ImportPlan, type ImportResult } from "@/server/transfer";
+import { isAutoPlatform } from "@/server/social/config";
+import { removeConnection } from "@/server/social/store";
+import { importLinkedin, syncPlatform } from "@/server/social/sync";
 import {
   createShare,
   deleteEntry,
@@ -208,6 +211,48 @@ export async function sendTestMailAction(_prev: FormState, _form: FormData): Pro
   await requireAdmin();
   const res = await sendTestMail();
   return { ok: res.ok, message: res.message };
+}
+
+// ---------- Media sosial ----------
+
+// Tarik postingan baru dari satu akun yang terhubung. Hasilnya selalu data privat.
+export async function syncSocialAction(_prev: FormState, form: FormData): Promise<FormState> {
+  await requireAdmin();
+  const platform = form.get("platform");
+  if (!isAutoPlatform(platform)) return { message: "Platform tidak dikenal." };
+  const report = await syncPlatform(platform);
+  revalidatePath("/admin", "layout");
+  if (report.error) return { message: report.error };
+  if (report.added === 0) return { ok: true, message: "Tidak ada postingan baru." };
+  const more = report.more ? " Masih ada postingan lama, tekan Tarik sekarang lagi untuk melanjutkan." : "";
+  return { ok: true, message: `${report.added} postingan baru masuk sebagai data privat.${more}` };
+}
+
+export async function disconnectSocialAction(form: FormData) {
+  await requireAdmin();
+  const platform = form.get("platform");
+  if (!isAutoPlatform(platform)) throw new Error("Platform tidak dikenal");
+  await removeConnection(platform);
+  redirect(`/admin/settings/social/?${new URLSearchParams({ social: "disconnected", platform }).toString()}`);
+}
+
+// Impor Shares.csv dari ekspor data LinkedIn.
+export async function importLinkedinAction(_prev: FormState, form: FormData): Promise<FormState> {
+  await requireAdmin();
+  const file = form.get("shares");
+  if (!(file instanceof File) || file.size === 0) return { message: "Pilih berkas Shares.csv lebih dulu." };
+  if (!/\.csv$/i.test(file.name)) return { message: "Unggah berkas Shares.csv dari ekspor data LinkedIn, bukan arsip zip-nya." };
+  try {
+    const rows = await readUpload(file);
+    const res = await importLinkedin(rows);
+    revalidatePath("/admin", "layout");
+    const extra = [res.existing > 0 ? `${res.existing} sudah ada` : "", res.skipped > 0 ? `${res.skipped} baris tanpa tautan postingan` : ""]
+      .filter((x) => x !== "")
+      .join(", ");
+    return { ok: true, message: `${res.added} postingan LinkedIn masuk sebagai data privat.${extra ? ` Dilewati: ${extra}.` : ""}` };
+  } catch (err) {
+    return { message: (err as Error).message };
+  }
 }
 
 // ---------- Pesan masuk ----------

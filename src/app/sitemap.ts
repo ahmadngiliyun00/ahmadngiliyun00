@@ -40,6 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     research: achievements.filter((e) => ["publikasi", "hibah", "reviewer"].includes(e.data.kind)),
     teaching: [...content.institution, ...content.course, ...content.term, ...content.focus],
     journey: [...content.milestone, ...content.plan, ...content.principle],
+    social: content.social,
   };
   const innerPages = PAGE_KEYS.flatMap((page) => pair(pagePath("id", page), pagePath("en", page), latest(sources[page])));
   const postPages = posts.flatMap((p) =>

@@ -11,6 +11,8 @@ import { sha256 } from "@/server/auth/session";
 import { invalidateSite, primaryLang, rowToEntry } from "@/server/content";
 import { deleteEntryFiles, deleteFile, saveUpload, syncInlineFiles } from "@/server/files";
 import { sanitizeRichText } from "@/server/richtext";
+import { ignorePost } from "@/server/social/store";
+import { parseTopicRules } from "@/lib/social";
 
 // Lapisan tulis konten untuk CMS. Pemanggil (Server Action) WAJIB sudah memanggil requireAdmin().
 
@@ -45,6 +47,15 @@ async function checkRules(
     }
     if (visibility === "public") {
       if (data.date === null) errors.date = "Data public wajib punya tanggal terbit.";
+    }
+    return;
+  }
+  if (collection === "social") {
+    if (visibility === "public") {
+      if (data.date === null || data.date === undefined) errors.date = "Data public wajib punya tanggal posting.";
+      const caption = (data.caption ?? {}) as Record<string, string>;
+      const primary = await primaryLang();
+      if ((caption[primary] ?? "").trim() === "") errors.caption = "Teks postingan wajib diisi sebelum dijadikan public.";
     }
     return;
   }
@@ -244,6 +255,12 @@ export async function deleteEntry(id: number) {
     await db.delete(comments).where(eq(comments.entryId, id));
     await db.delete(postViews).where(eq(postViews.entryId, id));
   }
+  // Postingan hasil tarikan yang dihapus diingat, supaya tidak masuk lagi pada tarikan berikutnya.
+  if (row.collection === "social") {
+    if (typeof d.platform === "string") {
+      if (typeof d.sourceId === "string") await ignorePost(`${d.platform}:${d.sourceId}`);
+    }
+  }
   invalidateSite();
 }
 
@@ -321,6 +338,10 @@ export async function saveSettings(key: string, form: FormData): Promise<SaveRes
   }
   if (key === "seo") checkSeo(data, errors);
   if (key === "mail") checkMail(data, errors);
+  if (key === "social") {
+    const bad = parseTopicRules(Array.isArray(data.topicRules) ? (data.topicRules as string[]) : []).errors;
+    if (bad.length > 0) errors.topicRules = `Aturan topik: format "kata kunci | Nama topik", periksa baris "${bad[0]}".`;
+  }
   if (Object.keys(errors).length > 0) return { ok: false, errors, message: "Periksa kembali isian yang ditandai." };
   const now = new Date();
   if (rows.length === 0) await db.insert(settings).values({ key, value: data, updatedAt: now });

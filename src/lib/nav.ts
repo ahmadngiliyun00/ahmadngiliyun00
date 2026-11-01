@@ -4,15 +4,16 @@ import { archivePath } from "@/lib/achievements";
 import { postsPath } from "@/lib/posts";
 
 // Halaman dalam yang dipindah dari beranda. Slug mengikuti pola /sertifikat/ dan /en/certificates/.
-export type PageKey = "projects" | "research" | "teaching" | "journey";
+export type PageKey = "projects" | "research" | "teaching" | "journey" | "social";
 
-export const PAGE_KEYS: PageKey[] = ["projects", "research", "teaching", "journey"];
+export const PAGE_KEYS: PageKey[] = ["projects", "research", "teaching", "journey", "social"];
 
 const PAGE_SLUGS: Record<PageKey, Record<Lang, string>> = {
   projects: { id: "proyek", en: "projects" },
   research: { id: "riset", en: "research" },
   teaching: { id: "mengajar", en: "teaching" },
   journey: { id: "perjalanan", en: "journey" },
+  social: { id: "media-sosial", en: "social" },
 };
 
 export function homePath(lang: Lang): string {

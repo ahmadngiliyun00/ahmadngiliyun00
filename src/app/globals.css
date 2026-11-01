@@ -3097,6 +3097,56 @@ select.field {
 
 /* ---------- Kurangi gerakan ---------- */
 
+/* Media sosial: lompatan topik dan kartu postingan dengan gambar di atas. */
+@layer components {
+  .social-topics {
+    margin-top: 1.75rem;
+  }
+
+  .social-topics a {
+    color: inherit;
+    transition: color 0.2s ease;
+  }
+
+  .social-topics a:hover,
+  .social-topics a:focus-visible {
+    color: var(--color-leaf);
+  }
+
+  .social-post .social-image {
+    width: calc(100% + 2.8rem);
+    max-width: none;
+    aspect-ratio: 1 / 1;
+    margin: -1.4rem -1.4rem 1.1rem;
+    border-radius: 1.1rem 1.1rem 0 0;
+    border-bottom: 1px solid var(--color-line);
+    object-fit: cover;
+    background: var(--color-ink);
+  }
+
+  .social-caption {
+    display: -webkit-box;
+    margin-top: 0.75rem;
+    overflow: hidden;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 7;
+    line-clamp: 7;
+  }
+}
+
+/* Di luar layer karena .cred-kind juga di luar layer (gaya tanpa layer selalu menang). */
+.social-post[data-platform="facebook"] .cred-kind {
+  color: var(--color-sky);
+}
+
+.social-post[data-platform="linkedin"] .cred-kind {
+  color: var(--color-paper);
+}
+
 /* Kabar dan liputan: arsip per tahun dan halaman tulisan. */
 @layer components {
   .news-years {

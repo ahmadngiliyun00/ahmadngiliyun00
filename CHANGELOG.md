@@ -9,6 +9,10 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 ### Ditambahkan
 
 - Bukti sertifikat dari Google Drive: isian "Tautan Google Drive" di formulir capaian menerima tautan berbagi atau kode sematan, menyimpan bentuk baku, dan menampilkan pratinjau berkas di halaman detail. Kartu di beranda dan arsip mendapat tombol "Lihat bukti" yang langsung menuju pratinjau
+- Halaman Media sosial (`/media-sosial/`, `/en/social/`) berisi postingan Instagram, Facebook, dan LinkedIn yang dikelompokkan per topik, misalnya program yang sedang didampingi
+- Koneksi Instagram (akun Creator atau Business) dan Facebook (profil pribadi) di Pengaturan, Media sosial lewat OAuth. Postingan dan gambarnya ditarik ke koleksi baru Postingan media sosial sebagai data privat, lewat tombol Tarik sekarang atau cron harian `POST /cron/social/`. Token disimpan terenkripsi dan tidak pernah tampil di situs
+- Impor postingan LinkedIn dari `Shares.csv` hasil ekspor data LinkedIn
+- Aturan topik otomatis (`kata kunci | Nama topik`) dan pembersihan caption: emoji, em dash, ampersand, dan blok tagar
 - Ekspor dan impor lembar kerja untuk setiap koleksi CMS: unduh Excel berisi semua data dan lembar petunjuk, isi sel yang kosong, lalu unggah kembali (.xlsx atau .csv). Impor menampilkan pratinjau per baris sebelum menyimpan, sel kosong tidak mengubah data, dan semua validasi CMS tetap berlaku
 
 ## [2.0.0] - 2026-10-29

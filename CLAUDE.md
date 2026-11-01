@@ -20,7 +20,7 @@ Repo ini adalah `ahmadngiliyun00/ahmadngiliyun00`, jadi `README.md` di akar repo
 - Hosting: VPS aaPanel, PM2 satu instans, Nginx reverse proxy (keputusan Mas Ilyun, 28 Okt 2026)
 - Font dari paket `@fontsource-variable/*`: Bricolage Grotesque (judul), Instrument Sans (isi)
 - Dua bahasa lewat dua route: `/` (Indonesia) dan `/en/` (Inggris)
-- Beranda ringkas tujuh bagian (hero, tentang, jelajahi, proyek unggulan, sorotan capaian, kabar terbaru, kontak). Isi lengkap di halaman dalam: `/proyek/`, `/riset/`, `/mengajar/`, `/perjalanan/` dan padanannya `/en/projects/`, `/en/research/`, `/en/teaching/`, `/en/journey/`
+- Beranda ringkas tujuh bagian (hero, tentang, jelajahi, proyek unggulan, sorotan capaian, kabar terbaru, kontak). Isi lengkap di halaman dalam: `/proyek/`, `/riset/`, `/mengajar/`, `/perjalanan/`, `/media-sosial/` dan padanannya `/en/projects/`, `/en/research/`, `/en/teaching/`, `/en/journey/`, `/en/social/`
 
 ## Struktur
 
@@ -50,11 +50,15 @@ tests/home.test.mjs              unit test aturan beranda: alat utama, tahun awa
 tests/seo-text.test.mjs          unit test panjang dan gaya judul serta deskripsi SEO bawaan (npm test)
 tests/drive.test.mjs             unit test tautan Google Drive untuk pratinjau sertifikat (npm test)
 tests/transfer.test.mjs          unit test ekspor dan impor lembar kerja: kolom, sel, Excel, CSV (npm test)
+tests/social.test.mjs            unit test caption, tagar, topik, tanggal, CDN gambar, Shares.csv LinkedIn (npm test)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, proyek, riset, mengajar, perjalanan,
-                                 sertifikat, kabar, s/[token] (EN: projects, research, teaching, journey, certificates, news)
+                                 media-sosial, sertifikat, kabar, s/[token] (EN: projects, research, teaching, journey, social,
+                                 certificates, news)
     (admin)/admin/               CMS: login, ringkasan, [collection] (daftar, new, [id], export, import), settings/[key], actions.ts
+    (admin)/admin/auth/          OAuth: github, instagram, facebook (masing-masing route.ts dan callback/)
+    cron/social/route.ts         tarikan terjadwal postingan media sosial (POST, Bearer SOCIAL_CRON_SECRET)
     files/[id]/route.ts          sajikan berkas unggahan dengan pemeriksaan izin
     globals.css                  token warna, tekstur, animasi, gaya semua komponen situs
     robots.ts, sitemap.ts
@@ -76,6 +80,7 @@ src/
     transfer.ts                  ekspor dan impor lembar kerja koleksi CMS (pratinjau lalu terapkan)
     messages.ts, mail.ts         pesan kontak di database, kirim email SMTP
     turnstile.ts                 verifikasi Cloudflare Turnstile (opsional)
+    social/                      media sosial: config (env Meta), store (token terenkripsi), meta (Graph API), oauth, sync
     auth/                        password, session, github, rate-limit
   data/
     profile.ts                   identitas situs dan teks antarmuka situs ID/EN
@@ -85,6 +90,7 @@ src/
   lib/drive.ts                   tautan Google Drive: terima tautan berbagi atau kode iframe, simpan bentuk baku
   lib/xlsx.ts, lib/transfer.ts   tulis dan baca .xlsx (tanpa pustaka luar) dan konversi baris ke isian formulir
   lib/nav.ts                     alamat halaman dalam (pagePath), menu header dan footer, peta jangkar lama
+  lib/social.ts                  aturan murni media sosial: cleanCaption, aturan topik, groupByTopic, Shares.csv LinkedIn
 ```
 
 ## Aturan kerja
@@ -119,6 +125,7 @@ src/
 - Formulir harus tetap terisi setelah disimpan. Server Action simpan memanggil `revalidatePath("/admin", "layout")`; formulir tambah data dialihkan ke halaman ubah
 - Judul, deskripsi, dan kata kunci SEO beranda, arsip, dan empat halaman dalam diatur di CMS (Pengaturan, SEO dan Search Console) dan dibaca `src/lib/metadata.ts`; teks di `profile.ts` hanya cadangan
 - Jangan commit `.env.local`, `.env.production.local`, atau folder `storage/`
+- Media sosial (koleksi `social`, Pengaturan, Media sosial): hanya MEMBACA postingan akun sendiri, tidak pernah memposting. Hasil tarikan dan impor selalu `private`; Mas Ilyun memeriksa sebelum public. Token hanya di `settings` kunci `social-auth` (terenkripsi, tanpa formulir, tidak ikut `loadSite()`), jangan pernah dikirim ke browser atau situs. Gambar hanya diunduh dari CDN Meta (`isAllowedMediaUrl`) dan disimpan di `UPLOAD_DIR`. Caption wajib lewat `cleanCaption`. LinkedIn hanya lewat `Shares.csv` atau isian manual (tanpa scraping)
 - Pesan form kontak (tabel `messages`) selalu privat: hanya tampil di `/admin/pesan/`, tidak pernah di situs, sitemap, atau README
 - Kontak publik hanya lewat email (`ahmad@ngiliyun.my.id`). Jangan menambahkan WhatsApp atau nomor telepon (keputusan Mas Ilyun)
 
@@ -154,7 +161,7 @@ npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
 npm run errors         # buat ulang halaman error statis Nginx di public/errors/
-npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja
+npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja, media sosial
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build
@@ -179,3 +186,4 @@ VPS aaPanel dengan PM2 (satu instans) dan Nginx reverse proxy. Langkah lengkap d
 - Foto pribadi belum dipasang
 - Tautan ke ngiliyun.my.id di README baru berfungsi setelah situs di-deploy dan DNS diarahkan
 - Deploy ke VPS (database produksi, akun admin, OAuth App GitHub) belum dilakukan
+- Media sosial: Instagram belum diubah ke akun Creator, aplikasi Meta belum dibuat, dan cron `/cron/social/` belum dijadwalkan (`docs/DEPLOY.md` bagian 9)

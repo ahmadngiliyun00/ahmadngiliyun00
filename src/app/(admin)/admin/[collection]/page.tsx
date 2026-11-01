@@ -34,7 +34,7 @@ export default async function AdminList({ params, searchParams }: Props) {
   let list = await listEntries(cfg.key, { publicOnly: false });
   if (cfg.order === "date") {
     list =
-      cfg.key === "post"
+      cfg.key === "post" || cfg.key === "social"
         ? [...list].sort((a, b) => byPostDate(a.data as Post, b.data as Post))
         : [...list].sort((a, b) => byNewest(a.data as Achievement, b.data as Achievement));
   }

@@ -54,6 +54,7 @@ Beranda sengaja ringkas: tujuh bagian yang menjawab siapa, keahlian apa, bukti t
 | Perjalanan | `/perjalanan/` | `/en/journey/` | Garis waktu, lalu Arah ke depan (rencana lima tahun, cara bekerja dengan AI, sedang didalami) |
 | Sertifikat | `/sertifikat/` | `/en/certificates/` | Arsip capaian dengan pencarian dan saringan, halaman detail per capaian |
 | Kabar | `/kabar/` | `/en/news/` | Arsip liputan, tulisan, dan kabar |
+| Media sosial | `/media-sosial/` | `/en/social/` | Postingan public dari Instagram, Facebook, dan LinkedIn, dikelompokkan per topik |
 
 - Halaman dalam memakai `SubpageShell` (header, tautan kembali ke beranda, footer) dan `PageHead` (breadcrumb "Beranda / Judul", satu h1, kalimat pembuka, data terstruktur BreadcrumbList)
 - Alamat halaman, menu header, dan tautan footer diatur di `src/lib/nav.ts`. Menu desktop tampil mulai lebar 1024px; di bawahnya menu ponsel yang ditutup dengan Escape
@@ -182,6 +183,17 @@ Setiap koleksi punya tombol **Ekspor Excel** dan **Impor** di halaman daftarnya.
 - Impor menerima `.xlsx` atau `.csv` (koma atau titik koma), maksimal 5 MB dan 1000 baris. **Periksa berkas** menampilkan pratinjau per baris (baru, diubah, bermasalah, beserta isian yang berubah) tanpa menyimpan. **Terapkan** menghitung ulang dari data terbaru lalu menyimpan baris satu per satu lewat `saveEntry`, jadi validasi dan aturan CMS (misalnya batas sorotan beranda) tetap berlaku. Baris yang gagal dilaporkan, sisanya tetap tersimpan
 - Pembanding perubahan adalah hasil menyimpan ulang data lama tanpa perubahan, sehingga mengunggah berkas ekspor apa adanya selalu menghasilkan nol perubahan
 - Berkas Excel ditulis dan dibaca tanpa pustaka tambahan (`src/lib/xlsx.ts`, zlib bawaan Node). Konversi baris dan isian formulir di `src/lib/transfer.ts`, ekspor dan impor di `src/server/transfer.ts`
+
+### Media sosial
+
+Postingan Instagram, Facebook, dan LinkedIn milik Mas Ilyun masuk ke koleksi `social` (Kabar, Postingan media sosial) dan tampil di halaman `/media-sosial/`. Langkah menyiapkan aplikasi Meta ada di `docs/DEPLOY.md` bagian 9.
+
+- Koneksi akun: Pengaturan, Media sosial (`/admin/settings/social/`, panel `SocialConnections`). OAuth di `/admin/auth/instagram/` dan `/admin/auth/facebook/` (beserta `callback/`), wajib login admin dan memakai state acak di cookie. Kredensial aplikasi dari variabel lingkungan (`src/server/social/config.ts`)
+- Token disimpan di tabel `settings` kunci `social-auth`, dienkripsi AES-256-GCM dengan kunci HKDF dari rahasia aplikasi (`src/server/social/store.ts`). Kunci ini tidak terdaftar di `settingsConfigs`, jadi tidak punya formulir dan tidak ikut `loadSite()`. Panggilan Facebook memakai `appsecret_proof`
+- Tarikan (`src/server/social/sync.ts`): hasil selalu data privat, paling banyak 30 postingan baru per tarikan, postingan yang sudah ada tidak ditimpa, dan postingan yang dihapus di CMS dicatat di `social-auth.ignored` supaya tidak masuk lagi. Gambar hanya diunduh dari CDN Meta (`isAllowedMediaUrl`) lalu disimpan lewat `saveUpload` sebagai `fileId`
+- Caption dibersihkan `cleanCaption` (`src/lib/social.ts`): emoji dibuang, em dash dan ampersand diganti, tagar dipindah ke isian `tags`. Aturan topik (`kata kunci | Nama topik`) di Pengaturan, Media sosial mengisi isian `topic`. Semua aturan murni ini diuji `tests/social.test.mjs`
+- LinkedIn tidak punya API baca untuk profil pribadi, jadi diimpor dari `Shares.csv` ekspor data (`parseLinkedinShares`), atau diisi manual di CMS
+- Tarikan terjadwal: `POST /cron/social/` dengan `Authorization: Bearer <SOCIAL_CRON_SECRET>`. Sekaligus memperpanjang token Instagram (paling sering sekali sehari)
 
 ### Header keamanan
 

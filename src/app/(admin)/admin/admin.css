@@ -589,6 +589,32 @@
     background: linear-gradient(transparent, var(--color-ink) 35%);
   }
 
+  /* Pengaturan, Media sosial: kartu akun terhubung. */
+  .social-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 64rem) {
+    .social-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .social-card .admin-help {
+    margin-top: 0.5rem;
+  }
+
+  .social-card .admin-warn {
+    color: #ffc2b8;
+  }
+
+  .social-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
   .admin-danger {
     border-color: color-mix(in srgb, #ff9b8a 50%, var(--color-line));
     color: #ffc2b8;

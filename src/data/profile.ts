@@ -83,6 +83,7 @@ export type Copy = {
     research: string;
     teaching: string;
     journey: string;
+    social: string;
     certificates: string;
     news: string;
     contact: string;
@@ -96,9 +97,11 @@ export type Copy = {
   };
   // Halaman dalam: judul, kalimat pembuka, serta judul dan deskripsi bawaan untuk mesin pencari.
   pages: Record<
-    "projects" | "research" | "teaching" | "journey",
+    "projects" | "research" | "teaching" | "journey" | "social",
     { title: string; intro: string; metaTitle: string; metaDescription: string }
   >;
+  // Halaman Media sosial: kelompok topik dan tautan ke postingan asli.
+  social: { topicsLabel: string; other: string; empty: string; viewOn: string; noImage: string };
   hero: {
     primary: string;
     secondary: string;
@@ -384,6 +387,7 @@ export const copy: Localized<Copy> = {
       research: "Riset",
       teaching: "Mengajar",
       journey: "Perjalanan",
+      social: "Media sosial",
       certificates: "Sertifikat",
       news: "Kabar",
       contact: "Kontak",
@@ -424,6 +428,20 @@ export const copy: Localized<Copy> = {
         metaDescription:
           "Ahmad Ngiliyun memulai dari kode di GitHub, menyelesaikan Magister Komputer, lalu menjadi dosen tetap. Kini ia menapaki jalan menjadi AI engineer.",
       },
+      social: {
+        title: "Media sosial",
+        intro: "Kegiatan yang saya bagikan di Instagram, Facebook, dan LinkedIn, dikelompokkan per topik dengan yang terbaru di atas.",
+        metaTitle: "Kegiatan Ahmad Ngiliyun di media sosial",
+        metaDescription:
+          "Catatan kegiatan Ahmad Ngiliyun yang dibagikan di Instagram, Facebook, dan LinkedIn, dari kelas dan pendampingan program sampai kabar terbaru.",
+      },
+    },
+    social: {
+      topicsLabel: "Topik",
+      other: "Lainnya",
+      empty: "Belum ada postingan.",
+      viewOn: "Lihat di {platform}",
+      noImage: "Tanpa gambar",
     },
     hero: {
       primary: "Lihat proyek",
@@ -776,6 +794,7 @@ export const copy: Localized<Copy> = {
       research: "Research",
       teaching: "Teaching",
       journey: "Journey",
+      social: "Social",
       certificates: "Certificates",
       news: "News",
       contact: "Contact",
@@ -816,6 +835,20 @@ export const copy: Localized<Copy> = {
         metaDescription:
           "Ahmad Ngiliyun started out writing code on GitHub, earned a Master of Computer Science, became a permanent lecturer, and is now growing into an AI engineer.",
       },
+      social: {
+        title: "Social media",
+        intro: "What I share on Instagram, Facebook, and LinkedIn, grouped by topic with the newest first.",
+        metaTitle: "Ahmad Ngiliyun's activities on social media",
+        metaDescription:
+          "Notes on the work Ahmad Ngiliyun shares on Instagram, Facebook, and LinkedIn, from classes and program mentoring to his latest updates.",
+      },
+    },
+    social: {
+      topicsLabel: "Topics",
+      other: "Other posts",
+      empty: "No posts yet.",
+      viewOn: "View on {platform}",
+      noImage: "No image",
     },
     hero: {
       primary: "See projects",

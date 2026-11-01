@@ -2,9 +2,20 @@
 // Menambah field baru di sini otomatis muncul di formulir admin dan ikut divalidasi.
 
 import type { Field, Option } from "@/content/fields";
-import { kindLabels, postKindLabels, programLabels, type AchievementKind, type CollectionKey, type PostKind, type Program } from "@/content/types";
+import {
+  kindLabels,
+  postKindLabels,
+  programLabels,
+  socialPlatformLabels,
+  type AchievementKind,
+  type CollectionKey,
+  type PostKind,
+  type Program,
+  type SocialPlatform,
+} from "@/content/types";
 import { copy } from "@/data/profile";
 import { showsInContact } from "@/lib/home";
+import { captionTitle } from "@/lib/social";
 
 type Doc = Record<string, unknown>;
 
@@ -34,11 +45,12 @@ const loc = (v: unknown): string => {
 const s = (v: unknown): string => (typeof v === "string" ? v : "");
 
 // Judul dan deskripsi SEO halaman dalam, satu pasang isian per halaman.
-const PAGE_SEO: { key: "projects" | "research" | "teaching" | "journey"; label: string; paths: string }[] = [
+const PAGE_SEO: { key: "projects" | "research" | "teaching" | "journey" | "social"; label: string; paths: string }[] = [
   { key: "projects", label: "Proyek", paths: "/proyek/ dan /en/projects/" },
   { key: "research", label: "Riset dan Publikasi", paths: "/riset/ dan /en/research/" },
   { key: "teaching", label: "Mengajar", paths: "/mengajar/ dan /en/teaching/" },
   { key: "journey", label: "Perjalanan", paths: "/perjalanan/ dan /en/journey/" },
+  { key: "social", label: "Media sosial", paths: "/media-sosial/ dan /en/social/" },
 ];
 
 const pageSeoFields: Field[] = PAGE_SEO.flatMap((p) => [
@@ -181,6 +193,58 @@ export const collections: CollectionConfig[] = [
         label: "Izinkan komentar",
         type: "boolean",
         help: "Menampilkan kolom komentar di halaman tulisan. Komentar yang masuk tampil setelah Anda setujui di menu Komentar. Mematikannya menyembunyikan form dan semua komentar.",
+      },
+    ],
+  },
+  {
+    key: "social",
+    label: "Postingan media sosial",
+    singular: "postingan",
+    description:
+      "Postingan Instagram, Facebook, dan LinkedIn Anda untuk halaman Media sosial. Hasil tarikan otomatis masuk sebagai data privat; periksa lalu jadikan public satu per satu. Koneksi akun di Pengaturan, Media sosial.",
+    group: "Kabar",
+    order: "date",
+    title: (d) => captionTitle(loc(d.caption)) || s(d.url),
+    subtitle: (d) => {
+      const platform = s(d.platform) as SocialPlatform;
+      return [socialPlatformLabels[platform] ?? platform, s(d.topic), dateText(d.date)].filter((x) => x !== "").join(" | ");
+    },
+    fields: [
+      {
+        name: "platform",
+        width: "third",
+        label: "Platform",
+        type: "select",
+        required: true,
+        options: (Object.keys(socialPlatformLabels) as SocialPlatform[]).map((p) => ({ value: p, label: socialPlatformLabels[p] })),
+      },
+      { name: "date", width: "third", label: "Tanggal posting", type: "date", help: "Wajib untuk data public." },
+      {
+        name: "topic",
+        width: "third",
+        label: "Topik",
+        type: "text",
+        placeholder: "Program PIJAK",
+        help: "Pengelompokan di halaman Media sosial. Diisi otomatis oleh aturan topik di Pengaturan, Media sosial.",
+      },
+      { name: "url", label: "Tautan postingan", type: "url", required: true, placeholder: "https://www.instagram.com/p/..." },
+      { name: "sourceId", label: "ID sumber", type: "text", help: "Diisi otomatis saat ditarik, mencegah postingan yang sama masuk dua kali. Biarkan apa adanya." },
+      {
+        name: "caption",
+        label: "Teks postingan",
+        type: "localized",
+        multiline: true,
+        rows: 6,
+        required: true,
+        help: "Teks asli dari platform, tanpa emoji dan blok tagar. Rapikan atau ringkas sebelum dijadikan public; versi Inggris boleh menyusul.",
+      },
+      { name: "tags", label: "Tagar", type: "list", help: "Tanpa tanda pagar, satu per baris. Hanya untuk aturan topik, tidak tampil di situs." },
+      { name: "fileId", label: "Gambar", type: "file", help: "Disalin otomatis dari postingan saat ditarik. PNG, JPG, atau WebP, maksimal 5 MB." },
+      {
+        name: "imageAlt",
+        label: "Teks alternatif gambar",
+        type: "localized",
+        help: "Jelaskan isi gambar untuk pembaca layar, misalnya Peserta PIJAK berdiskusi di kelas. Kosongkan bila gambar hanya hiasan.",
       },
     ],
   },
@@ -422,7 +486,12 @@ export function getCollection(key: string): CollectionConfig | undefined {
 
 // ---------- Pengaturan tunggal ----------
 
-export type SettingsConfig = { key: "profile" | "metrics" | "seo" | "mail" | "language"; label: string; description: string; fields: Field[] };
+export type SettingsConfig = {
+  key: "profile" | "metrics" | "seo" | "mail" | "language" | "social";
+  label: string;
+  description: string;
+  fields: Field[];
+};
 
 export const settingsConfigs: SettingsConfig[] = [
   {
@@ -565,6 +634,28 @@ export const settingsConfigs: SettingsConfig[] = [
           { value: "en", label: "Inggris" },
         ],
         help: "Isian wajib cukup diisi dalam bahasa ini. Selama terjemahan belum diisi, situs versi bahasa lain memakai teks bahasa utama. Isi lengkap tulisan tidak ikut: tulisan tanpa terjemahan tidak punya halaman di bahasa itu.",
+      },
+    ],
+  },
+  {
+    key: "social",
+    label: "Media sosial",
+    description:
+      "Hubungkan Instagram dan Facebook supaya postingan Anda bisa ditarik ke CMS, atau impor postingan LinkedIn dari ekspor data. Koneksi dan token hanya tersimpan di CMS dan tidak pernah tampil di situs. Postingan yang ditarik selalu masuk sebagai data privat.",
+    fields: [
+      {
+        name: "topicRules",
+        label: "Aturan topik",
+        type: "list",
+        placeholder: "pijak | Program PIJAK\nbeasiswa | Beasiswa",
+        help: "Satu aturan per baris: kata kunci | Nama topik. Bila tagar atau teks postingan memuat kata kunci, postingan baru diberi topik itu. Aturan teratas didahulukan; postingan lama tidak berubah.",
+      },
+      {
+        name: "facebookAll",
+        width: "full",
+        label: "Tarik juga postingan Facebook yang tidak publik",
+        type: "boolean",
+        help: "Bawaan hanya postingan dengan audiens Publik. Postingan untuk teman saja sebaiknya tidak dipajang di situs.",
       },
     ],
   },
