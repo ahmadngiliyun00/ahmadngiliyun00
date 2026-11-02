@@ -237,7 +237,11 @@ export default function FieldInput({
       return (
         <div className="admin-field">
           <label htmlFor={id}>{label}</label>
+          {/* key ikut nilai: React 19 me-reset formulir setelah Server Action, dan select tidak
+              memperbarui nilai bawaannya, jadi pilihan hilang setelah simpan gagal. Elemen baru
+              membawa nilai bawaan yang benar. */}
           <select
+            key={`${key}:${one(key, str)}`}
             id={id}
             name={key}
             className="field"
