@@ -231,19 +231,22 @@ Rute `/cron/social/` mati bila `SOCIAL_CRON_SECRET` kosong atau kurang dari 32 k
 
 ```bash
 cd /www/wwwroot/ngiliyun.my.id
-git pull
+git restore README.md profile src/data/github.json
+git pull --ff-only
 npm ci
 npm run db:migrate
 npm run build
 pm2 reload ngiliyun
 ```
 
+`git restore` wajib di awal: setiap `npm run build` menulis ulang `README.md`, gambar di `profile/`, dan `src/data/github.json` (data GitHub terbaru), sehingga tanpa langkah ini `git pull` menolak dengan pesan "Your local changes would be overwritten". Ketiganya dibuat ulang saat build, jadi aman dipulihkan.
+
 Jangan lewati `npm ci`: rilis bisa membawa paket baru (misalnya `pdfjs-dist` untuk galeri gambar). Bila lupa, `npm run build` berhenti di awal dengan pesan `[deps] Paket di node_modules tidak sesuai package-lock.json` (`scripts/check-deps.mjs`).
 
 Supaya aplikasi tidak dimuat ulang ketika salah satu langkah gagal, jalankan berantai dalam satu baris. `pm2 reload` hanya berjalan bila semua langkah sebelumnya berhasil:
 
 ```bash
-git pull --ff-only && npm ci && npm run db:migrate && npm run build && pm2 reload ngiliyun
+git restore README.md profile src/data/github.json && git pull --ff-only && npm ci && npm run db:migrate && npm run build && pm2 reload ngiliyun
 ```
 
 ### Memperbarui Node.js
