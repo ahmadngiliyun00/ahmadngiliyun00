@@ -95,6 +95,8 @@ location ^~ /errors/ {
 - Uji: `pm2 stop ngiliyun`, buka situs (harus tampil halaman 502), lalu `pm2 start ngiliyun`
 - `Host` wajib diteruskan apa adanya. Server Action Next.js menolak permintaan bila Origin dan Host tidak cocok
 - SSL: pakai Let's Encrypt dari aaPanel, atau sertifikat Origin Cloudflare bila DNS diproksikan
+- HSTS cukup dikirim satu sumber: aplikasi sudah mengirim `Strict-Transport-Security: max-age=31536000` (`next.config.ts`) bila `SITE_URL` memakai https. Matikan HSTS bawaan aaPanel (baris `add_header Strict-Transport-Security` di blok SSL situs, beri tanda `#`) dan biarkan HSTS di Cloudflare (SSL/TLS, Edge Certificates) mati. Header ganda tidak membuka celah, tetapi peramban hanya membaca yang pertama sehingga perubahan di salah satu tempat bisa tidak berlaku. Periksa: `curl -sI https://ngiliyun.my.id/ | grep -ci strict-transport` harus `1`
+- Protokol TLS di blok SSL aaPanel: pakai `ssl_protocols TLSv1.2 TLSv1.3;` (hapus `TLSv1.1`) dan buang sandi lemah `3DES` dari `ssl_ciphers`. TLS 1.1 sudah dinyatakan usang, dan 3DES rentan serangan SWEET32. Pengunjung yang lewat Cloudflare tidak terdampak, tetapi pengaturan ini berlaku bagi siapa pun yang menghubungi IP server secara langsung
 - Bila DNS lewat proxy Cloudflare (awan oranye), pulihkan IP asli pengunjung supaya pembatas percobaan login bekerja per pengunjung, bukan per IP Cloudflare. Tambahkan `set_real_ip_from` untuk setiap rentang IP di <https://www.cloudflare.com/ips/> lalu `real_ip_header CF-Connecting-IP;`
 
 ## 6. Login GitHub (opsional)
@@ -161,6 +163,22 @@ Bila halaman situs sudah muncul di Google tetapi sitemap tetap **Couldn't fetch*
 4. Setelah penyebabnya dibereskan, hapus sitemap dari daftar lalu kirim ulang (atau kirim `sitemap.xml?v=2`)
 
 Format sitemap sudah disamakan dengan sitemap yang terbukti dibaca Search Console: `lastmod` WIB tanpa milidetik (misalnya `2026-11-02T23:21:28+07:00`), `changefreq`, dan `priority` (`src/lib/sitemap.ts`). Hasilnya lolos validasi skema sitemap 0.9.
+
+**Jadwal memeriksa sitemap (tidak perlu dicek setiap hari).** Status Couldn't fetch dengan kolom Last read **kosong** berarti Google belum pernah mencoba mengambil sitemap, bukan mencoba lalu gagal. Search Console menampilkan label itu selama sitemap masih menunggu di antrean. Untuk domain baru (ngiliyun.my.id pindah ke Cloudflare 28 Oktober 2026) antrean ini wajar memakan satu sampai dua minggu; sebagai pembanding, sitemap lain yang dikirim 13 Oktober baru dibaca 27 Oktober. Sudah dipastikan 3 November 2026: Uji URL aktif untuk `/sitemap.xml` berhasil (Pengambilan halaman: Berhasil), log firewall Cloudflare tidak memblokir apa pun di `/sitemap.xml`, dan Bot Fight Mode mati.
+
+| Kapan | Periksa | Bila belum berubah |
+| --- | --- | --- |
+| Setelah 1 minggu (sekitar 10 November 2026) | Kolom Last read di menu Sitemaps | Biarkan, jangan hapus atau kirim ulang (tidak mempercepat antrean) |
+| Setelah 2 minggu (sekitar 17 November 2026) | Last read, lalu log Nginx (perintah di bawah) | Bila log menunjukkan Googlebot mengambil sitemap dengan status `200`, tunggu Search Console menyusul. Bila belum ada permintaan sama sekali, kirim `sitemap.xml?v=2` |
+| Setelah 4 minggu (sekitar 1 Desember 2026) | Ulangi Uji URL aktif untuk `/sitemap.xml` | Bila uji aktif gagal, ikuti daftar periksa di atas. Bila berhasil tetapi status masih Couldn't fetch, laporkan lewat tombol Kirim masukan di Search Console |
+
+Apakah Googlebot sudah pernah mengambil sitemap (log akses Nginx bawaan aaPanel; sesuaikan bila lokasinya berbeda):
+
+```bash
+grep "sitemap.xml" /www/wwwlogs/ngiliyun.my.id.log | grep -i googlebot | tail -5
+```
+
+Search Console, Setelan, Statistik crawl juga menampilkan semua permintaan Googlebot beserta kode statusnya, termasuk berkas XML. Sambil menunggu, halaman tetap bisa diindeks lebih cepat lewat Pemeriksaan URL, Minta pengindeksan untuk halaman penting (`/`, `/proyek/`, `/riset/`). Jangan meminta pengindeksan untuk alamat sitemap, karena sitemap bukan halaman yang diindeks.
 
 **c. Google Analytics 4.** Buka <https://analytics.google.com>, Admin, Buat properti, lalu Aliran data Web dengan URL `https://ngiliyun.my.id`. Salin ID pengukuran (`G-XXXXXXXXXX`) ke CMS. Script hanya dipasang di beranda, arsip, dan detail capaian; tidak di CMS dan tidak di tautan berbagi rahasia, jadi token berbagi tidak terkirim ke Google. Kunjungan saat Mas Ilyun sedang masuk CMS tidak dihitung. Analytics memasang cookie pengunjung, jadi bila nanti dibutuhkan, tambahkan pemberitahuan privasi di situs.
 
