@@ -67,3 +67,12 @@ export function normalizeDriveUrl(input: string): string | null {
   const file = parseDriveUrl(input);
   return file === null ? null : driveViewUrl(file);
 }
+
+// Tautan gambar yang bisa dipakai langsung di <img> untuk berkas gambar di Google Drive.
+// Berkas harus dibagikan ke "Siapa saja yang memiliki link". Null bila bukan tautan berkas Drive.
+export function driveImageUrl(input: string): string | null {
+  const file = parseDriveUrl(input);
+  if (file === null) return null;
+  const base = `https://drive.google.com/thumbnail?id=${file.id}${AMP}sz=w1600`;
+  return file.resourceKey ? `${base}${AMP}resourcekey=${file.resourceKey}` : base;
+}

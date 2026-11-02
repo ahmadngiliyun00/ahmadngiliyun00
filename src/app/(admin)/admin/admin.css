@@ -566,6 +566,124 @@
     overflow-wrap: anywhere;
   }
 
+  /* Area unggah berkas: kotak bergaris putus-putus, bisa diklik atau dijatuhi berkas. */
+  .file-drop {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+
+  .file-drop-zone {
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-height: 7.5rem;
+    align-items: center;
+    justify-content: center;
+    padding: 1.1rem 1.25rem;
+    border: 2px dashed color-mix(in srgb, var(--color-sky) 45%, var(--color-line));
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--color-sky) 5%, transparent);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .file-drop-zone:hover,
+  .file-drop[data-over] .file-drop-zone {
+    border-color: var(--color-leaf);
+    background: color-mix(in srgb, var(--color-leaf) 10%, transparent);
+  }
+
+  .file-drop-zone:focus-within {
+    outline: 2px solid var(--color-leaf);
+    outline-offset: 3px;
+  }
+
+  .file-drop[data-filled] .file-drop-zone {
+    justify-content: flex-start;
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--color-leaf) 55%, var(--color-line));
+    text-align: left;
+  }
+
+  .file-drop[data-invalid] .file-drop-zone {
+    border-color: #ff9b8a;
+  }
+
+  .file-drop-zone[aria-disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* Input asli tetap ada untuk formulir dan keyboard, tetapi tidak terlihat. */
+  .file-drop-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .file-drop-empty {
+    display: grid;
+    gap: 0.35rem;
+    justify-items: center;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+
+  .file-drop-empty strong {
+    color: var(--color-leaf);
+  }
+
+  .file-drop-icon {
+    font-size: 1.6rem;
+    color: var(--color-sky);
+  }
+
+  .file-drop-hint {
+    font-size: 0.8rem;
+  }
+
+  .file-drop-picked {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .file-drop-thumb {
+    width: 5rem;
+    height: 5rem;
+    flex-shrink: 0;
+    border-radius: 0.6rem;
+    object-fit: cover;
+    background: var(--color-ink);
+  }
+
+  .file-drop-meta {
+    display: grid;
+    min-width: 0;
+    gap: 0.2rem;
+  }
+
+  .file-drop-name {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .file-drop-size {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .file-drop-zone {
+      transition: none;
+    }
+  }
+
   .admin-file-input {
     font-size: 0.875rem;
     color: var(--color-muted);

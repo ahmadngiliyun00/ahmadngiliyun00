@@ -2,6 +2,7 @@
 
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { applyImportAction, previewImportAction, type ImportState } from "@/app/(admin)/admin/actions";
+import FileDrop from "@/components/admin/FileDrop";
 import Icon from "@/components/admin/Icon";
 import { toast } from "@/components/Toaster";
 import type { adminCopy } from "@/data/admin";
@@ -70,15 +71,15 @@ export default function ImportForm({ collection, listHref, labels }: { collectio
         <input type="hidden" name="collection" value={collection} />
         <div className="admin-field">
           <label htmlFor="sheet">{labels.file}</label>
-          <input
+          <FileDrop
             id="sheet"
             name="sheet"
-            type="file"
             required
             accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
-            className="admin-file-input"
-            aria-describedby="sheet-help"
-            onChange={() => setStaleFor(preview)}
+            hint={labels.dropHint}
+            maxBytes={5 * 1024 * 1024}
+            describedBy="sheet-help"
+            onFile={() => setStaleFor(preview)}
           />
           <p id="sheet-help" className="admin-help">
             {labels.fileHelp}

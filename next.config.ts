@@ -21,7 +21,8 @@ const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com ${TURNSTILE} ${CF_INSIGHTS_SCRIPT}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${GA}`,
+  // Gambar postingan media sosial boleh berasal dari tautan https mana pun (Tautan gambar di CMS).
+  `img-src 'self' data: blob: https:`,
   "font-src 'self' data:",
   `connect-src 'self' ${GA} ${TURNSTILE} ${CF_INSIGHTS_BEACON}${dev ? " ws: wss:" : ""}`,
   `frame-src 'self' ${TURNSTILE} ${DRIVE}`,

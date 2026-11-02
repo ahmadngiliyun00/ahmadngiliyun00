@@ -48,3 +48,13 @@ test("bukan berkas Drive ditolak", () => {
   assert.equal(isDriveFolder(`https://drive.google.com/drive/folders/${ID}?usp=sharing`), true);
   assert.equal(isDriveFolder(VIEW), false);
 });
+
+test("tautan berbagi Drive diubah menjadi tautan gambar thumbnail", async () => {
+  const { driveImageUrl } = await importTs(new URL("../src/lib/drive.ts", import.meta.url));
+  const AMP = String.fromCharCode(38);
+  assert.equal(
+    driveImageUrl("https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUv/view?usp=sharing"),
+    `https://drive.google.com/thumbnail?id=1AbCdEfGhIjKlMnOpQrStUv${AMP}sz=w1600`,
+  );
+  assert.equal(driveImageUrl("https://contoh.id/gambar.jpg"), null);
+});

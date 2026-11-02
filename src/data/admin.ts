@@ -114,6 +114,7 @@ export const adminCopy = {
     ],
     file: "Berkas lembar kerja",
     fileHelp: "Excel (.xlsx) atau CSV, maksimal 5 MB dan 1000 baris. Berkas unggahan dan isi tulisan panjang tidak ikut impor.",
+    dropHint: "Excel (.xlsx) atau CSV, maksimal 5 MB",
     preview: "Periksa berkas",
     previewing: "Memeriksa...",
     apply: "Terapkan {n} perubahan",
@@ -217,6 +218,7 @@ export const adminCopy = {
       copyConfirm: "Versi {other} sudah berisi. Ganti dengan salinan versi {lang}?",
     },
     currentFile: "Berkas saat ini",
+    fileHint: "PDF, PNG, JPG, atau WebP, maksimal 5 MB. Diunggah saat Simpan.",
     openFile: "Buka berkas",
     removeFile: "Hapus berkas ini",
     save: "Simpan",
@@ -240,6 +242,15 @@ export const adminCopy = {
     once: "Simpan tautan ini sekarang. Setelah halaman ditutup, tautan tidak bisa ditampilkan lagi.",
     publicNote: "Data ini public, jadi bisa juga dibagikan lewat halaman portofolionya:",
     unsupported: "Tautan berbagi tersedia untuk sertifikat dan capaian.",
+  },
+  // Area unggah berkas (FileDrop) di semua formulir CMS.
+  fileDrop: {
+    choose: "Pilih berkas",
+    or: "atau seret ke sini",
+    ready: "siap diunggah",
+    clear: "Batal pilih",
+    wrongType: "Jenis berkas {name} tidak diterima di sini.",
+    tooBig: "Berkas terlalu besar, maksimal {max}.",
   },
   settings: {
     title: "Pengaturan",
@@ -277,6 +288,7 @@ export const adminCopy = {
           "Server membalas tidak terduga. Muat ulang halaman (Ctrl+Shift+R), lalu impor ulang ZIP yang sama untuk melengkapi gambar postingan yang masih privat. Bila terulang, kirim status permintaan yang gagal dari tab Network dan pm2 logs ngiliyun.",
         unsupported: "Peramban ini belum bisa membaca ZIP. Pakai Chrome, Edge, Firefox, atau Safari versi terbaru.",
         platforms: { instagram: "Instagram:", facebook: "Facebook:" },
+        dropHint: "ZIP ekspor Instagram, Facebook, atau LinkedIn. Tidak dikirim utuh ke server.",
       },
       platforms: {
         instagram: {
@@ -312,6 +324,7 @@ export const adminCopy = {
         intro:
           "LinkedIn tidak mengizinkan aplikasi membaca postingan profil pribadi, jadi postingan LinkedIn diimpor dari ekspor data. Buka LinkedIn, Settings, Data privacy, Get a copy of your data, pilih Download larger data archive. LinkedIn mengirim arsip Basic lebih dulu (tanpa postingan), lalu arsip Complete 24 sampai 48 jam kemudian (tautan unduhnya berlaku 72 jam). Setelah email arsip Complete datang, unggah ZIP-nya di kartu Impor dari ekspor data, atau ekstrak lalu unggah berkas Shares.csv (di arsip Complete bernama Shares_ diikuti nomor) di sini. Postingan yang sudah ada tidak dobel.",
         file: "Berkas Shares.csv",
+        dropHint: "Shares.csv atau Shares_<nomor>.csv, maksimal 5 MB",
         submit: "Impor postingan LinkedIn",
         submitting: "Mengimpor...",
       },

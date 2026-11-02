@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { importLinkedinAction, syncSocialAction, type FormState } from "@/app/(admin)/admin/actions";
+import FileDrop from "@/components/admin/FileDrop";
 import Icon from "@/components/admin/Icon";
 import { toast } from "@/components/Toaster";
 
@@ -23,7 +24,7 @@ export function SocialSync({ platform, label, pending: pendingLabel }: { platfor
 }
 
 // Unggah Shares.csv dari ekspor data LinkedIn.
-export function LinkedinImport({ labels }: { labels: { file: string; submit: string; submitting: string } }) {
+export function LinkedinImport({ labels }: { labels: { file: string; submit: string; submitting: string; dropHint: string } }) {
   const [state, action, pending] = useActionState<FormState, FormData>(importLinkedinAction, undefined);
   const form = useRef<HTMLFormElement>(null);
   useEffect(() => {
@@ -34,7 +35,7 @@ export function LinkedinImport({ labels }: { labels: { file: string; submit: str
     <form ref={form} action={action} className="mt-4">
       <div className="admin-field">
         <label htmlFor="linkedin-shares">{labels.file}</label>
-        <input id="linkedin-shares" type="file" name="shares" accept=".csv,text/csv" required className="admin-file-input" />
+        <FileDrop id="linkedin-shares" name="shares" accept=".csv,text/csv" required hint={labels.dropHint} maxBytes={5 * 1024 * 1024} />
       </div>
       <div className="mt-3">
         <button type="submit" className="btn btn-line btn-small" disabled={pending}>

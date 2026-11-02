@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { attachExportImageAction, importExportAction, importLinkedinAction } from "@/app/(admin)/admin/actions";
+import FileDrop from "@/components/admin/FileDrop";
 import Icon from "@/components/admin/Icon";
 import { toast } from "@/components/Toaster";
 import { coverImage, detectExport, parseFacebookExport, parseInstagramExport, type ExportParse, type SkipReason } from "@/lib/social-export";
@@ -26,6 +27,7 @@ export type ExportImportLabels = {
   retryHint: string;
   unsupported: string;
   platforms: { instagram: string; facebook: string };
+  dropHint: string;
 };
 
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -67,7 +69,8 @@ type Loaded = { zip: File; entries: ZipEntry[]; parsed: ExportParse };
 // mengirim daftar postingan, lalu mengunggah gambar sampul satu per satu.
 export default function SocialExportImport({ labels }: { labels: ExportImportLabels }) {
   const router = useRouter();
-  const input = useRef<HTMLInputElement>(null);
+  // Kunci baru memasang ulang area unggah, jadi pilihan berkas kosong lagi.
+  const [dropKey, setDropKey] = useState(0);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
@@ -104,7 +107,7 @@ export default function SocialExportImport({ labels }: { labels: ExportImportLab
           if (res?.ok) anyOk = true;
         }
         setStatus("");
-        if (input.current) input.current.value = "";
+        setDropKey((k) => k + 1);
         if (anyOk) router.refresh();
         return;
       }
@@ -119,7 +122,7 @@ export default function SocialExportImport({ labels }: { labels: ExportImportLab
     } catch (err) {
       setStatus("");
       toast((err as Error).message, "error");
-      if (input.current) input.current.value = "";
+      setDropKey((k) => k + 1);
     } finally {
       setBusy(false);
     }
@@ -187,7 +190,7 @@ export default function SocialExportImport({ labels }: { labels: ExportImportLab
       const problem = failed === 0 ? "" : ` ${fill(labels.imagesFailed, { n: failed })}${serverIssue ? ` ${labels.retryHint}` : ""}`;
       toast(`${summary}${problem}`, failed > 0 ? "error" : "success");
       setLoaded(null);
-      if (input.current) input.current.value = "";
+      setDropKey((k) => k + 1);
       router.refresh();
     } catch (err) {
       toast((err as Error).message, "error");
@@ -206,15 +209,15 @@ export default function SocialExportImport({ labels }: { labels: ExportImportLab
     <div className="mt-4">
       <div className="admin-field">
         <label htmlFor="social-export-zip">{labels.file}</label>
-        <input
-          ref={input}
+        <FileDrop
+          key={dropKey}
           id="social-export-zip"
-          type="file"
+          name="zip"
           accept=".zip,application/zip"
-          className="admin-file-input"
-          aria-describedby="social-export-help"
+          hint={labels.dropHint}
+          describedBy="social-export-help"
           disabled={busy}
-          onChange={(e) => onPick(e.currentTarget.files?.[0])}
+          onFile={(f) => onPick(f)}
         />
         <p id="social-export-help" className="admin-help">
           {labels.help}

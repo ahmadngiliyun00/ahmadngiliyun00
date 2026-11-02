@@ -1,6 +1,7 @@
 "use client";
 
 import { LocalizedInputs, type LangModeLabels } from "@/components/admin/LangMode";
+import FileDrop from "@/components/admin/FileDrop";
 import RichTextPair from "@/components/admin/RichTextPair";
 import type { RichTextLabels } from "@/components/admin/RichTextEditor";
 import type { Field, Option } from "@/content/fields";
@@ -15,6 +16,7 @@ export type FieldLabels = {
   day: string;
   choose: string;
   currentFile: string;
+  fileHint: string;
   openFile: string;
   removeFile: string;
   required: string;
@@ -340,14 +342,14 @@ export default function FieldInput({
               <input type="hidden" name={key} value={str} />
             </div>
           ) : null}
-          <input
+          <FileDrop
             id={id}
             name="upload"
-            type="file"
             accept="application/pdf,image/png,image/jpeg,image/webp"
-            className="admin-file-input"
-            aria-invalid={invalid}
-            aria-describedby={describedBy}
+            hint={labels.fileHint}
+            maxBytes={5 * 1024 * 1024}
+            invalid={invalid}
+            describedBy={describedBy}
           />
           {foot}
         </div>

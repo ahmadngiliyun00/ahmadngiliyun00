@@ -8,6 +8,9 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Ditambahkan
 
+- Pilihan sumber gambar postingan media sosial: isian Tautan gambar (didahulukan) dan Gambar unggahan (dipakai bila tautan kosong); bila keduanya kosong, kartu tampil tanpa gambar. Tautan berbagi Google Drive diubah otomatis menjadi tautan gambar, dan tautan CDN LinkedIn, Facebook, atau Instagram ditolak karena kedaluwarsa dalam beberapa hari
+- Area unggah berkas baru di semua formulir CMS (isian berkas, impor lembar kerja, impor ZIP ekspor, Shares.csv LinkedIn): kotak bergaris putus-putus yang bisa diklik atau dijatuhi berkas, pratinjau gambar atau nama dan ukuran berkas sebelum diunggah, tombol batal, serta penolakan jenis atau ukuran berkas yang salah lewat toast
+
 - Impor ZIP ekspor data Instagram dan Facebook (format JSON) di Pengaturan, Media sosial. ZIP dibaca di peramban, jadi arsip ratusan MB tidak melewati batas unggah; server hanya menerima daftar postingan lalu gambar sampul satu per satu. Hasil impor selalu privat, teks rusak dari Meta diperbaiki, impor ulang tidak membuat data ganda, dan postingan yang pernah dihapus tidak masuk lagi
 - ZIP arsip LinkedIn bisa diunggah langsung (Shares.csv dibaca dari dalamnya); arsip tanpa postingan ditolak dengan pesan cara memintanya ulang
 - Catatan impor pada postingan media sosial untuk hal yang perlu diperiksa, misalnya audiens Facebook yang tidak tercatat di ekspor
@@ -23,6 +26,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- CSP `img-src` kini mengizinkan gambar dari https mana pun, supaya Tautan gambar postingan media sosial bisa tampil. Gambar dari tautan luar dimuat tanpa Referer
 - CSP mengizinkan Cloudflare Web Analytics (`static.cloudflareinsights.com` dan `cloudflareinsights.com`), yang disisipkan Cloudflare ke setiap halaman bila Web Analytics aktif; sebelumnya skripnya diblokir dan memunculkan error di konsol
 - Impor arsip LinkedIn Complete: berkas postingan bernama `Shares_<nomor>.csv` kini dikenali, dan tanda kutip yang dipakai LinkedIn untuk membungkus setiap baris teks postingan dibuang, sehingga tidak tampil di situs
 - Pesan dan panduan impor LinkedIn diperbaiki: postingan (`Shares.csv`) hanya ada di arsip Complete dari pilihan Download larger data archive, bukan di arsip Basic yang dikirim lebih dulu. Pilihan per berkas di LinkedIn tidak punya opsi Posts

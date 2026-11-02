@@ -161,7 +161,8 @@ export type SocialPost = {
   url?: string; // tautan ke postingan asli; ekspor Meta tidak memuatnya, kartu lalu menaut ke profil akun
   topic?: string; // pengelompokan di halaman Media sosial, misalnya nama program
   tags?: string[]; // tagar dari postingan asli, tanpa tanda pagar
-  fileId?: string; // gambar postingan, disalin ke UPLOAD_DIR
+  imageUrl?: string; // tautan gambar; didahulukan dari fileId bila diisi
+  fileId?: string; // gambar postingan yang diunggah (UPLOAD_DIR), dipakai bila imageUrl kosong
   imageAlt?: Localized<string>;
   sourceId?: string; // ID postingan di platform asal, mencegah tarikan ganda
   importNote?: string; // peringatan dari impor untuk diperiksa di CMS, tidak pernah tampil di situs

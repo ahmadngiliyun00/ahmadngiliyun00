@@ -18,11 +18,20 @@ export default function SocialCard({ post, lang, profiles }: { post: SocialItem;
   const caption = post.caption[lang];
   const href = post.url ?? profiles[post.platform];
   const label = (post.url ? t.social.viewOn : t.social.profileOn).replace("{platform}", platform);
+  // Urutan gambar: tautan gambar, lalu gambar unggahan, lalu tanpa gambar.
+  const image = post.imageUrl ?? (post.fileId ? `/files/${post.fileId}/` : null);
   return (
     <article className="cred social-post" data-spot data-platform={post.platform}>
-      {post.fileId ? (
-        // Gambar disajikan dari /files/ (UPLOAD_DIR), bukan dari CDN Meta yang tautannya kedaluwarsa.
-        <img src={`/files/${post.fileId}/`} alt={post.imageAlt?.[lang] ?? ""} loading="lazy" decoding="async" className="social-image" />
+      {image ? (
+        // Gambar unggahan disajikan dari /files/ (UPLOAD_DIR). Tautan luar tidak mengirim Referer.
+        <img
+          src={image}
+          alt={post.imageAlt?.[lang] ?? ""}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          className="social-image"
+        />
       ) : null}
       <p className="cred-meta">
         <span className="cred-kind">{platform}</span>

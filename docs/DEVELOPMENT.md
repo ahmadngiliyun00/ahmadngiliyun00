@@ -190,6 +190,8 @@ Postingan Instagram, Facebook, dan LinkedIn milik Mas Ilyun masuk ke koleksi `so
 
 - Impor ekspor (`SocialExportImport`, kartu Impor dari ekspor data): peramban membaca ZIP lewat `src/lib/zip-reader.ts` (Blob.slice dan `DecompressionStream`, mendukung ZIP64), mengenali jenis arsip dan membaca postingan lewat `src/lib/social-export.ts` (`detectExport`, `parseInstagramExport`, `parseFacebookExport`, `fixMetaText`). Server Action `importExportAction` menerima daftar postingan per 200 (divalidasi ulang `validatePayload` di `src/server/social/import.ts`), lalu `attachExportImageAction` menerima gambar sampul satu per satu. ZIP tidak pernah dikirim ke server
 - Instagram: `posts.json` berlabel (ID `fbid`, Caption, Published, Draft) digabung dengan `posts_1.json` format lama (daftar gambar carousel lengkap) bila waktunya berselisih paling banyak 5 detik. Facebook tidak punya ID, jadi `derivedSourceId` memakai waktu dan nama berkas media pertama, atau hash teks. Pemilik akun dibaca dari awalan judul (`ownerName`); postingan di profil orang lain dan berbagi tanpa isi sendiri dilewati
+- Gambar kartu: `imageUrl` (Tautan gambar) didahulukan, lalu `fileId` (unggahan), lalu tanpa gambar. Saat disimpan, `checkRules` mengubah tautan berbagi Drive lewat `driveImageUrl` dan menolak tautan CDN LinkedIn atau Meta yang kedaluwarsa (`imageLinkProblem`)
+- Unggah berkas di CMS memakai `FileDrop` (drag and drop, pratinjau, validasi jenis dan ukuran di peramban; validasi server tetap berlaku)
 - Peringatan untuk diperiksa disimpan di isian `importNote` (hanya CMS). Isian `url` opsional; kartu tanpa `url` menaut ke `profiles.<platform>` di Pengaturan, Media sosial, dan `checkRules` menolak public bila keduanya kosong
 - Semua aturan murni ini diuji `tests/social-export.test.mjs` dengan fixture buatan. Jangan menyalin isi ekspor asli ke repo
 
@@ -204,7 +206,7 @@ Postingan Instagram, Facebook, dan LinkedIn milik Mas Ilyun masuk ke koleksi `so
 
 `next.config.ts` mengirim header keamanan ke semua halaman: Content Security Policy, `X-Frame-Options: DENY` (CMS tidak bisa dibingkai situs lain), `nosniff`, `Referrer-Policy`, `Permissions-Policy`, dan HSTS bila `SITE_URL` memakai https. Berkas `/files/` hanya boleh dibingkai situs sendiri, untuk pratinjau PDF.
 
-CSP hanya mengizinkan skrip dari situs sendiri, Google Analytics, Cloudflare Turnstile, dan Cloudflare Web Analytics (`static.cloudflareinsights.com`, kirim data ke `cloudflareinsights.com`; disisipkan Cloudflare bila Web Analytics aktif di dasbor), serta iframe dari Turnstile dan Google Drive (pratinjau sertifikat). Skrip, gambar, iframe, atau tujuan `fetch` dari domain lain akan diblokir peramban sampai domainnya ditambahkan ke CSP. Periksa konsol peramban setelah menambah layanan pihak ketiga.
+Gambar (`img-src`) boleh dari https mana pun, karena Tautan gambar postingan media sosial bisa menunjuk ke host apa saja; gambar itu dimuat dengan `referrerPolicy="no-referrer"`. CSP hanya mengizinkan skrip dari situs sendiri, Google Analytics, Cloudflare Turnstile, dan Cloudflare Web Analytics (`static.cloudflareinsights.com`, kirim data ke `cloudflareinsights.com`; disisipkan Cloudflare bila Web Analytics aktif di dasbor), serta iframe dari Turnstile dan Google Drive (pratinjau sertifikat). Skrip, gambar, iframe, atau tujuan `fetch` dari domain lain akan diblokir peramban sampai domainnya ditambahkan ke CSP. Periksa konsol peramban setelah menambah layanan pihak ketiga.
 
 ## Data awal (seed)
 

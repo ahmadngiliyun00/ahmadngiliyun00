@@ -12,7 +12,8 @@ import { getSettingDoc, invalidateSite, primaryLang, rowToEntry } from "@/server
 import { deleteEntryFiles, deleteFile, saveUpload, syncInlineFiles } from "@/server/files";
 import { sanitizeRichText } from "@/server/richtext";
 import { ignorePost } from "@/server/social/store";
-import { parseTopicRules } from "@/lib/social";
+import { imageLinkProblem, parseTopicRules } from "@/lib/social";
+import { driveImageUrl } from "@/lib/drive";
 import { HOME_SOCIAL_LIMIT } from "@/lib/home";
 
 // Lapisan tulis konten untuk CMS. Pemanggil (Server Action) WAJIB sudah memanggil requireAdmin().
@@ -52,6 +53,13 @@ async function checkRules(
     return;
   }
   if (collection === "social") {
+    // Tautan gambar: tautan berbagi Drive diubah ke tautan gambar, CDN yang kedaluwarsa ditolak.
+    if (typeof data.imageUrl === "string") {
+      const drive = driveImageUrl(data.imageUrl);
+      if (drive !== null) data.imageUrl = drive;
+      const problem = imageLinkProblem(String(data.imageUrl));
+      if (problem !== null) errors.imageUrl = problem;
+    }
     if (visibility === "public") {
       if (data.date === null || data.date === undefined) errors.date = "Data public wajib punya tanggal posting.";
       const caption = (data.caption ?? {}) as Record<string, string>;

@@ -259,7 +259,20 @@ export const collections: CollectionConfig[] = [
         help: "Diisi otomatis saat impor ekspor, misalnya audiens Facebook yang tidak tercatat. Hanya terlihat di CMS. Kosongkan setelah diperiksa.",
       },
       { name: "tags", label: "Tagar", type: "list", help: "Tanpa tanda pagar, satu per baris. Hanya untuk aturan topik, tidak tampil di situs." },
-      { name: "fileId", label: "Gambar", type: "file", help: "Disalin otomatis dari postingan saat ditarik. PNG, JPG, atau WebP, maksimal 5 MB." },
+      {
+        name: "imageUrl",
+        width: "full",
+        label: "Tautan gambar",
+        type: "url",
+        placeholder: "https://drive.google.com/file/d/.../view",
+        help: "Opsional, didahulukan dari gambar unggahan. Tautan berbagi Google Drive (Siapa saja yang memiliki link) diubah otomatis. Tautan dari LinkedIn, Facebook, atau Instagram ditolak karena kedaluwarsa dalam beberapa hari; unggah gambarnya saja.",
+      },
+      {
+        name: "fileId",
+        label: "Gambar unggahan",
+        type: "file",
+        help: "Dipakai bila Tautan gambar kosong. Terisi otomatis saat impor ekspor bila postingan bergambar. PNG, JPG, atau WebP, maksimal 5 MB. Bila keduanya kosong, kartu tampil tanpa gambar.",
+      },
       {
         name: "imageAlt",
         label: "Teks alternatif gambar",

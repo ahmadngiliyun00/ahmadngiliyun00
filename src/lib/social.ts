@@ -108,6 +108,27 @@ export function isAllowedMediaUrl(value: string): boolean {
   }
 }
 
+// Host gambar yang tautannya bertanda tangan dan kedaluwarsa dalam hitungan hari (CDN LinkedIn dan
+// Meta). Tautan dari sini membuat gambar rusak di situs, jadi CMS menolaknya sebagai Tautan gambar.
+const EXPIRING_IMAGE_HOSTS = ["media.licdn.com", ".fbcdn.net", ".cdninstagram.com"];
+
+// Masalah pada Tautan gambar postingan, atau null bila bisa dipakai.
+export function imageLinkProblem(value: string): string | null {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return "Tautan gambar tidak sah.";
+  }
+  if (url.protocol !== "https:") return "Tautan gambar harus https.";
+  const host = url.hostname;
+  const expiring = EXPIRING_IMAGE_HOSTS.some((h) => (h.startsWith(".") ? host.endsWith(h) : host === h));
+  if (expiring) {
+    return "Tautan gambar dari LinkedIn, Facebook, atau Instagram kedaluwarsa dalam beberapa hari. Unggah gambarnya, atau pakai tautan yang permanen.";
+  }
+  return null;
+}
+
 // Slug data dari platform dan ID sumber, misalnya instagram-17912345678901234.
 export function socialSlug(platform: SocialPlatform, sourceId: string): string {
   const id = sourceId

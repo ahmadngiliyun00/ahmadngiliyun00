@@ -141,3 +141,14 @@ test("teks LinkedIn yang tiap barisnya dibungkus kutip dibuka satu lapis", () =>
   assert.equal(items[0].sourceId, "ugcpost-7000000000000000009");
   assert.equal(cleanCaption(items[0].text).caption, "Kabar baik hari ini.\n\nSaya belajar AI bersama peserta.");
 });
+
+test("tautan gambar: https permanen diterima, CDN yang kedaluwarsa ditolak", async () => {
+  const { imageLinkProblem } = await importTs(new URL("../src/lib/social.ts", import.meta.url));
+  assert.equal(imageLinkProblem("https://contoh.id/gambar/kelas.jpg"), null);
+  assert.equal(imageLinkProblem("https://drive.google.com/thumbnail?id=abc"), null);
+  assert.match(imageLinkProblem("http://contoh.id/a.jpg"), /https/);
+  assert.match(imageLinkProblem("bukan tautan"), /tidak sah/);
+  assert.match(imageLinkProblem("https://media.licdn.com/dms/image/v2/X/0/1?e=1794132000"), /kedaluwarsa/);
+  assert.match(imageLinkProblem("https://scontent-sin6-1.cdninstagram.com/v/a.jpg"), /kedaluwarsa/);
+  assert.match(imageLinkProblem("https://scontent.xx.fbcdn.net/v/a.jpg"), /kedaluwarsa/);
+});
