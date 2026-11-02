@@ -39,6 +39,20 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   // Sengaja 404, bukan 403, supaya keberadaan berkas privat tidak terungkap.
   if (!allowed) return new Response("Tidak ditemukan", { status: 404 });
 
+  // Isi berkas tidak pernah berubah untuk ID yang sama (unggahan baru selalu ID baru), jadi ID
+  // menjadi ETag. Peramban yang sudah punya salinannya mendapat 304 tanpa berkas dibaca dari disk.
+  // Pemeriksaan izin di atas tetap berjalan lebih dulu. Berkas public disimpan peramban sehari dan
+  // boleh dipakai sambil diperiksa ulang seminggu; berkas privat tidak pernah disimpan.
+  const etag = `"${meta.id}-${meta.size}"`;
+  const cache = isPublic ? "public, max-age=86400, stale-while-revalidate=604800" : "private, no-store";
+  const robots = isPublic ? "all" : "noindex, nofollow";
+  if (isPublic) {
+    const match = (req.headers.get("if-none-match") ?? "").split(",").map((t) => t.trim().replace(/^W\//, ""));
+    if (match.includes(etag)) {
+      return new Response(null, { status: 304, headers: { ETag: etag, "Cache-Control": cache, "X-Robots-Tag": robots } });
+    }
+  }
+
   const body = await readStored(meta);
   const safeName = meta.originalName.replace(/[^\w.\- ]+/g, "_");
   return new Response(new Uint8Array(body), {
@@ -47,8 +61,9 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       "Content-Length": String(body.length),
       "Content-Disposition": `inline; filename="${safeName}"`,
       "X-Content-Type-Options": "nosniff",
-      "Cache-Control": isPublic ? "public, max-age=3600" : "private, no-store",
-      "X-Robots-Tag": isPublic ? "all" : "noindex, nofollow",
+      "Cache-Control": cache,
+      "X-Robots-Tag": robots,
+      ...(isPublic ? { ETag: etag, "Last-Modified": new Date(meta.createdAt).toUTCString() } : {}),
     },
   });
 }
