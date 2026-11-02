@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { db } from "@/db";
 import { entries } from "@/db/schema";
@@ -14,17 +14,18 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   const meta = await getFileMeta(id);
   if (meta === undefined) return new Response("Tidak ditemukan", { status: 404 });
 
-  // Pemilik: data yang memakai berkas ini sebagai fileId (sertifikat), atau data yang tercatat
-  // di files.entry_id (gambar di dalam isi tulisan).
-  const owners = await db
-    .select({ visibility: entries.visibility, shareHash: entries.shareHash })
-    .from(entries)
-    .where(
-      meta.entryId === null
-        ? sql`JSON_UNQUOTE(JSON_EXTRACT(${entries.data}, '$.fileId')) = ${id}`
-        : sql`${entries.id} = ${meta.entryId} OR JSON_UNQUOTE(JSON_EXTRACT(${entries.data}, '$.fileId')) = ${id}`,
-    )
-    .limit(1);
+  // Pemilik: data yang tercatat di files.entry_id (lewat kunci utama, cepat). Hanya berkas lama
+  // yang belum dikaitkan (entry_id kosong, atau datanya sudah tidak ada) dicari lewat isian fileId
+  // di JSON, yang harus membaca seluruh tabel. cleanupOrphanFiles mengaitkan berkas seperti itu.
+  const select = { visibility: entries.visibility, shareHash: entries.shareHash };
+  let owners = meta.entryId === null ? [] : await db.select(select).from(entries).where(eq(entries.id, meta.entryId)).limit(1);
+  if (owners.length === 0) {
+    owners = await db
+      .select(select)
+      .from(entries)
+      .where(sql`JSON_UNQUOTE(JSON_EXTRACT(${entries.data}, '$.fileId')) = ${id}`)
+      .limit(1);
+  }
   const owner = owners[0];
   const isPublic = owner ? owner.visibility === "public" : false;
 
