@@ -244,6 +244,8 @@ export const adminCopy = {
       pdfFailed: "PDF {name} tidak bisa dibaca. Pastikan tidak terkunci kata sandi.",
       moved: "Gambar dipindah ke posisi {n}.",
       removed: "Gambar dihapus dari galeri. Simpan formulir untuk menghapusnya permanen.",
+      alt: "Teks alternatif gambar {n} ({lang})",
+      altPlaceholder: "Opsional, misalnya Peserta berdiskusi di kelas",
     },
     save: "Simpan",
     saving: "Menyimpan...",

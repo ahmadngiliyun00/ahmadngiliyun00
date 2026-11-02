@@ -14,6 +14,7 @@ import {
   type SocialPlatform,
 } from "@/content/types";
 import { copy } from "@/data/profile";
+import { imageModeOf } from "@/lib/gallery";
 import { showsInContact } from "@/lib/home";
 import { captionTitle } from "@/lib/social";
 
@@ -185,13 +186,13 @@ export const collections: CollectionConfig[] = [
         name: "gallery",
         label: "Galeri gambar",
         type: "gallery",
-        help: "Opsional. Satu gambar tampil diam; dua atau lebih tampil sebagai slide yang berganti otomatis tiap 3 detik dan bisa digeser, di kartu beranda, arsip Kabar, dan halaman tulisan. Gambar pertama menjadi sampul dan gambar pratinjau saat dibagikan.",
+        help: "Opsional. Satu gambar tampil diam; dua atau lebih tampil sebagai slide yang berganti otomatis tiap 3 detik dan bisa digeser, di kartu beranda, arsip Kabar, dan halaman tulisan. Gambar pertama menjadi sampul dan gambar pratinjau saat dibagikan. Teks alternatif per gambar opsional.",
       },
       {
         name: "imageAlt",
         label: "Teks alternatif galeri",
         type: "localized",
-        help: "Jelaskan isi gambar untuk pembaca layar, misalnya Suasana pelatihan AI di kelas. Situs menambahkan nomor gambar, misalnya gambar 2 dari 5.",
+        help: "Untuk gambar yang tidak punya teks alternatif sendiri, misalnya Suasana pelatihan AI di kelas. Situs menambahkan nomor gambar, misalnya gambar 2 dari 5.",
       },
       {
         name: "body",
@@ -216,6 +217,8 @@ export const collections: CollectionConfig[] = [
       "Postingan Instagram, Facebook, dan LinkedIn Anda untuk halaman Media sosial. Hasil tarikan otomatis masuk sebagai data privat; periksa lalu jadikan public satu per satu. Koneksi akun di Pengaturan, Media sosial.",
     group: "Kabar",
     order: "date",
+    // Data lama tanpa pilihan tab gambar: tab dibuka sesuai isian yang terisi.
+    fill: (_slug, d) => (typeof d.imageMode === "string" ? d : { ...d, imageMode: imageModeOf(d) }),
     title: (d) => captionTitle(loc(d.caption)) || s(d.url),
     subtitle: (d) => {
       const platform = s(d.platform) as SocialPlatform;
@@ -272,30 +275,47 @@ export const collections: CollectionConfig[] = [
       },
       { name: "tags", label: "Tagar", type: "list", help: "Tanpa tanda pagar, satu per baris. Hanya untuk aturan topik, tidak tampil di situs." },
       {
+        name: "imageMode",
+        width: "full",
+        label: "Gambar postingan",
+        type: "select",
+        tabs: true,
+        options: [
+          { value: "link", label: "Tautan gambar" },
+          { value: "upload", label: "Satu gambar" },
+          { value: "gallery", label: "Beberapa gambar (carousel)" },
+        ],
+        help: "Hanya tab yang dipilih yang tampil di situs. Isi tab lain tetap tersimpan, jadi aman berganti tab.",
+      },
+      {
         name: "imageUrl",
         width: "full",
         label: "Tautan gambar",
         type: "url",
+        tab: { of: "imageMode", show: ["link"] },
         placeholder: "https://drive.google.com/file/d/.../view",
-        help: "Opsional, didahulukan dari gambar unggahan. Tautan berbagi Google Drive (Siapa saja yang memiliki link) diubah otomatis. Tautan dari LinkedIn, Facebook, atau Instagram ditolak karena kedaluwarsa dalam beberapa hari; unggah gambarnya saja.",
+        help: "Tautan berbagi Google Drive (Siapa saja yang memiliki link) diubah otomatis. Tautan dari LinkedIn, Facebook, atau Instagram ditolak karena kedaluwarsa dalam beberapa hari; pakai tab Satu gambar.",
       },
       {
         name: "fileId",
-        label: "Gambar unggahan",
+        label: "Satu gambar",
         type: "file",
-        help: "Dipakai bila Tautan gambar kosong. Terisi otomatis saat impor ekspor bila postingan bergambar. PNG, JPG, atau WebP, maksimal 5 MB. Bila keduanya kosong, kartu tampil tanpa gambar.",
+        tab: { of: "imageMode", show: ["upload"] },
+        help: "Terisi otomatis saat impor ekspor bila postingan bergambar. PNG, JPG, atau WebP, maksimal 5 MB.",
       },
       {
         name: "gallery",
-        label: "Gambar tambahan (carousel)",
+        label: "Beberapa gambar (carousel)",
         type: "gallery",
-        help: "Untuk postingan berisi beberapa gambar atau dokumen PDF LinkedIn. Tampil sebagai slide setelah Tautan gambar atau Gambar unggahan (bila ada), berganti otomatis tiap 3 detik dan bisa digeser.",
+        tab: { of: "imageMode", show: ["gallery"] },
+        help: "Untuk postingan berisi beberapa gambar atau dokumen PDF LinkedIn. Berganti otomatis tiap 3 detik dan bisa digeser. Teks alternatif per gambar opsional; yang kosong memakai teks alternatif umum di bawah.",
       },
       {
         name: "imageAlt",
-        label: "Teks alternatif gambar",
+        label: "Teks alternatif",
         type: "localized",
-        help: "Jelaskan isi gambar untuk pembaca layar, misalnya Peserta PIJAK berdiskusi di kelas. Kosongkan bila gambar hanya hiasan.",
+        tab: { of: "imageMode" },
+        help: "Jelaskan isi gambar untuk pembaca layar, misalnya Peserta PIJAK berdiskusi di kelas. Untuk carousel, berlaku bagi gambar yang tidak punya teks sendiri, dengan nomor gambar. Kosongkan bila gambar hanya hiasan.",
       },
     ],
   },

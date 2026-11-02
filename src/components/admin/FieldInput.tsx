@@ -330,13 +330,20 @@ export default function FieldInput({
         </div>
       );
     case "gallery": {
-      // value = daftar ID berkas tersimpan; raw = isian mentah bila simpan sebelumnya gagal.
-      const rawIds = raw?.(key)?.[0];
-      const initial = rawIds !== undefined ? rawIds.split(",").filter((x) => x !== "") : Array.isArray(value) ? value : [];
+      // value = JSON item tersimpan; raw = isian mentah bila simpan sebelumnya gagal.
+      const initial = raw?.(key)?.[0] ?? (typeof value === "string" ? value : "[]");
       return (
         <div className="admin-field">
           <label htmlFor={id}>{label}</label>
-          <GalleryInput id={id} name={key} initial={initial} labels={labels.gallery} invalid={invalid} describedBy={describedBy} />
+          <GalleryInput
+            id={id}
+            name={key}
+            initial={initial}
+            labels={labels.gallery}
+            names={{ id: labels.id, en: labels.en }}
+            invalid={invalid}
+            describedBy={describedBy}
+          />
           {foot}
         </div>
       );

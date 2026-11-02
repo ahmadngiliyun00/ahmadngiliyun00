@@ -214,7 +214,9 @@ export function formFromEntry(fields: Field[], entry: TransferEntry | null): For
         break;
       case "gallery":
         // Tidak ada di lembar kerja, tetapi tetap dikirim supaya impor tidak menghapus galeri.
-        if (Array.isArray(v)) put(key, (v as unknown[]).filter((x) => typeof x === "string").join(","));
+        if (Array.isArray(v)) {
+          if (v.length > 0) put(key, JSON.stringify(v));
+        }
         break;
       default: {
         const col: TransferColumn = { key: f.name, label: "", note: "", width: 0 };

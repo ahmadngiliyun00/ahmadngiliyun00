@@ -4,15 +4,20 @@ import { useEffect, useId, useRef, useState, type DragEvent } from "react";
 import { uploadInlineImageAction } from "@/app/(admin)/admin/actions";
 import Icon from "@/components/admin/Icon";
 import { shrink } from "@/components/admin/image-shrink";
+import { useLangMode } from "@/components/admin/LangMode";
 import { toast } from "@/components/Toaster";
-import { fileUrl, GALLERY_MAX, isFileId, moveItem } from "@/lib/gallery";
+import type { Lang } from "@/content/types";
+import { ALT_MAX, fileUrl, GALLERY_MAX, galleryItems, moveItem, type GalleryItem } from "@/lib/gallery";
+import { langOrder } from "@/lib/i18n";
 
 // Isian galeri di CMS: beberapa gambar berurutan yang tampil sebagai carousel di situs.
 // - Gambar dipilih atau diseret (boleh banyak sekaligus), diperkecil di browser, lalu diunggah
 //   satu per satu lewat Server Action, jadi batas 6 MB per permintaan tidak terlampaui.
 // - PDF dipecah menjadi satu gambar per halaman (pdf.js di browser), misalnya dokumen carousel LinkedIn.
 // - Urutan disusun dengan menyeret kartu atau tombol panah (keyboard). Gambar pertama menjadi sampul.
-// - Urutan dikirim lewat input tersembunyi berisi ID berkas; baru tersimpan saat formulir disimpan.
+// - Teks alternatif per gambar opsional (bahasa utama; bahasa lain tampil di mode terjemahan).
+//   Gambar tanpa teks sendiri memakai teks alternatif umum di situs.
+// - Urutan dan teks dikirim lewat input tersembunyi berisi JSON; tersimpan saat formulir disimpan.
 //   Gambar yang dilepas dari galeri dihapus permanen oleh server saat formulir disimpan.
 
 export type GalleryLabels = {
@@ -37,7 +42,17 @@ export type GalleryLabels = {
   pdfFailed: string;
   moved: string;
   removed: string;
+  alt: string;
+  altPlaceholder: string;
 };
+
+function parseInitial(text: string): GalleryItem[] {
+  try {
+    return galleryItems(JSON.parse(text));
+  } catch {
+    return galleryItems(text.split(","));
+  }
+}
 
 const IMAGE = /^image\/(png|jpeg|webp)$/;
 const ACCEPT = "image/png,image/jpeg,image/webp,application/pdf";
@@ -55,13 +70,15 @@ export default function GalleryInput({
   name,
   initial,
   labels,
+  names,
   invalid,
   describedBy,
 }: {
   id?: string;
   name: string;
-  initial: string[];
+  initial: string; // JSON daftar item, atau ID dipisah koma
   labels: GalleryLabels;
+  names: Record<Lang, string>;
   invalid?: boolean;
   describedBy?: string;
 }) {
@@ -69,7 +86,9 @@ export default function GalleryInput({
   const inputId = id ?? auto;
   const wrap = useRef<HTMLDivElement>(null);
   const picker = useRef<HTMLInputElement>(null);
-  const [ids, setIds] = useState<string[]>(() => initial.filter(isFileId));
+  const { primary, translate } = useLangMode();
+  const [items, setItems] = useState<GalleryItem[]>(() => parseInitial(initial));
+  const ids = items.map((x) => x.file);
   const [busy, setBusy] = useState("");
   const [over, setOver] = useState(false);
   const [dragFrom, setDragFrom] = useState<number | null>(null);
@@ -78,8 +97,8 @@ export default function GalleryInput({
   // Jumlah gambar terkini untuk proses unggah yang berjalan di luar siklus render.
   const count = useRef(ids.length);
   useEffect(() => {
-    count.current = ids.length;
-  }, [ids]);
+    count.current = items.length;
+  }, [items]);
 
   async function upload(file: File | Blob, filename: string, entryId: string): Promise<string> {
     const data = new FormData();
@@ -135,7 +154,7 @@ export default function GalleryInput({
           const blob = file.type === "image/webp" ? file : await shrink(file);
           const fid = await upload(blob, file.name, entryId);
           added += 1;
-          setIds((prev) => (prev.includes(fid) ? prev : [...prev, fid]));
+          setItems((prev) => (prev.some((x) => x.file === fid) ? prev : [...prev, { file: fid }]));
         } catch (err) {
           problems.push(`${file.name}: ${(err as Error).message}`);
         }
@@ -151,7 +170,7 @@ export default function GalleryInput({
 
   function move(from: number, to: number, focus = false) {
     if (to < 0 || to >= ids.length) return;
-    setIds((prev) => moveItem(prev, from, to));
+    setItems((prev) => moveItem(prev, from, to));
     setSay(fill(labels.moved, { n: to + 1 }));
     if (focus) {
       // Fokus mengikuti gambar yang dipindah, supaya tombol panah bisa ditekan berulang.
@@ -164,9 +183,15 @@ export default function GalleryInput({
   }
 
   function remove(index: number) {
-    setIds((prev) => prev.filter((_, i) => i !== index));
+    setItems((prev) => prev.filter((_, i) => i !== index));
     setSay(labels.removed);
     toast(labels.removed, "info");
+  }
+
+  function setAlt(index: number, lang: Lang, text: string) {
+    setItems((prev) =>
+      prev.map((x, i) => (i === index ? { ...x, alt: { ...(x.alt ?? { id: "", en: "" }), [lang]: text } } : x)),
+    );
   }
 
   function onZoneDrop(e: DragEvent<HTMLLabelElement>) {
@@ -189,7 +214,7 @@ export default function GalleryInput({
 
   return (
     <div ref={wrap} className="gallery-input" data-invalid={invalid ? "" : undefined}>
-      <input type="hidden" name={name} value={ids.join(",")} />
+      <input type="hidden" name={name} value={JSON.stringify(items)} />
 
       <div className="file-drop" data-over={over ? "" : undefined}>
         <label
@@ -244,34 +269,40 @@ export default function GalleryInput({
 
       {ids.length > 0 ? (
         <ol className="gallery-list">
-          {ids.map((fid, i) => {
+          {items.map((item, i) => {
+            const fid = item.file;
             const label = fill(labels.item, { n: i + 1 });
             return (
               <li
                 key={fid}
                 data-slot={i}
                 className="gallery-item"
-                draggable={!disabled}
                 data-dragging={dragFrom === i ? "" : undefined}
                 data-drop={dropAt === i ? (dragFrom !== null ? (dragFrom < i ? "after" : "before") : undefined) : undefined}
-                onDragStart={(e) => {
-                  setDragFrom(i);
-                  e.dataTransfer.effectAllowed = "move";
-                  e.dataTransfer.setData("text/plain", String(i));
-                }}
                 onDragOver={(e) => {
                   if (dragFrom === null) return;
                   e.preventDefault();
                   e.dataTransfer.dropEffect = "move";
                   if (dropAt !== i) setDropAt(i);
                 }}
-                onDragEnd={() => {
-                  setDragFrom(null);
-                  setDropAt(null);
-                }}
                 onDrop={(e) => onItemDrop(e, i)}
               >
-                <img src={fileUrl(fid)} alt={label} className="gallery-thumb" loading="lazy" draggable={false} />
+                {/* Hanya gambar yang bisa diseret, supaya teks di isian tetap bisa dipilih. */}
+                <div
+                  className="gallery-handle"
+                  draggable={!disabled}
+                  onDragStart={(e) => {
+                    setDragFrom(i);
+                    e.dataTransfer.effectAllowed = "move";
+                    e.dataTransfer.setData("text/plain", String(i));
+                  }}
+                  onDragEnd={() => {
+                    setDragFrom(null);
+                    setDropAt(null);
+                  }}
+                >
+                  <img src={fileUrl(fid)} alt={label} className="gallery-thumb" loading="lazy" draggable={false} />
+                </div>
                 <span className="gallery-badge">{i === 0 ? `${i + 1} · ${labels.first}` : i + 1}</span>
                 <span className="gallery-tools">
                   <button
@@ -308,6 +339,29 @@ export default function GalleryInput({
                     <Icon name="trash-can" />
                   </button>
                 </span>
+                <div className="gallery-alt">
+                  {langOrder(primary).map((lang) => {
+                    if (lang !== primary) {
+                      if (!translate) return null;
+                    }
+                    const altId = `${inputId}-alt-${i}-${lang}`;
+                    return (
+                      <div key={lang} className="gallery-alt-row">
+                        <label htmlFor={altId} className="gallery-alt-label">
+                          {fill(labels.alt, { n: i + 1, lang: names[lang] })}
+                        </label>
+                        <input
+                          id={altId}
+                          className="field gallery-alt-input"
+                          value={item.alt?.[lang] ?? ""}
+                          maxLength={ALT_MAX}
+                          placeholder={labels.altPlaceholder}
+                          onChange={(e) => setAlt(i, lang, e.currentTarget.value)}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </li>
             );
           })}

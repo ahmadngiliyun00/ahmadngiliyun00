@@ -1,6 +1,8 @@
 // Tipe semua konten yang dikelola lewat CMS.
 // Berkas ini hanya berisi tipe dan label (tanpa impor nilai), karena juga dibaca skrip Node.
 
+import type { GalleryItem, ImageMode } from "@/lib/gallery";
+
 export type Lang = "id" | "en";
 export type Localized<T> = Record<Lang, T>;
 export type Visibility = "public" | "private";
@@ -146,7 +148,8 @@ export type Post = {
   summary?: Localized<string>;
   body?: Localized<string>; // isi lengkap (HTML); bila ada, tulisan punya halaman sendiri di situs
   comments?: boolean; // kolom komentar di halaman tulisan
-  gallery?: string[]; // ID berkas unggahan berurutan, tampil sebagai carousel (src/lib/gallery.ts)
+  // Gambar berurutan, tampil sebagai carousel. Data lama berupa ID saja; baca lewat galleryItems.
+  gallery?: (GalleryItem | string)[];
   imageAlt?: Localized<string>; // teks alternatif galeri, situs menambahkan nomor gambar
 };
 
@@ -165,7 +168,10 @@ export type SocialPost = {
   tags?: string[]; // tagar dari postingan asli, tanpa tanda pagar
   imageUrl?: string; // tautan gambar; didahulukan dari fileId bila diisi
   fileId?: string; // gambar postingan yang diunggah (UPLOAD_DIR), dipakai bila imageUrl kosong
-  gallery?: string[]; // gambar tambahan berurutan (carousel), tampil setelah imageUrl atau fileId
+  // Sumber gambar yang tampil di situs, dipilih lewat tab di CMS. Kosong pada data lama: ditebak
+  // dari isian yang terisi (imageModeOf). Isian tab lain tetap tersimpan, tetapi tidak tampil.
+  imageMode?: ImageMode;
+  gallery?: (GalleryItem | string)[]; // tab Beberapa gambar (carousel)
   imageAlt?: Localized<string>;
   sourceId?: string; // ID postingan di platform asal, mencegah tarikan ganda
   importNote?: string; // peringatan dari impor untuk diperiksa di CMS, tidak pernah tampil di situs

@@ -678,6 +678,94 @@
     color: var(--color-muted);
   }
 
+  /* Tab isian (FieldTabs): sumber gambar postingan dan kelompok isian lain yang saling menggantikan. */
+  .field-tabs {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .field-tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--color-ink) 60%, transparent);
+  }
+
+  .field-tab {
+    flex: 1 1 auto;
+    min-height: 2.5rem;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid transparent;
+    border-radius: 0.6rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .field-tab:hover {
+    color: var(--color-fg);
+  }
+
+  .field-tab[aria-selected="true"] {
+    border-color: color-mix(in srgb, var(--color-leaf) 55%, var(--color-line));
+    color: var(--color-ink);
+    background: var(--color-leaf);
+  }
+
+  .field-tab:focus-visible {
+    outline: 2px solid var(--color-sky);
+    outline-offset: 2px;
+  }
+
+  /* Tab dengan isian galat ditandai titik merah. */
+  .field-tab[data-error]::after {
+    content: "";
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-left: 0.45rem;
+    border-radius: 999px;
+    background: #ff9b8a;
+    vertical-align: middle;
+  }
+
+  .field-tabpanel {
+    padding: 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.8rem;
+  }
+
+  .field-tabpanel[hidden] {
+    display: none;
+  }
+
+  /* Judul isian di dalam panel sama dengan nama tabnya: disembunyikan dari mata, tetap dibaca
+     pembaca layar sebagai label isian. */
+  .field-tabpanel > .admin-field > label:first-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .field-tabshared {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .field-tab {
+      transition: none;
+    }
+  }
+
   /* Isian galeri: area unggah banyak berkas, lalu kartu gambar yang bisa diseret untuk menyusun urutan. */
   .gallery-input {
     display: grid;
@@ -699,7 +787,7 @@
 
   .gallery-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
     gap: 0.75rem;
     padding: 0;
     list-style: none;
@@ -708,11 +796,11 @@
   .gallery-item {
     position: relative;
     display: grid;
+    align-content: start;
     overflow: hidden;
     border: 1px solid var(--color-line);
     border-radius: 0.8rem;
     background: var(--color-ink);
-    cursor: grab;
     transition: border-color 0.2s ease, opacity 0.2s ease;
   }
 
@@ -739,11 +827,40 @@
     box-shadow: inset -4px 0 0 var(--color-leaf);
   }
 
+  .gallery-handle {
+    cursor: grab;
+  }
+
   .gallery-thumb {
+    display: block;
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
     pointer-events: none;
+  }
+
+  .gallery-alt {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.5rem;
+    border-top: 1px solid var(--color-line);
+    background: var(--color-surface);
+    cursor: auto;
+  }
+
+  .gallery-alt-row {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .gallery-alt-label {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+
+  .gallery-alt-input {
+    padding: 0.45rem 0.6rem;
+    font-size: 0.85rem;
   }
 
   .gallery-badge {

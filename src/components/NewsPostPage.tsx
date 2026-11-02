@@ -8,7 +8,7 @@ import ViewBeacon from "@/components/ViewBeacon";
 import { copy, site, type Lang } from "@/data/profile";
 import { homePath } from "@/lib/nav";
 import { formatNumber } from "@/lib/github";
-import { fileUrl, galleryIds, slideImages } from "@/lib/gallery";
+import { gallerySlides, slideImages } from "@/lib/gallery";
 import { jsonForScript } from "@/lib/json-script";
 import { asHtml, htmlToText, readingMinutes } from "@/lib/richtext";
 import type { PublicComment } from "@/server/comments";
@@ -52,8 +52,9 @@ export default function NewsPostPage({
   });
   const viewText = views === 1 ? t.news.viewsOne : t.news.views.replace("{n}", formatNumber(views, lang));
   const otherHref = hasPage(post, other) ? postPath(other, post.slug) : postsPath(other);
-  const gallery = galleryIds(post.gallery).map(fileUrl);
-  const images = slideImages(gallery, post.imageAlt?.[lang] ?? "", t.carousel.image);
+  const slides = gallerySlides(post.gallery);
+  const gallery = slides.map((x) => x.src);
+  const images = slideImages(slides, lang, post.imageAlt?.[lang] ?? "", t.carousel.image);
 
   const structured = {
     "@context": "https://schema.org",

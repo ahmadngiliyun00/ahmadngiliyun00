@@ -10,7 +10,7 @@ import { fileIdsIn, htmlToText } from "@/lib/richtext";
 import { sha256 } from "@/server/auth/session";
 import { getSettingDoc, invalidateSite, primaryLang, rowToEntry } from "@/server/content";
 import { deleteEntryFiles, deleteFile, getFileMeta, saveUpload, syncInlineFiles } from "@/server/files";
-import { galleryIds } from "@/lib/gallery";
+import { galleryIds, galleryItems } from "@/lib/gallery";
 import { sanitizeRichText } from "@/server/richtext";
 import { ignorePost } from "@/server/social/store";
 import { imageLinkProblem, parseTopicRules } from "@/lib/social";
@@ -207,13 +207,13 @@ export async function saveEntry(
   // Galeri hanya boleh berisi berkas yang baru diunggah (belum berpemilik) atau milik data ini,
   // supaya gambar data lain tidak ikut terbuka lewat data ini.
   for (const f of galleryFields) {
-    const ids: string[] = [];
-    for (const fid of galleryIds(getPath(data, f.name))) {
-      const meta = await getFileMeta(fid);
+    const items = [];
+    for (const item of galleryItems(getPath(data, f.name))) {
+      const meta = await getFileMeta(item.file);
       if (meta === undefined) continue;
-      if (meta.entryId === null ? true : meta.entryId === id) ids.push(fid);
+      if (meta.entryId === null ? true : meta.entryId === id) items.push(item);
     }
-    setPath(data, f.name, ids.length === 0 ? undefined : ids);
+    setPath(data, f.name, items.length === 0 ? undefined : items);
   }
 
   // Berkas: unggahan baru menggantikan yang lama; centang "hapus berkas" melepasnya.

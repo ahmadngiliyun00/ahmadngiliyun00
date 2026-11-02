@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { SeoSettings } from "@/content/types";
 import { copy, site, type Lang } from "@/data/profile";
-import { fileUrl, galleryIds } from "@/lib/gallery";
+import { fileUrl, galleryItems } from "@/lib/gallery";
 import { type AchievementItem, archivePath, detailPath, formatPartialDate, kindName } from "@/lib/achievements";
 import { type PageKey, PAGE_KEYS, pagePath } from "@/lib/nav";
 import { type PostItem, hasPage, isoPartialDate, postPath, postsPath } from "@/lib/posts";
@@ -141,8 +141,9 @@ export function buildPostMetadata(lang: Lang, post: PostItem): Metadata {
     if (hasPage(post, l)) languages[l] = postPath(l, post.slug);
   }
   // Gambar pertama galeri menjadi gambar pratinjau saat tautan dibagikan.
-  const cover = galleryIds(post.gallery)[0];
-  const images = cover === undefined ? undefined : [{ url: fileUrl(cover), alt: post.imageAlt?.[lang] ?? post.title[lang] }];
+  const cover = galleryItems(post.gallery)[0];
+  const coverAlt = cover?.alt?.[lang] || post.imageAlt?.[lang] || post.title[lang];
+  const images = cover === undefined ? undefined : [{ url: fileUrl(cover.file), alt: coverAlt }];
   return {
     metadataBase: new URL(site.url),
     title,

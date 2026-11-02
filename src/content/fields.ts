@@ -3,7 +3,7 @@
 
 import type { Lang, PartialDate } from "@/content/types";
 import { isDriveFolder, normalizeDriveUrl } from "@/lib/drive";
-import { galleryIds, parseGallery } from "@/lib/gallery";
+import { galleryItems, parseGallery } from "@/lib/gallery";
 import { isBlank } from "@/lib/i18n";
 import { asHtml, htmlToText } from "@/lib/richtext";
 
@@ -16,6 +16,10 @@ interface Base {
   required?: boolean;
   placeholder?: string | { id: string; en: string }; // bila kosong, FieldInput membuat placeholder dari jenis dan label field
   width?: FieldWidth; // lebar di desktop; bila kosong, ditentukan oleh fieldWidth()
+  // Field ini tampil di dalam tab milik field select bertab (tabs: true) bernama of.
+  // show = nilai tab tempat field tampil; kosong berarti tampil di bawah semua tab.
+  // Field di tab yang tidak aktif tetap ikut terkirim, jadi isinya tidak hilang saat berganti tab.
+  tab?: { of: string; show?: string[] };
 }
 interface PlainField extends Base {
   // gallery = beberapa gambar berurutan (carousel), disimpan sebagai daftar ID berkas (src/lib/gallery.ts).
@@ -41,6 +45,9 @@ interface RichTextField extends Base {
 interface ChoiceField extends Base {
   type: "select" | "multiselect";
   options: Option[];
+  // Khusus select: tampil sebagai tab navigasi, dan field dengan tab.of = nama field ini
+  // menjadi isi tab (FieldTabs). Nilai select = tab yang dipilih.
+  tabs?: boolean;
 }
 interface ReferenceField extends Base {
   type: "reference";
@@ -273,7 +280,10 @@ export function readField(field: Field, form: FormData, errors: FieldErrors): un
     case "gallery": {
       const parsed = parseGallery(str(form, key));
       if (parsed.error) errors[field.name] = `${label}: ${parsed.error}`;
-      return parsed.ids.length === 0 ? undefined : parsed.ids;
+      parsed.items.forEach((item) => {
+        if (item.alt) checkText(`${item.alt.id} ${item.alt.en}`, label, errors, field.name);
+      });
+      return parsed.items.length === 0 ? undefined : parsed.items;
     }
     case "secret": {
       // Rahasia (misalnya sandi SMTP) tidak pernah dikirim balik ke formulir. Kosong berarti
@@ -337,7 +347,8 @@ export function formValue(field: Field, doc: Doc): string | { id: string; en: st
     case "list":
       return Array.isArray(v) ? (v as string[]).join("\n") : "";
     case "gallery":
-      return galleryIds(v);
+      // JSON daftar item (ID berkas dan teks alternatif per gambar), dibaca GalleryInput.
+      return JSON.stringify(galleryItems(v));
     case "links":
       return Array.isArray(v)
         ? (v as { label: { id: string; en: string }; href: string }[])

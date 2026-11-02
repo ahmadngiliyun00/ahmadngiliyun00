@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef } from "react";
 import type { FormState } from "@/app/(admin)/admin/actions";
 import { toast } from "@/components/Toaster";
 import FieldInput, { type FieldLabels, type FieldValue } from "@/components/admin/FieldInput";
+import FieldTabs from "@/components/admin/FieldTabs";
 import { LangModeProvider } from "@/components/admin/LangMode";
 import { fieldWidth, type Field, type Option } from "@/content/fields";
 import type { Lang } from "@/content/types";
@@ -68,6 +69,21 @@ export default function EntryForm({
     const first = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
     first?.focus();
   }, [state, labels.saved, labels.errorsTitle]);
+
+  function input(field: Field) {
+    return (
+      <FieldInput
+        key={field.name}
+        field={field}
+        value={values[field.name] ?? null}
+        raw={raw}
+        error={errors[field.name]}
+        options={field.type === "reference" ? references?.[field.collection] : undefined}
+        file={field.type === "file" ? file : undefined}
+        labels={labels}
+      />
+    );
+  }
 
   return (
     <form ref={formRef} action={formAction} className="admin-form" noValidate>
@@ -149,19 +165,38 @@ export default function EntryForm({
         showBar={fields.some((f) => LOCALIZED.includes(f.type))}
       >
         <div className="admin-card admin-fields">
-          {fields.map((field) => (
-            <div key={field.name} className="admin-cell" data-w={fieldWidth(field)}>
-              <FieldInput
-                field={field}
-                value={values[field.name] ?? null}
-                raw={raw}
-                error={errors[field.name]}
-                options={field.type === "reference" ? references?.[field.collection] : undefined}
-                file={field.type === "file" ? file : undefined}
-                labels={labels}
-              />
-            </div>
-          ))}
+          {fields.map((field) => {
+            // Isian bertab dirender di dalam FieldTabs milik select-nya.
+            if (field.tab) return null;
+            if (field.type === "select" ? field.tabs === true : false) {
+              const members = fields.filter((f) => f.tab?.of === field.name);
+              const options = field.type === "select" ? field.options : [];
+              const errorTabs = options
+                .map((o) => o.value)
+                .filter((v) => members.some((m) => (m.tab?.show?.includes(v) ? errors[m.name] !== undefined : false)));
+              const current = raw?.(`f.${field.name}`)?.[0] ?? values[field.name];
+              return (
+                <div key={field.name} className="admin-cell" data-w="full">
+                  <FieldTabs
+                    field={field}
+                    value={typeof current === "string" ? current : ""}
+                    errorTabs={errorTabs}
+                    error={errors[field.name]}
+                    panels={options.map((o) => ({
+                      value: o.value,
+                      children: members.filter((m) => m.tab?.show?.includes(o.value)).map((m) => input(m)),
+                    }))}
+                    shared={members.filter((m) => (m.tab?.show ?? []).length === 0).map((m) => input(m))}
+                  />
+                </div>
+              );
+            }
+            return (
+              <div key={field.name} className="admin-cell" data-w={fieldWidth(field)}>
+                {input(field)}
+              </div>
+            );
+          })}
         </div>
       </LangModeProvider>
 
