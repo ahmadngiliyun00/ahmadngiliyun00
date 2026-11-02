@@ -4,6 +4,7 @@ import { site } from "@/data/profile";
 import { archivePath, detailPath } from "@/lib/achievements";
 import { type PageKey, PAGE_KEYS, pagePath } from "@/lib/nav";
 import { hasPage, postPath, postsPath, publicPosts } from "@/lib/posts";
+import { SITEMAP_RULES, w3cDate } from "@/lib/sitemap";
 import { loadSite } from "@/server/content";
 
 // Dibaca dari database saat diminta, jadi data yang baru dipublikasikan di CMS langsung masuk
@@ -14,6 +15,7 @@ import { loadSite } from "@/server/content";
 // Pasangan bahasa (hreflang) tidak ditulis di sini karena sudah ada di <head> setiap halaman
 // (alternates.languages di src/lib/metadata.ts). Tanpa elemen xhtml:link, browser menampilkan
 // sitemap sebagai pohon XML yang mudah dibaca, bukan teks yang menyambung.
+// Format lastmod, changefreq, dan priority mengikuti src/lib/sitemap.ts.
 export const dynamic = "force-dynamic";
 
 function latest(list: Entry[]): Date | undefined {
@@ -24,10 +26,9 @@ function latest(list: Entry[]): Date | undefined {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const content = await loadSite();
-  const pair = (id: string, en: string, lastModified: Date | undefined) => [
-    { url: `${site.url}${id}`, lastModified },
-    { url: `${site.url}${en}`, lastModified },
-  ];
+  type Rule = (typeof SITEMAP_RULES)[keyof typeof SITEMAP_RULES];
+  const item = (path: string, date: Date | undefined, rule: Rule) => ({ url: `${site.url}${path}`, lastModified: w3cDate(date), ...rule });
+  const pair = (id: string, en: string, date: Date | undefined, rule: Rule) => [item(id, date, rule), item(en, date, rule)];
 
   const achievements = content.achievement.filter((e) => e.visibility === "public");
   const everything = Object.values(content).filter(Array.isArray).flat() as Entry[];
@@ -42,21 +43,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     journey: [...content.milestone, ...content.plan, ...content.principle],
     social: content.social,
   };
-  const innerPages = PAGE_KEYS.flatMap((page) => pair(pagePath("id", page), pagePath("en", page), latest(sources[page])));
+  const innerPages = PAGE_KEYS.flatMap((page) => pair(pagePath("id", page), pagePath("en", page), latest(sources[page]), SITEMAP_RULES.inner));
   const postPages = posts.flatMap((p) =>
     (["id", "en"] as const)
       .filter((l) => hasPage(p, l))
-      .map((l) => ({ url: `${site.url}${postPath(l, p.slug)}`, lastModified: new Date(p.updatedAt) })),
+      .map((l) => item(postPath(l, p.slug), new Date(p.updatedAt), SITEMAP_RULES.post)),
   );
 
   return [
-    ...pair("/", "/en/", latest(everything)),
+    ...pair("/", "/en/", latest(everything), SITEMAP_RULES.home),
     ...innerPages,
-    ...pair(archivePath("id"), archivePath("en"), latest(achievements)),
+    ...pair(archivePath("id"), archivePath("en"), latest(achievements), SITEMAP_RULES.archive),
     ...achievements.flatMap((e) =>
-      pair(detailPath("id", e.slug), detailPath("en", e.slug), new Date(e.updatedAt)),
+      pair(detailPath("id", e.slug), detailPath("en", e.slug), new Date(e.updatedAt), SITEMAP_RULES.detail),
     ),
-    ...(news.length === 0 ? [] : pair(postsPath("id"), postsPath("en"), latest(news))),
+    ...(news.length === 0 ? [] : pair(postsPath("id"), postsPath("en"), latest(news), SITEMAP_RULES.archive)),
     ...postPages,
   ];
 }
