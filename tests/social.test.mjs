@@ -152,3 +152,14 @@ test("tautan gambar: https permanen diterima, CDN yang kedaluwarsa ditolak", asy
   assert.match(imageLinkProblem("https://scontent-sin6-1.cdninstagram.com/v/a.jpg"), /kedaluwarsa/);
   assert.match(imageLinkProblem("https://scontent.xx.fbcdn.net/v/a.jpg"), /kedaluwarsa/);
 });
+
+test("caption kartu dipotong di batas kata, teks pendek utuh", async () => {
+  const { cardCaption, CARD_CAPTION_MAX } = await importTs(new URL("../src/lib/social.ts", import.meta.url));
+  assert.equal(cardCaption("  Pendek saja.  "), "Pendek saja.");
+  const long = "kata ".repeat(300);
+  const out = cardCaption(long);
+  assert.ok(out.length <= CARD_CAPTION_MAX + 3);
+  assert.ok(out.endsWith("kata..."));
+  // Tanpa spasi: dipotong tepat di batas.
+  assert.equal(cardCaption("x".repeat(700)).length, CARD_CAPTION_MAX + 3);
+});

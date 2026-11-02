@@ -56,6 +56,19 @@ export type TopicRule = { keyword: string; topic: string };
 
 // Aturan topik dari Pengaturan, satu per baris: "kata kunci | Nama topik".
 // Kata kunci boleh diawali tanda pagar; pencocokan tidak membedakan huruf besar dan kecil.
+// Teks kartu: kartu memotong caption secara visual (line-clamp 4 sampai 7 baris), jadi sisanya
+// tidak perlu ikut dikirim ke peramban. Dipotong di batas kata dengan "...", tetap lebih panjang
+// dari yang terlihat, sehingga tampilan kartu tidak berubah. Versi lengkap ada di platform asal.
+export const CARD_CAPTION_MAX = 600;
+
+export function cardCaption(caption: string, max = CARD_CAPTION_MAX): string {
+  const text = caption.trim();
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).trimEnd()}...`;
+}
+
 export function parseTopicRules(lines: string[]): { rules: TopicRule[]; errors: string[] } {
   const rules: TopicRule[] = [];
   const errors: string[] = [];

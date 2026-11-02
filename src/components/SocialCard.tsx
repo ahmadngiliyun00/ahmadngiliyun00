@@ -3,6 +3,7 @@ import MediaCarousel from "@/components/MediaCarousel";
 import { socialPlatformLabels, type SocialPlatform, type SocialPost } from "@/content/types";
 import { copy, type Lang } from "@/data/profile";
 import { formatPartialDate } from "@/lib/achievements";
+import { cardCaption } from "@/lib/social";
 import { slideImages, socialSlides } from "@/lib/gallery";
 
 export interface SocialItem extends SocialPost {
@@ -17,7 +18,7 @@ export type SocialProfiles = Partial<Record<SocialPlatform, string>>;
 export default function SocialCard({ post, lang, profiles }: { post: SocialItem; lang: Lang; profiles: SocialProfiles }) {
   const t = copy[lang];
   const platform = socialPlatformLabels[post.platform];
-  const caption = post.caption[lang];
+  const caption = cardCaption(post.caption[lang] ?? "");
   const href = post.url ?? profiles[post.platform];
   const label = (post.url ? t.social.viewOn : t.social.profileOn).replace("{platform}", platform);
   // Gambar dari tab yang dipilih di CMS (tautan, satu gambar, atau carousel); tanpa gambar bila kosong.
