@@ -28,6 +28,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- `npm run build` kini berhenti di awal dengan pesan jelas bila paket di `node_modules` belum sesuai `package-lock.json` (misalnya lupa `npm ci` setelah `git pull`), bukan gagal di tengah dengan "Module not found". Panduan deploy memakai perintah berantai supaya `pm2 reload` tidak berjalan setelah build gagal
 - CSP `img-src` kini mengizinkan gambar dari https mana pun, supaya Tautan gambar postingan media sosial bisa tampil. Gambar dari tautan luar dimuat tanpa Referer
 - CSP mengizinkan Cloudflare Web Analytics (`static.cloudflareinsights.com` dan `cloudflareinsights.com`), yang disisipkan Cloudflare ke setiap halaman bila Web Analytics aktif; sebelumnya skripnya diblokir dan memunculkan error di konsol
 - Impor arsip LinkedIn Complete: berkas postingan bernama `Shares_<nomor>.csv` kini dikenali, dan tanda kutip yang dipakai LinkedIn untuk membungkus setiap baris teks postingan dibuang, sehingga tidak tampil di situs

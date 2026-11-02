@@ -31,7 +31,8 @@ CHANGELOG.md                     catatan perubahan per versi rilis
 drizzle/                         migrasi database (dibuat npm run db:generate)
 seed/                            konten awal untuk npm run db:seed (hanya import type)
 profile/                         banner.svg, marquee.svg, stats.svg, dan fonts/ untuk README
-scripts/prebuild.mjs             prebuild: data GitHub lalu README
+scripts/prebuild.mjs             prebuild: cek paket terpasang, data GitHub, lalu README
+scripts/check-deps.mjs           hentikan build bila node_modules tidak sesuai package-lock.json (lupa npm ci)
 scripts/fetch-github.mjs         ambil data GitHub, fallback ke data lama bila gagal
 scripts/readme-assets.mjs        buat gambar SVG README
 scripts/readme-sections.mjs      bagian proyek, capaian, mengajar, perjalanan README dari database

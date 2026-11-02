@@ -238,6 +238,14 @@ npm run build
 pm2 reload ngiliyun
 ```
 
+Jangan lewati `npm ci`: rilis bisa membawa paket baru (misalnya `pdfjs-dist` untuk galeri gambar). Bila lupa, `npm run build` berhenti di awal dengan pesan `[deps] Paket di node_modules tidak sesuai package-lock.json` (`scripts/check-deps.mjs`).
+
+Supaya aplikasi tidak dimuat ulang ketika salah satu langkah gagal, jalankan berantai dalam satu baris. `pm2 reload` hanya berjalan bila semua langkah sebelumnya berhasil:
+
+```bash
+git pull --ff-only && npm ci && npm run db:migrate && npm run build && pm2 reload ngiliyun
+```
+
 ### Memperbarui Node.js
 
 Node.js merilis tambalan keamanan beberapa kali setahun (pengumuman di <https://nodejs.org/en/blog/vulnerability>). Periksa versi dengan `node -v`, lalu perbarui ke patch terbaru di jalur yang sama:
