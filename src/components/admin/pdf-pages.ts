@@ -20,14 +20,24 @@ function loadPdfJs(): Promise<PdfJs> {
   return loading;
 }
 
-// onPage dipanggil setelah setiap halaman selesai digambar (untuk pesan kemajuan).
+// Muat pdf.js lebih awal (misalnya saat kursor atau berkas mendekati area unggah), supaya
+// saat PDF dijatuhkan tidak ada jeda unduh pustaka yang terasa seperti tidak terjadi apa-apa.
+export function preloadPdfJs(): void {
+  void loadPdfJs().catch(() => {
+    loading = null;
+  });
+}
+
+// onOpen dipanggil sebelum PDF dibuka, onPage sebelum setiap halaman digambar (pesan kemajuan).
 // limit = paling banyak halaman yang diambil, sisanya dilewati.
 export async function pdfToImages(
   file: File,
   limit: number,
   onPage?: (page: number, pages: number) => void,
+  onOpen?: () => void,
 ): Promise<{ files: File[]; pages: number }> {
   const pdfjs = await loadPdfJs();
+  onOpen?.();
   const task = pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) });
   const doc = await task.promise;
   const base = file.name.replace(/\.pdf$/i, "");

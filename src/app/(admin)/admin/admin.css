@@ -776,6 +776,42 @@
     border-color: #ff9b8a;
   }
 
+  /* Sedang memproses: area unggah terkunci, ikon berputar, bilah kemajuan. */
+  .file-drop[data-busy] .file-drop-zone,
+  .file-drop[data-busy] .file-drop-zone:hover {
+    border-style: solid;
+    border-color: var(--color-sky);
+    background: color-mix(in srgb, var(--color-sky) 8%, transparent);
+    cursor: progress;
+    opacity: 1;
+  }
+
+  .gallery-busy strong {
+    color: var(--color-fg);
+  }
+
+  .gallery-progress {
+    width: min(100%, 22rem);
+    height: 0.5rem;
+    overflow: hidden;
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-line);
+    accent-color: var(--color-leaf);
+  }
+
+  .gallery-progress::-webkit-progress-bar {
+    background: var(--color-line);
+  }
+
+  .gallery-progress::-webkit-progress-value {
+    background: var(--color-leaf);
+  }
+
+  .gallery-progress::-moz-progress-bar {
+    background: var(--color-leaf);
+  }
+
   .gallery-count {
     font-size: 0.875rem;
     font-weight: 600;

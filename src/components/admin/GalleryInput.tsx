@@ -42,6 +42,11 @@ export type GalleryLabels = {
   pdfFailed: string;
   moved: string;
   removed: string;
+  preparing: string;
+  loadingPdf: string;
+  opening: string;
+  wait: string;
+  stillWorking: string;
   alt: string;
   altPlaceholder: string;
 };
@@ -90,6 +95,12 @@ export default function GalleryInput({
   const [items, setItems] = useState<GalleryItem[]>(() => parseInitial(initial));
   const ids = items.map((x) => x.file);
   const [busy, setBusy] = useState("");
+  // Kemajuan untuk bilah progres: null = belum diketahui (bilah berjalan tanpa angka).
+  const [progress, setProgress] = useState<{ value: number; max: number } | null>(null);
+  // Penanda sibuk yang langsung berlaku, sebelum render berikutnya: berkas kedua yang dijatuhkan
+  // di saat yang sama ditolak, tidak ikut diproses bersamaan.
+  const working = useRef(false);
+  const warmed = useRef(false);
   const [over, setOver] = useState(false);
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const [dropAt, setDropAt] = useState<number | null>(null);
@@ -111,13 +122,27 @@ export default function GalleryInput({
     return found[1];
   }
 
+  // pdf.js (sekitar 1 MB) dimuat lebih awal saat kursor, fokus, atau berkas mendekati area unggah.
+  function warmUp() {
+    if (warmed.current) return;
+    warmed.current = true;
+    void import("@/components/admin/pdf-pages").then((m) => m.preloadPdfJs()).catch(() => {
+      warmed.current = false;
+    });
+  }
+
   async function addFiles(list: File[]) {
-    if (busy !== "") return;
+    if (working.current) return;
+    if (list.length === 0) return;
     const room = GALLERY_MAX - count.current;
     if (room <= 0) {
       toast(fill(labels.full, { max: GALLERY_MAX }), "error");
       return;
     }
+    // Langsung terkunci dan berputar begitu berkas diterima, sebelum pekerjaan berat dimulai.
+    working.current = true;
+    setBusy(fill(labels.preparing, { n: list.length }));
+    setProgress(null);
     const entryId = wrap.current?.closest("form")?.querySelector<HTMLInputElement>('input[name="id"]')?.value ?? "";
     const problems: string[] = [];
     let added = 0;
@@ -132,9 +157,17 @@ export default function GalleryInput({
         }
         if (isPdf(file)) {
           try {
+            setBusy(fill(labels.loadingPdf, { name: file.name }));
+            setProgress(null);
             const { pdfToImages } = await import("@/components/admin/pdf-pages");
-            const res = await pdfToImages(file, room - queue.length, (page, pages) =>
-              setBusy(fill(labels.reading, { name: file.name, page, pages })),
+            const res = await pdfToImages(
+              file,
+              room - queue.length,
+              (page, pages) => {
+                setBusy(fill(labels.reading, { name: file.name, page, pages: Math.min(pages, room - queue.length) }));
+                setProgress({ value: page - 1, max: Math.min(pages, room - queue.length) });
+              },
+              () => setBusy(fill(labels.opening, { name: file.name })),
             );
             queue.push(...res.files);
             if (res.pages > res.files.length) trimmed = true;
@@ -149,6 +182,7 @@ export default function GalleryInput({
       }
       for (let i = 0; i < queue.length; i++) {
         setBusy(fill(labels.uploading, { done: i + 1, total: queue.length }));
+        setProgress({ value: i, max: queue.length });
         const file = queue[i];
         try {
           const blob = file.type === "image/webp" ? file : await shrink(file);
@@ -160,7 +194,9 @@ export default function GalleryInput({
         }
       }
     } finally {
+      working.current = false;
       setBusy("");
+      setProgress(null);
       if (picker.current) picker.current.value = "";
     }
     if (added > 0) toast(fill(labels.uploaded, { n: added }), "success");
@@ -200,7 +236,12 @@ export default function GalleryInput({
     // Seret ulang kartu galeri ke area unggah tidak dihitung sebagai berkas baru.
     if (dragFrom !== null) return;
     const files = [...e.dataTransfer.files];
-    if (files.length > 0) void addFiles(files);
+    if (files.length === 0) return;
+    if (working.current) {
+      toast(labels.stillWorking, "info");
+      return;
+    }
+    void addFiles(files);
   }
 
   function onItemDrop(e: DragEvent<HTMLLIElement>, index: number) {
@@ -216,13 +257,17 @@ export default function GalleryInput({
     <div ref={wrap} className="gallery-input" data-invalid={invalid ? "" : undefined}>
       <input type="hidden" name={name} value={JSON.stringify(items)} />
 
-      <div className="file-drop" data-over={over ? "" : undefined}>
+      <div className="file-drop" data-over={over ? "" : undefined} data-busy={disabled ? "" : undefined}>
         <label
           htmlFor={inputId}
           className="file-drop-zone"
           aria-disabled={disabled || undefined}
+          aria-busy={disabled || undefined}
+          onPointerEnter={warmUp}
+          onFocus={warmUp}
           onDragEnter={(e) => {
             e.preventDefault();
+            warmUp();
             if (dragFrom === null) {
               if (!disabled) setOver(true);
             }
@@ -246,20 +291,29 @@ export default function GalleryInput({
             className="file-drop-input"
             onChange={(e) => void addFiles([...(e.currentTarget.files ?? [])])}
           />
-          <span className="file-drop-empty">
-            <Icon name={disabled ? "spinner fa-spin" : "images"} className="file-drop-icon" />
-            {disabled ? (
-              <span role="status">{busy}</span>
-            ) : (
-              <>
-                <span>
-                  <strong>{labels.choose}</strong> {labels.or}
-                </span>
-                <span className="file-drop-hint">{fill(labels.hint, { max: GALLERY_MAX })}</span>
-              </>
-            )}
-          </span>
+          {disabled ? (
+            <span className="file-drop-empty gallery-busy">
+              <Icon name="spinner fa-spin-pulse" className="file-drop-icon" />
+              <strong>{busy}</strong>
+              {progress === null ? <progress className="gallery-progress" aria-hidden="true" /> : (
+                <progress className="gallery-progress" value={progress.value} max={progress.max} aria-hidden="true" />
+              )}
+              <span className="file-drop-hint">{labels.wait}</span>
+            </span>
+          ) : (
+            <span className="file-drop-empty">
+              <Icon name="images" className="file-drop-icon" />
+              <span>
+                <strong>{labels.choose}</strong> {labels.or}
+              </span>
+              <span className="file-drop-hint">{fill(labels.hint, { max: GALLERY_MAX })}</span>
+            </span>
+          )}
         </label>
+        {/* Selalu ada di halaman, supaya setiap perubahan tahap dibacakan pembaca layar. */}
+        <p className="sr-only" role="status" aria-live="polite">
+          {busy}
+        </p>
       </div>
 
       <p className="gallery-count">

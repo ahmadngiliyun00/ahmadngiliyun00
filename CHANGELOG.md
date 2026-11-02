@@ -30,6 +30,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- Unggah galeri: begitu berkas dipilih atau dijatuhkan, area unggah langsung terkunci dengan ikon berputar, pesan per tahap (memuat pembaca PDF, membuka, mengubah halaman, mengunggah), dan bilah kemajuan. Sebelumnya beberapa detik pertama saat PDF diproses tidak menampilkan apa pun, sehingga terlihat seperti belum terjadi apa-apa. Pembaca PDF kini dimuat lebih awal saat kursor atau berkas mendekati area unggah
 - Pilihan di isian select CMS (misalnya Platform) tidak lagi kosong setelah simpan gagal
 - `npm run build` kini berhenti di awal dengan pesan jelas bila paket di `node_modules` belum sesuai `package-lock.json` (misalnya lupa `npm ci` setelah `git pull`), bukan gagal di tengah dengan "Module not found". Panduan deploy memakai perintah berantai supaya `pm2 reload` tidak berjalan setelah build gagal
 - CSP `img-src` kini mengizinkan gambar dari https mana pun, supaya Tautan gambar postingan media sosial bisa tampil. Gambar dari tautan luar dimuat tanpa Referer
