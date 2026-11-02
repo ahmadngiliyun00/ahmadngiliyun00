@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent, type SyntheticEvent } from "react";
+import LazyImage from "@/components/LazyImage";
 import { SLIDE_MS, wrapIndex } from "@/lib/gallery";
 
 // Carousel gambar untuk kartu kabar, kartu media sosial, dan halaman tulisan.
@@ -185,13 +186,13 @@ export default function MediaCarousel({
     const only = images[0];
     return (
       <div className={className ? `carousel carousel-single ${className}` : "carousel carousel-single"}>
-        <img
+        <LazyImage
           src={only.src}
           alt={only.alt}
           loading={eager ? "eager" : "lazy"}
-          decoding="async"
           referrerPolicy="no-referrer"
           className="carousel-img"
+          fit={natural ? "natural" : "fill"}
         />
       </div>
     );
@@ -228,11 +229,10 @@ export default function MediaCarousel({
             aria-label={fill(labels.slide, i + 1, total)}
             aria-hidden={i === index ? undefined : true}
           >
-            <img
+            <LazyImage
               src={img.src}
               alt={img.alt}
               loading={eager ? (i === 0 ? "eager" : "lazy") : "lazy"}
-              decoding="async"
               referrerPolicy="no-referrer"
               draggable={false}
               className="carousel-img"

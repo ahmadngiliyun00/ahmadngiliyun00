@@ -3814,3 +3814,118 @@ select.field {
     transition: none;
   }
 }
+
+/* ---------- Gambar dengan placeholder skeleton (LazyImage) ----------
+   Selama gambar diunduh, bingkai menampilkan blok abu-abu dengan kilau bergerak ke kanan.
+   Kilau ada di latar bingkai (di belakang gambar), jadi gambar menutupinya sendiri begitu terbaca. */
+@layer components {
+  .lazy-frame {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--color-raised);
+    background-image: linear-gradient(
+      100deg,
+      transparent 30%,
+      color-mix(in srgb, var(--color-fg) 13%, transparent) 50%,
+      transparent 70%
+    );
+    background-repeat: no-repeat;
+    background-size: 220% 100%;
+    background-position: 160% 0;
+  }
+
+  .lazy-frame[data-state="loading"] {
+    animation: lazy-shimmer 1.4s ease-in-out infinite;
+  }
+
+  /* Selesai atau gagal: latar diam (kilau berhenti), tanpa ikon gambar rusak. */
+  .lazy-frame[data-state="loaded"],
+  .lazy-frame[data-state="ready"],
+  .lazy-frame[data-state="error"] {
+    background-image: none;
+  }
+
+  .lazy-frame[data-state="error"] > img {
+    visibility: hidden;
+  }
+
+  .lazy-frame[data-state="loaded"] > img {
+    animation: lazy-in 0.45s ease-out;
+  }
+
+  /* Tinggi mengikuti gambar (misalnya bukti sertifikat): sebelum terbaca, tinggi cadangan
+     supaya skeleton terlihat. */
+  .lazy-frame[data-fit="natural"] {
+    height: auto;
+  }
+
+  .lazy-frame[data-fit="natural"][data-state="loading"] {
+    min-height: 14rem;
+  }
+
+  /* Iframe (pratinjau Google Drive): latar transparan selama memuat supaya kilau terlihat. */
+  .lazy-frame[data-state="loading"] > iframe {
+    background: transparent;
+  }
+
+  /* Gambar di dalam isi tulisan (HTML editor, PostBody): kilau di latar gambar itu sendiri
+     selama diunduh. Sebelum terbaca, gambar belum punya ukuran, jadi diberi bingkai 16:9. */
+  .post-body img {
+    background-color: var(--color-raised);
+  }
+
+  .post-body img[data-state="loading"] {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-image: linear-gradient(
+      100deg,
+      transparent 30%,
+      color-mix(in srgb, var(--color-fg) 13%, transparent) 50%,
+      transparent 70%
+    );
+    background-repeat: no-repeat;
+    background-size: 220% 100%;
+    animation: lazy-shimmer 1.4s ease-in-out infinite;
+  }
+
+  .post-body img[data-state="loaded"] {
+    background-color: transparent;
+    animation: lazy-in 0.45s ease-out;
+  }
+}
+
+@keyframes lazy-shimmer {
+  from {
+    background-position: 160% 0;
+  }
+
+  to {
+    background-position: -60% 0;
+  }
+}
+
+@keyframes lazy-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lazy-frame[data-state="loading"] {
+    animation: none;
+    background-position: 50% 0;
+  }
+
+  .lazy-frame[data-state="loaded"] > img,
+  .post-body img[data-state="loading"],
+  .post-body img[data-state="loaded"] {
+    animation: none;
+  }
+}

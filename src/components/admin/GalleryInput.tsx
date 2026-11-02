@@ -9,6 +9,7 @@ import { toast } from "@/components/Toaster";
 import type { Lang } from "@/content/types";
 import { ALT_MAX, fileUrl, GALLERY_MAX, galleryItems, moveItem, type GalleryItem } from "@/lib/gallery";
 import { langOrder } from "@/lib/i18n";
+import LazyImage from "@/components/LazyImage";
 
 // Isian galeri di CMS: beberapa gambar berurutan yang tampil sebagai carousel di situs.
 // - Gambar dipilih atau diseret (boleh banyak sekaligus), diperkecil di browser, lalu diunggah
@@ -355,7 +356,7 @@ export default function GalleryInput({
                     setDropAt(null);
                   }}
                 >
-                  <img src={fileUrl(fid)} alt={label} className="gallery-thumb" loading="lazy" draggable={false} />
+                  <LazyImage src={fileUrl(fid)} alt={label} className="gallery-thumb" draggable={false} frameClassName="gallery-thumb-frame" />
                 </div>
                 <span className="gallery-badge">{i === 0 ? `${i + 1} · ${labels.first}` : i + 1}</span>
                 <span className="gallery-tools">

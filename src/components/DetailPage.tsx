@@ -18,6 +18,8 @@ import { drivePreviewUrl, driveViewUrl, parseDriveUrl } from "@/lib/drive";
 import { jsonForScript } from "@/lib/json-script";
 import { formatPasteText } from "@/lib/linkedin";
 import { homePath } from "@/lib/nav";
+import LazyImage from "@/components/LazyImage";
+import LazyIframe from "@/components/LazyIframe";
 
 function isoDate(d: PartialDate): string {
   const parts = [String(d.year)];
@@ -191,8 +193,7 @@ export default function DetailPage({
                         <p className="p-6 text-muted">{t.detail.fileFallback}</p>
                       </object>
                     ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={fileHref} alt={`${t.detail.file}: ${title}`} loading="lazy" />
+                      <LazyImage src={fileHref} alt={`${t.detail.file}: ${title}`} fit="natural" />
                     )}
                   </div>
                   <p className="mt-4">
@@ -207,10 +208,9 @@ export default function DetailPage({
                 <div id="bukti" className="mt-12">
                   <h2 className="sub-title">{t.detail.file}</h2>
                   <div className="file-preview mt-5">
-                    <iframe
+                    <LazyIframe
                       src={drivePreviewUrl(drive)}
                       title={`${t.detail.file}: ${title}`}
-                      loading="lazy"
                       referrerPolicy="strict-origin-when-cross-origin"
                       sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
                     />

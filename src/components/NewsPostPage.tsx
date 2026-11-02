@@ -2,6 +2,7 @@ import Analytics from "@/components/Analytics";
 import CommentForm from "@/components/CommentForm";
 import ExternalLink from "@/components/ExternalLink";
 import MediaCarousel from "@/components/MediaCarousel";
+import PostBody from "@/components/PostBody";
 import ShareButtons from "@/components/ShareButtons";
 import SubpageShell from "@/components/SubpageShell";
 import ViewBeacon from "@/components/ViewBeacon";
@@ -112,7 +113,7 @@ export default function NewsPostPage({
             {post.summary ? <p className="section-intro">{post.summary[lang]}</p> : null}
             {images.length > 0 ? <MediaCarousel images={images} labels={t.carousel} className="post-media" natural eager /> : null}
 
-            <div className="post-body" dangerouslySetInnerHTML={{ __html: html }} />
+            <PostBody className="post-body" html={html} />
 
             <ShareButtons url={postUrl(lang, post.slug)} title={title} labels={{ ...t.news.share, newTab: t.newTab }} />
 

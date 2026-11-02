@@ -867,6 +867,11 @@
     cursor: grab;
   }
 
+  /* Bingkai skeleton thumbnail mengikuti rasio thumbnail (LazyImage). */
+  .gallery-thumb-frame {
+    aspect-ratio: 4 / 3;
+  }
+
   .gallery-thumb {
     display: block;
     width: 100%;
