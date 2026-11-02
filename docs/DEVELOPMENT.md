@@ -133,12 +133,13 @@ Bahasa utama diatur di Pengaturan, **Bahasa** (bawaan Indonesia). Formulir CMS m
 
 Berita dan tulisan (isian Galeri gambar) dan postingan media sosial (isian Gambar tambahan) bisa berisi beberapa gambar yang tampil sebagai slide.
 
-- **Isian `gallery`** (`src/content/fields.ts`): daftar ID berkas sesuai urutan tampil, paling banyak 20 (`GALLERY_MAX`). Aturan murninya di `src/lib/gallery.ts` dan diuji `tests/gallery.test.mjs`
+- **Isian `gallery`** (`src/content/fields.ts`): daftar item `{ file, alt? }` sesuai urutan tampil, paling banyak 20 (`GALLERY_MAX`). `alt` adalah teks alternatif per gambar dalam dua bahasa, opsional. Data lama berupa ID saja tetap terbaca (`galleryItems`). Aturan murninya di `src/lib/gallery.ts` dan diuji `tests/gallery.test.mjs`
+- **Teks alternatif di situs** (`slideImages`): teks gambar itu sendiri, kalau kosong teks alternatif umum (`imageAlt`) ditambah nomor gambar, kalau keduanya kosong `alt=""` (hiasan)
 - **CMS** (`src/components/admin/GalleryInput.tsx`): pilih atau seret banyak berkas sekaligus. Gambar diperkecil di peramban (`image-shrink.ts`) lalu diunggah satu per satu lewat `uploadInlineImageAction`, jadi batas 6 MB per permintaan tidak terlampaui. PDF dipecah menjadi satu gambar per halaman dengan pdf.js di peramban (`pdf-pages.ts`), cocok untuk dokumen carousel LinkedIn. Urutan disusun dengan menyeret kartu atau tombol panah; gambar pertama menjadi sampul. Urutan baru tersimpan saat formulir disimpan
 - **Server** (`saveEntry`): galeri hanya menerima berkas yang belum berpemilik atau milik data itu sendiri, mengaitkannya lewat `files.entry_id`, dan menghapus gambar yang dilepas dari galeri. Izin akses berkas mengikuti status data (public atau privat)
 - **Situs** (`src/components/MediaCarousel.tsx`): berganti otomatis tiap 3 detik (`SLIDE_MS`), bisa digeser (scroll-snap), tombol kiri dan kanan, titik indikator (sampai 10 gambar) dan penghitung "2 / 5", tombol jeda. Berhenti sementara saat kursor di atasnya, saat ada fokus keyboard, saat tidak terlihat, atau tab tidak aktif. Dengan `prefers-reduced-motion` tidak berputar sendiri. Satu gambar tampil diam tanpa kontrol
 - Kartu memakai bingkai berasio tetap dan gambar ditampilkan utuh (`contain`) supaya halaman PDF terbaca; halaman tulisan mengikuti rasio gambar pertama (antara 16:9 dan 4:5)
-- Postingan media sosial: urutan slide adalah Tautan gambar atau Gambar unggahan (bila ada), lalu Gambar tambahan
+- Postingan media sosial: sumber gambar dipilih lewat tab Gambar postingan (isian `imageMode`): Tautan gambar, Satu gambar, atau Beberapa gambar (carousel). Hanya tab yang dipilih yang tampil (`socialSlides`); isi tab lain tetap tersimpan. Data lama tanpa `imageMode` ditebak oleh `imageModeOf` (tautan, lalu unggahan, lalu galeri)
 - Gambar pertama galeri tulisan menjadi gambar pratinjau saat dibagikan (Open Graph) dan `image` di JSON-LD
 
 ### Menambah koleksi atau field
@@ -147,6 +148,8 @@ Berita dan tulisan (isian Galeri gambar) dan postingan media sosial (isian Gamba
 2. Tambahkan konfigurasi di `src/content/collections.ts`. Formulir dan validasinya ikut otomatis. Formulir memakai grid 12 kolom di desktop: lebar bawaan ditentukan `fieldWidth()` di `src/content/fields.ts` (teks pendek setengah, angka seperempat, centang sepertiga, teks panjang penuh) dan bisa diubah dengan `width`. Urutkan field supaya isian pendek berpasangan. Placeholder dibuat otomatis dari jenis dan label, atau tulis sendiri dengan `placeholder`
 3. Pakai datanya di komponen lewat `loadSite()`
 4. Bila butuh kolom tabel baru (jarang, karena konten disimpan sebagai JSON), ubah `src/db/schema.ts` lalu `npm run db:generate` dan `npm run db:migrate`
+- **Isian bertab:** beri select `tabs: true`, lalu tandai isian anggotanya dengan `tab: { of: "<nama select>", show: ["<nilai tab>"] }`. Isian tanpa `show` tampil di bawah semua tab. `FieldTabs` (`src/components/admin/FieldTabs.tsx`) merender tab navigasi; panel yang tidak aktif hanya disembunyikan, isinya tetap ikut terkirim. Setelah simpan gagal, tab yang berisi galat terbuka sendiri dan ditandai titik merah
+
 
 ### Aturan data capaian
 

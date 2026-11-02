@@ -8,6 +8,8 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Ditambahkan
 
+- Tab Gambar postingan di formulir media sosial: Tautan gambar, Satu gambar, atau Beberapa gambar (carousel), menggantikan tiga isian yang berderet. Hanya tab yang dipilih yang tampil di situs, isi tab lain tetap tersimpan. Komponen tab bisa dipakai isian lain
+- Teks alternatif per gambar di galeri (opsional, dua bahasa). Gambar tanpa teks sendiri memakai teks alternatif umum dengan nomor gambar
 - Galeri gambar (carousel) untuk berita dan tulisan serta postingan media sosial. Di CMS, banyak gambar bisa dipilih atau diseret sekaligus, disusun urutannya dengan menyeret atau tombol panah, dan gambar pertama menjadi sampul. PDF, misalnya dokumen carousel LinkedIn, dipecah otomatis menjadi satu gambar per halaman. Di situs, gambar berganti otomatis tiap 3 detik, bisa digeser di ponsel, punya tombol kiri dan kanan, titik indikator, penghitung, dan tombol jeda; tampil di Kabar terbaru beranda, arsip Kabar, halaman tulisan, dan halaman Media sosial. Tidak berputar sendiri bila pengunjung meminta gerak dikurangi
 - Gambar pertama galeri tulisan menjadi gambar pratinjau saat tautan dibagikan
 - Pilihan sumber gambar postingan media sosial: isian Tautan gambar (didahulukan) dan Gambar unggahan (dipakai bila tautan kosong); bila keduanya kosong, kartu tampil tanpa gambar. Tautan berbagi Google Drive diubah otomatis menjadi tautan gambar, dan tautan CDN LinkedIn, Facebook, atau Instagram ditolak karena kedaluwarsa dalam beberapa hari
@@ -28,6 +30,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- Pilihan di isian select CMS (misalnya Platform) tidak lagi kosong setelah simpan gagal
 - `npm run build` kini berhenti di awal dengan pesan jelas bila paket di `node_modules` belum sesuai `package-lock.json` (misalnya lupa `npm ci` setelah `git pull`), bukan gagal di tengah dengan "Module not found". Panduan deploy memakai perintah berantai supaya `pm2 reload` tidak berjalan setelah build gagal
 - CSP `img-src` kini mengizinkan gambar dari https mana pun, supaya Tautan gambar postingan media sosial bisa tampil. Gambar dari tautan luar dimuat tanpa Referer
 - CSP mengizinkan Cloudflare Web Analytics (`static.cloudflareinsights.com` dan `cloudflareinsights.com`), yang disisipkan Cloudflare ke setiap halaman bila Web Analytics aktif; sebelumnya skripnya diblokir dan memunculkan error di konsol
