@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { commentTooFast, normalizeComment, validateComment, type CommentState } from "@/lib/comment";
 import { hasPage, postPath } from "@/lib/posts";
 import { clientIp, consumeAttempt } from "@/server/auth/rate-limit";
@@ -42,7 +43,16 @@ export async function postComment(_prev: CommentState, form: FormData): Promise<
 
   try {
     const id = await createComment(entry.id, input, lang, ip);
-    await sendCommentNotification({ id, ...input, postTitle: entry.data.title.id, postUrl: postPath(lang, entry.slug) });
+    // Komentar sudah tersimpan; notifikasi dikirim setelah balasan sampai ke pengunjung.
+    const postTitle = entry.data.title.id;
+    const postUrl = postPath(lang, entry.slug);
+    after(async () => {
+      try {
+        await sendCommentNotification({ id, ...input, postTitle, postUrl });
+      } catch (err) {
+        console.error("[comment] Gagal mengirim notifikasi", err instanceof Error ? err.message : err);
+      }
+    });
   } catch (err) {
     console.error("[comment] Gagal menyimpan komentar", err instanceof Error ? err.message : err);
     return { status: "error", formError: "failed" };

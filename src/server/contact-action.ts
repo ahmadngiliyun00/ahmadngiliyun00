@@ -7,6 +7,7 @@ import {
   validateContact,
   type ContactState,
 } from "@/lib/contact";
+import { after } from "next/server";
 import { clientIp, consumeAttempt } from "@/server/auth/rate-limit";
 import { sendContactNotification } from "@/server/mail";
 import { createMessage, markNotified } from "@/server/messages";
@@ -46,7 +47,15 @@ export async function sendContactMessage(_prev: ContactState, form: FormData): P
 
   try {
     const id = await createMessage(input, lang, ip);
-    if (await sendContactNotification({ id, lang, ...input })) await markNotified(id);
+    // Pesan sudah tersimpan. Email notifikasi dikirim setelah balasan sampai ke pengunjung,
+    // jadi SMTP yang lambat atau tidak bisa dihubungi tidak membuat pengunjung menunggu.
+    after(async () => {
+      try {
+        if (await sendContactNotification({ id, lang, ...input })) await markNotified(id);
+      } catch (err) {
+        console.error("[contact] Gagal mengirim notifikasi", err instanceof Error ? err.message : err);
+      }
+    });
   } catch (err) {
     console.error("[contact] Gagal menyimpan pesan", err instanceof Error ? err.message : err);
     return { status: "error", formError: "failed" };

@@ -56,11 +56,16 @@ function transport(cfg: MailConfig): Transport {
     if (cached.key === key) return cached.t;
     cached.t.close();
   }
+  // Batas waktu: bawaan nodemailer menunggu koneksi 2 menit dan soket 10 menit. Banyak VPS
+  // memblokir port SMTP keluar tanpa jawaban, jadi tanpa batas ini pengiriman menggantung lama.
   const t = nodemailer.createTransport({
     host: cfg.host,
     port: cfg.port,
     secure: cfg.secure,
     auth: { user: cfg.user, pass: cfg.pass },
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 20_000,
   });
   globalForMail.transport = { key, t };
   return t;
