@@ -142,6 +142,12 @@ Berita dan tulisan (isian Galeri gambar) dan postingan media sosial (isian Gamba
 - Postingan media sosial: sumber gambar dipilih lewat tab Gambar postingan (isian `imageMode`): Tautan gambar, Satu gambar, atau Beberapa gambar (carousel). Hanya tab yang dipilih yang tampil (`socialSlides`); isi tab lain tetap tersimpan. Data lama tanpa `imageMode` ditebak oleh `imageModeOf` (tautan, lalu unggahan, lalu galeri)
 - Gambar pertama galeri tulisan menjadi gambar pratinjau saat dibagikan (Open Graph) dan `image` di JSON-LD
 
+### Gambar: placeholder, ukuran, dan cache
+
+- **Placeholder skeleton:** semua gambar dan sematan situs memakai `LazyImage` (gambar), `LazyIframe` (pratinjau Google Drive), atau `PostBody` (gambar di isi tulisan). Selama diunduh, bingkai menampilkan blok abu-abu dengan kilau bergerak ke kanan, lalu gambar muncul perlahan. Kilau ada di latar, di belakang gambar, jadi tanpa JavaScript gambar tetap tampil. Gambar dari cache langsung tampil tanpa efek; `prefers-reduced-motion` mematikan kilau dan efek muncul. Gambar baru di situs wajib memakai komponen ini, bukan `<img>` langsung
+- **Ukuran:** semua unggahan gambar diperkecil di peramban lewat `src/components/admin/image-shrink.ts` (lebar maksimal 1600 px, WebP atau JPEG): isian berkas (`FileDrop` dengan `shrinkImages`), galeri, editor rich text, dan impor ZIP ekspor media sosial. Batas 5 MB diperiksa setelah diperkecil
+- **Cache:** `/files/<id>/` memberi ETag `"<id>-<ukuran>"` dan menjawab 304 untuk berkas public, dengan `Cache-Control: public, max-age=86400, stale-while-revalidate=604800`. Isi berkas tidak pernah berubah untuk ID yang sama. Berkas privat tetap `private, no-store` tanpa ETag
+
 ### Menambah koleksi atau field
 
 1. Tambahkan tipe di `src/content/types.ts` dan kunci koleksinya di `CollectionData`

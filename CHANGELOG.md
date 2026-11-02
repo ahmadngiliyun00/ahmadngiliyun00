@@ -8,6 +8,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Ditambahkan
 
+- Placeholder skeleton untuk semua gambar dan sematan: blok abu-abu dengan kilau bergerak selama gambar diunduh, lalu gambar muncul perlahan. Berlaku di kartu media sosial, kartu kabar, halaman tulisan (termasuk gambar di dalam isi), bukti sertifikat dan pratinjau Google Drive, serta thumbnail galeri di CMS
 - Tab Gambar postingan di formulir media sosial: Tautan gambar, Satu gambar, atau Beberapa gambar (carousel), menggantikan tiga isian yang berderet. Hanya tab yang dipilih yang tampil di situs, isi tab lain tetap tersimpan. Komponen tab bisa dipakai isian lain
 - Teks alternatif per gambar di galeri (opsional, dua bahasa). Gambar tanpa teks sendiri memakai teks alternatif umum dengan nomor gambar
 - Galeri gambar (carousel) untuk berita dan tulisan serta postingan media sosial. Di CMS, banyak gambar bisa dipilih atau diseret sekaligus, disusun urutannya dengan menyeret atau tombol panah, dan gambar pertama menjadi sampul. PDF, misalnya dokumen carousel LinkedIn, dipecah otomatis menjadi satu gambar per halaman. Di situs, gambar berganti otomatis tiap 3 detik, bisa digeser di ponsel, punya tombol kiri dan kanan, titik indikator, penghitung, dan tombol jeda; tampil di Kabar terbaru beranda, arsip Kabar, halaman tulisan, dan halaman Media sosial. Tidak berputar sendiri bila pengunjung meminta gerak dikurangi
@@ -30,6 +31,8 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- Semua unggahan gambar diperkecil di peramban sebelum dikirim (lebar maksimal 1600 px, WebP), termasuk isian Satu gambar, berkas sertifikat, dan impor ZIP ekspor. Foto ponsel di atas 5 MB kini bisa dipakai karena batas diperiksa setelah diperkecil. Gambar yang sudah tersimpan tetap ukurannya sampai diunggah ulang
+- Berkas unggahan public kini disimpan peramban sehari dan diperiksa ulang lewat ETag (jawaban 304 tanpa mengunduh ulang), sebelumnya hanya satu jam lalu diunduh utuh
 - Unggah galeri: begitu berkas dipilih atau dijatuhkan, area unggah langsung terkunci dengan ikon berputar, pesan per tahap (memuat pembaca PDF, membuka, mengubah halaman, mengunggah), dan bilah kemajuan. Sebelumnya beberapa detik pertama saat PDF diproses tidak menampilkan apa pun, sehingga terlihat seperti belum terjadi apa-apa. Pembaca PDF kini dimuat lebih awal saat kursor atau berkas mendekati area unggah
 - Pilihan di isian select CMS (misalnya Platform) tidak lagi kosong setelah simpan gagal
 - `npm run build` kini berhenti di awal dengan pesan jelas bila paket di `node_modules` belum sesuai `package-lock.json` (misalnya lupa `npm ci` setelah `git pull`), bukan gagal di tengah dengan "Module not found". Panduan deploy memakai perintah berantai supaya `pm2 reload` tidak berjalan setelah build gagal

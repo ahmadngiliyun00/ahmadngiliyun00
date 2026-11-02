@@ -70,6 +70,7 @@ src/
   components/LegacyAnchors.tsx   alihkan jangkar beranda lama (#research, #teaching, #journey, #next, #activity)
   components/ErrorView.tsx       isi halaman error (404, 500) untuk situs ID dan EN, CMS, dan global-error
   components/MediaCarousel.tsx   carousel gambar situs (kartu kabar, kartu media sosial, halaman tulisan)
+  components/LazyImage.tsx       gambar dengan placeholder skeleton; LazyIframe (Drive) dan PostBody (gambar isi tulisan) serupa
   components/admin/              komponen CMS (AdminShell, EntryForm, FieldInput, FieldTabs, ShareBox, GalleryInput)
   components/admin/pdf-pages.ts  pecah PDF menjadi gambar per halaman di peramban (pdf.js)
   content/
@@ -130,6 +131,7 @@ src/
 - Halaman error: `not-found.tsx` dan `error.tsx` di `(id)/`, `(en)/en/`, dan `(admin)/admin/`, plus `app/global-error.tsx`. Alamat tak dikenal ditangkap rute `[...missing]` supaya 404 berbahasa sesuai. Teks di `copy.errors` (`profile.ts`) dan `adminCopy.errors`. Halaman 500, 502, 503, 504 untuk Nginx dibuat `npm run errors`; jangan edit `public/errors/` manual
 - Galeri gambar (isian `gallery`, berita dan media sosial): daftar item `{ file, alt? }` berurutan (teks alternatif per gambar opsional, lalu teks umum bernomor), maksimal 20, gambar pertama sampul. Diunggah satu per satu lewat `GalleryInput`, PDF dipecah per halaman di peramban, tidak pernah base64. Di situs tampil lewat `MediaCarousel` (otomatis tiap 3 detik, bisa digeser, tombol jeda, tanpa putar otomatis bila `prefers-reduced-motion`). Server hanya menerima berkas baru atau milik data itu, dan menghapus yang dilepas
 - Isian yang saling menggantikan dikelompokkan dengan tab (`FieldTabs`): select `tabs: true` dan isian anggota `tab: { of, show }`. Isi tab yang tidak aktif tetap tersimpan, tidak dihapus. Contoh: tab Gambar postingan media sosial (`imageMode`), hanya tab terpilih yang tampil di situs
+- Semua gambar dan sematan situs memakai `LazyImage`, `LazyIframe`, atau `PostBody` (placeholder skeleton berkilau, lazy, menghormati `prefers-reduced-motion`), bukan `<img>` langsung. Semua unggahan gambar diperkecil di peramban lewat `image-shrink.ts` (maksimal 1600 px). `/files/<id>/` memberi ETag dan 304 untuk berkas public
 - Semua isian unggah berkas di CMS memakai `FileDrop` (`src/components/admin/FileDrop.tsx`): area drag and drop dengan pratinjau sebelum diunggah, tetap memakai `<input type="file">` asli di dalamnya
 - Header keamanan dan CSP ada di `next.config.ts`. `img-src` sengaja mengizinkan `https:` untuk Tautan gambar media sosial. Skrip, gambar, iframe, atau `fetch` ke domain pihak ketiga baru wajib ditambahkan ke CSP, kalau tidak peramban memblokirnya
 - Gaya komponen ditulis di `globals.css` (situs) atau `admin.css` (CMS) di dalam `@layer components`
