@@ -153,6 +153,15 @@ Biarkan isian verifikasi tetap terpasang setelah berhasil, karena Google memerik
 
 Bila status sitemap di Search Console **Couldn't fetch** (Tidak dapat mengambil) dengan Last read kosong dan Discovered pages 0, periksa dulu sitemap dari luar: `curl -sI https://ngiliyun.my.id/sitemap.xml` harus membalas `200` dan `content-type: application/xml`, dan Pemeriksaan URL, Uji URL aktif untuk alamat sitemap harus berhasil. Bila keduanya benar, status itu sisa percobaan pertama (misalnya dikirim saat situs atau DNS belum siap), dan Search Console tidak selalu cepat mencoba lagi. Hapus sitemap dari daftar (menu titik tiga, Hapus peta situs), lalu kirim ulang `sitemap.xml`. Bila masih tertahan setelah satu sampai dua hari, kirim `sitemap.xml?v=2`: isinya sama, tetapi dianggap alamat baru sehingga langsung diambil. Sitemap juga tercantum di `robots.txt`, jadi Google tetap menemukannya.
 
+Bila halaman situs sudah muncul di Google tetapi sitemap tetap **Couldn't fetch**, Googlebot bisa masuk ke situs, jadi kemungkinan besar ada yang menghalangi permintaan ke `/sitemap.xml` saja. Periksa berurutan:
+
+1. Search Console, Pemeriksaan URL, isi `https://ngiliyun.my.id/sitemap.xml`, lalu **Uji URL aktif**. Bagian Pengambilan halaman menyebut penyebabnya bila gagal (diblokir, error server, waktu habis)
+2. Cloudflare, Security, Events: saring Path `/sitemap.xml` dan User agent berisi `Googlebot`. Bila ada yang diblokir atau ditantang (Managed Challenge, JS Challenge), matikan aturan itu untuk Googlebot, atau buat aturan Skip untuk `/sitemap.xml` dan `/robots.txt`. Bot Fight Mode dan Super Bot Fight Mode di Security, Bots kadang ikut menantang crawler sah
+3. aaPanel: bila firewall situs (Nginx WAF atau anti-crawler) aktif, periksa log blokirnya untuk `/sitemap.xml`, dan pastikan Googlebot tidak masuk daftar blokir user agent
+4. Setelah penyebabnya dibereskan, hapus sitemap dari daftar lalu kirim ulang (atau kirim `sitemap.xml?v=2`)
+
+Format sitemap sudah disamakan dengan sitemap yang terbukti dibaca Search Console: `lastmod` WIB tanpa milidetik (misalnya `2026-11-02T23:21:28+07:00`), `changefreq`, dan `priority` (`src/lib/sitemap.ts`). Hasilnya lolos validasi skema sitemap 0.9.
+
 **c. Google Analytics 4.** Buka <https://analytics.google.com>, Admin, Buat properti, lalu Aliran data Web dengan URL `https://ngiliyun.my.id`. Salin ID pengukuran (`G-XXXXXXXXXX`) ke CMS. Script hanya dipasang di beranda, arsip, dan detail capaian; tidak di CMS dan tidak di tautan berbagi rahasia, jadi token berbagi tidak terkirim ke Google. Kunjungan saat Mas Ilyun sedang masuk CMS tidak dihitung. Analytics memasang cookie pengunjung, jadi bila nanti dibutuhkan, tambahkan pemberitahuan privasi di situs.
 
 **d. Bing Webmaster (opsional).** Di <https://www.bing.com/webmasters>, cara tercepat adalah Import dari Google Search Console. Bila memilih tag meta, tempel tag `msvalidate.01` ke isian Bing Webmaster di CMS.

@@ -39,6 +39,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- Format sitemap disamakan dengan sitemap yang terbukti dibaca Search Console: `lastmod` dalam WIB tanpa milidetik, ditambah `changefreq` dan `priority`. Panduan deploy menjelaskan cara mencari penghalang bila status sitemap tetap Couldn't fetch (Uji URL aktif, Cloudflare Security Events, firewall aaPanel)
 - Semua unggahan gambar diperkecil di peramban sebelum dikirim (lebar maksimal 1600 px, WebP), termasuk isian Satu gambar, berkas sertifikat, dan impor ZIP ekspor. Foto ponsel di atas 5 MB kini bisa dipakai karena batas diperiksa setelah diperkecil. Gambar yang sudah tersimpan tetap ukurannya sampai diunggah ulang
 - Berkas unggahan public kini disimpan peramban sehari dan diperiksa ulang lewat ETag (jawaban 304 tanpa mengunduh ulang), sebelumnya hanya satu jam lalu diunduh utuh
 - Unggah galeri: begitu berkas dipilih atau dijatuhkan, area unggah langsung terkunci dengan ikon berputar, pesan per tahap (memuat pembaca PDF, membuka, mengubah halaman, mengunggah), dan bilah kemajuan. Sebelumnya beberapa detik pertama saat PDF diproses tidak menampilkan apa pun, sehingga terlihat seperti belum terjadi apa-apa. Pembaca PDF kini dimuat lebih awal saat kursor atau berkas mendekati area unggah

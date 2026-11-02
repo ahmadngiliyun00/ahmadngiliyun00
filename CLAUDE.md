@@ -54,6 +54,7 @@ tests/transfer.test.mjs          unit test ekspor dan impor lembar kerja: kolom,
 tests/social.test.mjs            unit test caption, tagar, topik, tanggal, CDN gambar, Shares.csv LinkedIn (npm test)
 tests/social-export.test.mjs     unit test impor ekspor Instagram dan Facebook, mojibake, pembaca ZIP (npm test, fixture buatan)
 tests/gallery.test.mjs           unit test galeri gambar: isian, urutan slide, teks alternatif, susun ulang (npm test)
+tests/sitemap.test.mjs           unit test format lastmod (WIB tanpa milidetik) dan bobot sitemap (npm test)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, proyek, riset, mengajar, perjalanan,
@@ -101,6 +102,7 @@ src/
   lib/social-export.ts           baca ekspor Instagram dan Facebook (JSON): detectExport, parser, fixMetaText, derivedSourceId
   lib/zip-reader.ts              baca ZIP besar di peramban per berkas (Blob.slice, DecompressionStream, ZIP64)
   lib/gallery.ts                 aturan galeri: parseGallery, slideSources, slideImages, GALLERY_MAX, SLIDE_MS
+  lib/sitemap.ts                 format sitemap: w3cDate (WIB tanpa milidetik), changefreq dan priority per jenis halaman
 ```
 
 ## Aturan kerja
@@ -179,7 +181,7 @@ npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
 npm run errors         # buat ulang halaman error statis Nginx di public/errors/
-npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja, media sosial, galeri
+npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja, media sosial, galeri, sitemap
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build
