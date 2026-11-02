@@ -23,6 +23,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- CSP mengizinkan Cloudflare Web Analytics (`static.cloudflareinsights.com` dan `cloudflareinsights.com`), yang disisipkan Cloudflare ke setiap halaman bila Web Analytics aktif; sebelumnya skripnya diblokir dan memunculkan error di konsol
 - Impor arsip LinkedIn Complete: berkas postingan bernama `Shares_<nomor>.csv` kini dikenali, dan tanda kutip yang dipakai LinkedIn untuk membungkus setiap baris teks postingan dibuang, sehingga tidak tampil di situs
 - Pesan dan panduan impor LinkedIn diperbaiki: postingan (`Shares.csv`) hanya ada di arsip Complete dari pilihan Download larger data archive, bukan di arsip Basic yang dikirim lebih dulu. Pilihan per berkas di LinkedIn tidak punya opsi Posts
 - Impor ekspor tidak lagi berhenti di gambar pertama yang gagal: gambar yang gagal dilewati, sisanya tetap diunggah, dan pesan menjelaskan cara melengkapinya (muat ulang halaman lalu impor ulang ZIP yang sama). Balasan server yang tidak terduga (misalnya halaman error Nginx) dilaporkan dengan pesan yang jelas

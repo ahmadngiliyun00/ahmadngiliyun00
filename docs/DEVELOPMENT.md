@@ -204,7 +204,7 @@ Postingan Instagram, Facebook, dan LinkedIn milik Mas Ilyun masuk ke koleksi `so
 
 `next.config.ts` mengirim header keamanan ke semua halaman: Content Security Policy, `X-Frame-Options: DENY` (CMS tidak bisa dibingkai situs lain), `nosniff`, `Referrer-Policy`, `Permissions-Policy`, dan HSTS bila `SITE_URL` memakai https. Berkas `/files/` hanya boleh dibingkai situs sendiri, untuk pratinjau PDF.
 
-CSP hanya mengizinkan skrip dari situs sendiri, Google Analytics, dan Cloudflare Turnstile, serta iframe dari Turnstile dan Google Drive (pratinjau sertifikat). Skrip, gambar, iframe, atau tujuan `fetch` dari domain lain akan diblokir peramban sampai domainnya ditambahkan ke CSP. Periksa konsol peramban setelah menambah layanan pihak ketiga.
+CSP hanya mengizinkan skrip dari situs sendiri, Google Analytics, Cloudflare Turnstile, dan Cloudflare Web Analytics (`static.cloudflareinsights.com`, kirim data ke `cloudflareinsights.com`; disisipkan Cloudflare bila Web Analytics aktif di dasbor), serta iframe dari Turnstile dan Google Drive (pratinjau sertifikat). Skrip, gambar, iframe, atau tujuan `fetch` dari domain lain akan diblokir peramban sampai domainnya ditambahkan ke CSP. Periksa konsol peramban setelah menambah layanan pihak ketiga.
 
 ## Data awal (seed)
 
