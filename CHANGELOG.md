@@ -6,6 +6,14 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ## [Belum dirilis]
 
+### Keamanan, performa, dan keandalan (audit 3 November 2026)
+
+- BUG-01: berkas unggahan dari formulir yang ditinggalkan tidak lagi menumpuk selamanya. Berkas tanpa pemilik yang berumur lebih dari 24 jam dikaitkan ke data yang memakainya atau dihapus, dan berkas data baru langsung dikaitkan ke datanya
+- PERF-01: `/files/<id>/` mencari pemilik berkas lewat kunci utama, bukan membaca seluruh tabel per gambar
+- PERF-02: teks kartu media sosial dipotong di server sesuai yang tampil, HTML halaman Media sosial lebih ringan sekitar 28 persen
+- NET-01: notifikasi email form kontak dan komentar dikirim setelah pengunjung mendapat balasan, dan SMTP diberi batas waktu. Sebelumnya pengunjung bisa menunggu 30 detik sampai 2 menit bila SMTP tidak menjawab
+- BUG-02, NET-02: langkah deploy memulihkan berkas hasil build sebelum `git pull`, dan Nginx disarankan memakai `server_tokens off`
+
 ### Ditambahkan
 
 - Placeholder skeleton untuk semua gambar dan sematan: blok abu-abu dengan kilau bergerak selama gambar diunduh, lalu gambar muncul perlahan. Berlaku di kartu media sosial, kartu kabar, halaman tulisan (termasuk gambar di dalam isi), bukti sertifikat dan pratinjau Google Drive, serta thumbnail galeri di CMS
