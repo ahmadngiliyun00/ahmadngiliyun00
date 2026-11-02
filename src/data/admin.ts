@@ -218,7 +218,7 @@ export const adminCopy = {
       copyConfirm: "Versi {other} sudah berisi. Ganti dengan salinan versi {lang}?",
     },
     currentFile: "Berkas saat ini",
-    fileHint: "PDF, PNG, JPG, atau WebP, maksimal 5 MB. Diunggah saat Simpan.",
+    fileHint: "PDF, PNG, JPG, atau WebP, maksimal 5 MB. Gambar diperkecil otomatis. Diunggah saat Simpan.",
     openFile: "Buka berkas",
     removeFile: "Hapus berkas ini",
     // Isian galeri (GalleryInput): beberapa gambar berurutan, tampil sebagai carousel di situs.
@@ -282,6 +282,8 @@ export const adminCopy = {
     clear: "Batal pilih",
     wrongType: "Jenis berkas {name} tidak diterima di sini.",
     tooBig: "Berkas terlalu besar, maksimal {max}.",
+    shrinking: "Memperkecil gambar...",
+    shrunk: "diperkecil dari {from}",
   },
   settings: {
     title: "Pengaturan",

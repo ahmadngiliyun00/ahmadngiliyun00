@@ -373,6 +373,7 @@ export default function FieldInput({
             accept="application/pdf,image/png,image/jpeg,image/webp"
             hint={labels.fileHint}
             maxBytes={5 * 1024 * 1024}
+            shrinkImages
             invalid={invalid}
             describedBy={describedBy}
           />

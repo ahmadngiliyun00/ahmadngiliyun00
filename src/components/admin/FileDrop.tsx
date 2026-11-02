@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type DragEvent } from "react";
 import Icon from "@/components/admin/Icon";
+import { shrink } from "@/components/admin/image-shrink";
 import { toast } from "@/components/Toaster";
 import { adminCopy } from "@/data/admin";
 
@@ -9,6 +10,11 @@ import { adminCopy } from "@/data/admin";
 // (drag and drop), dengan pratinjau sebelum diunggah. Di dalamnya tetap ada <input type="file">
 // asli, jadi formulir dan Server Action membaca berkas seperti biasa, dan keyboard tetap bisa
 // membuka pemilih berkas. Berkas yang dijatuhkan dipasang ke input lewat DataTransfer.
+// shrinkImages: gambar PNG, JPG, atau WebP diperkecil di peramban lebih dulu (lebar maksimal
+// 1600 px, WebP), lalu berkas hasilnya yang dipasang ke input dan diunggah saat Simpan. Batas
+// ukuran diperiksa setelah diperkecil, jadi foto ponsel besar tetap bisa dipakai.
+
+const SHRINKABLE = /^image\/(png|jpeg|webp)$/;
 
 const t = adminCopy.fileDrop;
 
@@ -40,6 +46,7 @@ export default function FileDrop({
   invalid,
   describedBy,
   onFile,
+  shrinkImages = false,
 }: {
   id?: string;
   name: string;
@@ -51,6 +58,7 @@ export default function FileDrop({
   invalid?: boolean;
   describedBy?: string;
   onFile?: (file: File | undefined) => void;
+  shrinkImages?: boolean;
 }) {
   const auto = useId();
   const inputId = id ?? auto;
@@ -58,6 +66,8 @@ export default function FileDrop({
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [over, setOver] = useState(false);
+  const [shrinking, setShrinking] = useState(false);
+  const [original, setOriginal] = useState<number | null>(null);
 
   // Pratinjau gambar dari berkas lokal, dilepas lagi saat berkas berganti.
   useEffect(() => {
@@ -79,8 +89,41 @@ export default function FileDrop({
     return () => form.removeEventListener("reset", onReset);
   }, []);
 
-  function take(next: File | undefined) {
+  // Pasang berkas (misalnya hasil diperkecil) ke input asli, supaya ikut terkirim bersama formulir.
+  function setInputFile(next: File) {
     const el = input.current;
+    if (!el) return;
+    const dt = new DataTransfer();
+    dt.items.add(next);
+    el.files = dt.files;
+  }
+
+  async function take(picked: File | undefined) {
+    const el = input.current;
+    let next = picked;
+    setOriginal(null);
+    if (next !== undefined) {
+      if (shrinkImages ? SHRINKABLE.test(next.type) : false) {
+        if (accepted(next, accept)) {
+          setShrinking(true);
+          setFile(next);
+          try {
+            const blob = await shrink(next);
+            if (blob !== next) {
+              const ext = blob.type === "image/webp" ? "webp" : "jpg";
+              const smaller = new File([blob], next.name.replace(/\.[^.]+$/, "") + "." + ext, { type: blob.type });
+              setOriginal(next.size);
+              next = smaller;
+              setInputFile(smaller);
+            }
+          } catch {
+            // Peramban tidak bisa membaca gambarnya: berkas asli dipakai apa adanya.
+          } finally {
+            setShrinking(false);
+          }
+        }
+      }
+    }
     if (next !== undefined) {
       let problem = "";
       if (!accepted(next, accept)) problem = t.wrongType.replace("{name}", next.name);
@@ -91,6 +134,7 @@ export default function FileDrop({
         toast(problem, "error");
         if (el) el.value = "";
         setFile(null);
+        setOriginal(null);
         onFile?.(undefined);
         return;
       }
@@ -101,7 +145,7 @@ export default function FileDrop({
 
   function clear() {
     if (input.current) input.current.value = "";
-    take(undefined);
+    void take(undefined);
     input.current?.focus();
   }
 
@@ -117,7 +161,7 @@ export default function FileDrop({
       dt.items.add(dropped);
       el.files = dt.files;
     }
-    take(dropped);
+    void take(dropped);
   }
 
   return (
@@ -147,7 +191,7 @@ export default function FileDrop({
           aria-invalid={invalid}
           aria-describedby={describedBy}
           className="file-drop-input"
-          onChange={(e) => take(e.currentTarget.files?.[0])}
+          onChange={(e) => void take(e.currentTarget.files?.[0])}
         />
         {file ? (
           <span className="file-drop-picked">
@@ -155,7 +199,11 @@ export default function FileDrop({
             <span className="file-drop-meta">
               <span className="file-drop-name">{file.name}</span>
               <span className="file-drop-size">
-                {formatSize(file.size)} · {t.ready}
+                {shrinking
+                  ? t.shrinking
+                  : original !== null
+                    ? `${formatSize(file.size)} · ${t.shrunk.replace("{from}", formatSize(original))} · ${t.ready}`
+                    : `${formatSize(file.size)} · ${t.ready}`}
               </span>
             </span>
           </span>

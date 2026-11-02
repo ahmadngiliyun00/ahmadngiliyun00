@@ -186,7 +186,8 @@ export default function GalleryInput({
         setProgress({ value: i, max: queue.length });
         const file = queue[i];
         try {
-          const blob = file.type === "image/webp" ? file : await shrink(file);
+          // Semua gambar lewat shrink: gambar yang sudah kecil (misalnya halaman PDF) dipakai apa adanya.
+          const blob = await shrink(file);
           const fid = await upload(blob, file.name, entryId);
           added += 1;
           setItems((prev) => (prev.some((x) => x.file === fid) ? prev : [...prev, { file: fid }]));

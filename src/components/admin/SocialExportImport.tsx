@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { attachExportImageAction, importExportAction, importLinkedinAction } from "@/app/(admin)/admin/actions";
 import FileDrop from "@/components/admin/FileDrop";
+import { shrink } from "@/components/admin/image-shrink";
 import Icon from "@/components/admin/Icon";
 import { toast } from "@/components/Toaster";
 import { coverImage, detectExport, parseFacebookExport, parseInstagramExport, type ExportParse, type SkipReason } from "@/lib/social-export";
@@ -31,7 +32,6 @@ export type ExportImportLabels = {
 };
 
 const MAX_BYTES = 5 * 1024 * 1024;
-const MAX_SIDE = 2048;
 const BATCH = 200;
 const MAX_STREAK = 3;
 const TYPES: Record<string, string> = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp" };
@@ -39,27 +39,24 @@ const TYPES: Record<string, string> = { jpg: "image/jpeg", jpeg: "image/jpeg", p
 const fill = (text: string, values: Record<string, string | number>) =>
   Object.entries(values).reduce((out, [k, v]) => out.split(`{${k}}`).join(String(v)), text);
 
-// Gambar yang terlalu besar atau berformat lain (misalnya HEIC) diubah ke JPEG lewat canvas.
-// Bila peramban tidak bisa membacanya, gambar dilewati dan postingan tetap tersimpan.
+// Gambar dari ekspor diperkecil sebelum diunggah (lebar maksimal 1600 px, WebP atau JPEG), sama
+// seperti unggahan lain di CMS, supaya kartu di situs tidak memuat foto berukuran MB. Format lain
+// (misalnya HEIC) ikut diubah lewat canvas. Bila peramban tidak bisa membacanya, berkas asli
+// dipakai bila formatnya didukung dan ukurannya cukup; kalau tidak, gambar dilewati dan postingan
+// tetap tersimpan.
 async function prepareImage(blob: Blob, name: string): Promise<File | null> {
   const ext = (name.split(".").pop() ?? "").toLowerCase();
   const type = TYPES[ext];
-  if (type !== undefined) {
-    if (blob.size <= MAX_BYTES) return new File([blob], name, { type });
-  }
+  const source = new File([blob], name, { type: type ?? blob.type });
   try {
-    const bitmap = await createImageBitmap(blob);
-    const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(bitmap.width * scale);
-    canvas.height = Math.round(bitmap.height * scale);
-    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    bitmap.close();
-    const out = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
-    if (out === null) return null;
-    return out.size <= MAX_BYTES ? new File([out], name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }) : null;
+    const out = await shrink(source);
+    if (out === source) return type !== undefined ? (source.size <= MAX_BYTES ? source : null) : null;
+    if (out.size > MAX_BYTES) return null;
+    const outExt = out.type === "image/webp" ? "webp" : "jpg";
+    return new File([out], name.replace(/\.[^.]+$/, "") + "." + outExt, { type: out.type });
   } catch {
-    return null;
+    if (type === undefined) return null;
+    return blob.size <= MAX_BYTES ? source : null;
   }
 }
 
