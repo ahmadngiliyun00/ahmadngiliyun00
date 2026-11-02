@@ -86,15 +86,26 @@ export default function SocialExportImport({ labels }: { labels: ExportImportLab
       const entries = await listZip(file);
       const kind = detectExport(entries.map((e) => e.name));
       if (kind.kind === "linkedin") {
-        // Shares.csv dari arsip LinkedIn diteruskan ke impor CSV yang sudah ada.
-        const entry = findEntry(entries, kind.file);
-        if (entry === undefined) throw new Error("Shares.csv tidak bisa dibaca.");
-        const form = new FormData();
-        form.set("shares", new File([await readZipEntry(file, entry, "text/csv")], "Shares.csv", { type: "text/csv" }));
-        const res = await importLinkedinAction(undefined, form);
-        if (res?.message) toast(res.message, res.ok ? "success" : "error");
+        // Shares.csv (atau Shares_<nomor>.csv di arsip Complete) diteruskan ke impor CSV yang sudah
+        // ada, satu berkas per permintaan.
+        let anyOk = false;
+        for (const name of kind.files) {
+          const entry = findEntry(entries, name);
+          if (entry === undefined) throw new Error(`${name} tidak bisa dibaca.`);
+          const form = new FormData();
+          form.set("shares", new File([await readZipEntry(file, entry, "text/csv")], "Shares.csv", { type: "text/csv" }));
+          let res: Awaited<ReturnType<typeof importLinkedinAction>>;
+          try {
+            res = await importLinkedinAction(undefined, form);
+          } catch {
+            throw new Error(labels.serverError);
+          }
+          if (res?.message) toast(res.message, res.ok ? "success" : "error");
+          if (res?.ok) anyOk = true;
+        }
         setStatus("");
-        if (res?.ok) router.refresh();
+        if (input.current) input.current.value = "";
+        if (anyOk) router.refresh();
         return;
       }
       const files: Record<string, string> = {};

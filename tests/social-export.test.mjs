@@ -33,7 +33,12 @@ test("jenis arsip dikenali dari daftar isi ZIP", () => {
     files: ["your_facebook_activity/posts/your_posts__check_ins__photos_and_videos_1.json"],
   });
   assert.equal(ex.detectExport(["posts/your_posts_1.json"]).kind, "facebook");
-  assert.deepEqual(ex.detectExport(["Profile.csv", "Shares.csv"]), { kind: "linkedin", file: "Shares.csv" });
+  assert.deepEqual(ex.detectExport(["Profile.csv", "Shares.csv"]), { kind: "linkedin", files: ["Shares.csv"] });
+  // Arsip Complete menamai berkas dengan nomor dan tetap memuat Profile.csv.
+  assert.deepEqual(ex.detectExport(["Profile.csv", "Rich_Media.csv", "Shares_123456789.csv", "Reactions_123456789.csv"]), {
+    kind: "linkedin",
+    files: ["Shares_123456789.csv"],
+  });
 });
 
 test("arsip yang salah ditolak dengan pesan yang menjelaskan langkah berikutnya", () => {

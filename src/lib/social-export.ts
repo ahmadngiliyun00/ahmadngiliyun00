@@ -104,21 +104,22 @@ export function plainLink(value: string): string {
 export type ExportKind =
   | { kind: "instagram"; files: string[] }
   | { kind: "facebook"; files: string[] }
-  | { kind: "linkedin"; file: string };
+  | { kind: "linkedin"; files: string[] };
 
 const IG_POSTS = /(^|\/)(your_instagram_activity\/media|content|media)\/posts(_\d+)?\.json$/;
 const FB_POSTS = /(^|\/)(your_facebook_activity\/)?posts\/your_posts(__check_ins__photos_and_videos)?(_\d+)?\.json$/;
-const LI_SHARES = /(^|\/)Shares\.csv$/i;
+// Arsip Complete menamai berkasnya dengan nomor, misalnya Shares_863241591.csv.
+const LI_SHARES = /(^|\/)Shares(_\d+)?\.csv$/i;
 
 // Menentukan jenis arsip dari daftar nama berkas di dalam ZIP. Melempar Error dengan pesan yang
 // bisa langsung ditampilkan bila arsip tidak dikenali.
 export function detectExport(paths: string[]): ExportKind {
   const ig = paths.filter((p) => IG_POSTS.test(p));
   const fb = paths.filter((p) => FB_POSTS.test(p));
-  const li = paths.find((p) => LI_SHARES.test(p));
+  const li = paths.filter((p) => LI_SHARES.test(p));
   if (ig.length > 0) return { kind: "instagram", files: ig.sort() };
   if (fb.length > 0) return { kind: "facebook", files: fb.sort() };
-  if (li !== undefined) return { kind: "linkedin", file: li };
+  if (li.length > 0) return { kind: "linkedin", files: li.sort() };
   const html = paths.some((p) => /(your_instagram_activity|your_facebook_activity|posts)\/.*\.html$/.test(p));
   if (html) throw new Error("Ekspor ini berformat HTML. Minta ekspor ulang di Pusat Akun Meta dan pilih format JSON.");
   // LinkedIn mengirim arsip "Basic" lebih dulu (profil, koneksi, sertifikat), lalu arsip lengkap

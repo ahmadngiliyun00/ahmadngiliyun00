@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { importTs } from "../scripts/lib/load-ts.mjs";
 
-const { cleanCaption, captionTitle, parseTopicRules, matchTopic, partialDateFrom, isAllowedMediaUrl, socialSlug, parseLinkedinShares, linkedinId } =
+const { cleanCaption, captionTitle, parseTopicRules, matchTopic, partialDateFrom, isAllowedMediaUrl, socialSlug, parseLinkedinShares, linkedinId, unwrapLinkedinLines } =
   await importTs(new URL("../src/lib/social.ts", import.meta.url));
 
 const EM_DASH = String.fromCharCode(0x2014);
@@ -124,4 +124,20 @@ test("postingan dikelompokkan per topik, terbaru di atas, tanpa topik di akhir",
       [null, "lainnya", ["b", "e"]],
     ],
   );
+});
+
+test("teks LinkedIn yang tiap barisnya dibungkus kutip dibuka satu lapis", () => {
+  // Bentuk setelah CSV dibaca, sama dengan ekspor asli LinkedIn (isi buatan).
+  const raw = 'Kabar baik hari ini."\n""\n"Saya belajar AI bersama peserta."\n""\n"#belajar #ai';
+  assert.equal(unwrapLinkedinLines(raw), "Kabar baik hari ini.\n\nSaya belajar AI bersama peserta.\n\n#belajar #ai");
+  // Teks satu baris dan teks tanpa pola itu tidak diubah, termasuk kutipan asli.
+  assert.equal(unwrapLinkedinLines('Ia berkata "halo".'), 'Ia berkata "halo".');
+  assert.equal(unwrapLinkedinLines("Baris satu\nBaris dua"), "Baris satu\nBaris dua");
+  const rows = [
+    ["Date", "ShareLink", "ShareCommentary", "SharedUrl", "MediaUrl", "Visibility"],
+    ["2026-07-31 13:24:21", "https://www.linkedin.com/feed/update/urn%3Ali%3AugcPost%3A7000000000000000009", raw, "", "", "MEMBER_NETWORK"],
+  ];
+  const { items } = parseLinkedinShares(rows);
+  assert.equal(items[0].sourceId, "ugcpost-7000000000000000009");
+  assert.equal(cleanCaption(items[0].text).caption, "Kabar baik hari ini.\n\nSaya belajar AI bersama peserta.");
 });

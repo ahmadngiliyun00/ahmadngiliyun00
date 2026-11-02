@@ -139,10 +139,28 @@ export function parseLinkedinShares(rows: string[][]): { items: LinkedinShare[];
       skipped++;
       continue;
     }
-    const text = (row[iText] ?? "").trim();
+    const text = unwrapLinkedinLines(row[iText] ?? "").trim();
     items.push({ sourceId, url, text, date: iDate < 0 ? null : partialDateFrom(row[iDate] ?? "") });
   }
   return { items, skipped };
+}
+
+// Ekspor LinkedIn membungkus setiap baris teks postingan dengan tanda kutip sendiri, jadi setelah
+// CSV dibaca teks berbentuk: baris satu." lalu "" (baris kosong) lalu "baris dua. Bila pola kutip,
+// baris baru, kutip itu ada, satu lapis kutip di awal dan akhir setiap baris dibuang. Teks satu
+// baris atau tanpa pola itu tidak diubah.
+export function unwrapLinkedinLines(text: string): string {
+  const normalized = text.replace(/\r\n?/g, "\n");
+  if (!/"\n"/.test(normalized)) return normalized;
+  return normalized
+    .split("\n")
+    .map((line) => {
+      let out = line;
+      if (out.startsWith('"')) out = out.slice(1);
+      if (out.endsWith('"')) out = out.slice(0, -1);
+      return out;
+    })
+    .join("\n");
 }
 
 // ID postingan LinkedIn dari tautannya: urn:li:share:123, urn:li:activity:123, atau urn:li:ugcPost:123.

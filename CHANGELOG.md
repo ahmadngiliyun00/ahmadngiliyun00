@@ -23,6 +23,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
+- Impor arsip LinkedIn Complete: berkas postingan bernama `Shares_<nomor>.csv` kini dikenali, dan tanda kutip yang dipakai LinkedIn untuk membungkus setiap baris teks postingan dibuang, sehingga tidak tampil di situs
 - Pesan dan panduan impor LinkedIn diperbaiki: postingan (`Shares.csv`) hanya ada di arsip Complete dari pilihan Download larger data archive, bukan di arsip Basic yang dikirim lebih dulu. Pilihan per berkas di LinkedIn tidak punya opsi Posts
 - Impor ekspor tidak lagi berhenti di gambar pertama yang gagal: gambar yang gagal dilewati, sisanya tetap diunggah, dan pesan menjelaskan cara melengkapinya (muat ulang halaman lalu impor ulang ZIP yang sama). Balasan server yang tidak terduga (misalnya halaman error Nginx) dilaporkan dengan pesan yang jelas
 - Tautan postingan media sosial kini opsional, karena ekspor Meta tidak memuatnya. Postingan tanpa tautan hanya bisa dijadikan public bila tautan profil platformnya terisi
