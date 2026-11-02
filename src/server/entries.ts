@@ -1,15 +1,15 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
-import { and, asc, eq, ne } from "drizzle-orm";
+import { and, asc, eq, isNull, ne } from "drizzle-orm";
 import { getCollection, getSettingsConfig } from "@/content/collections";
 import { getPath, readFields, setPath, slugify, SLUG_PATTERN, type Doc, type FieldErrors } from "@/content/fields";
 import { socialPlatformLabels, type CollectionKey, type SocialPlatform, type SocialSettings, type Visibility } from "@/content/types";
 import { db } from "@/db";
-import { comments, entries, postViews, settings } from "@/db/schema";
+import { comments, entries, files, postViews, settings } from "@/db/schema";
 import { fileIdsIn, htmlToText } from "@/lib/richtext";
 import { sha256 } from "@/server/auth/session";
 import { getSettingDoc, invalidateSite, primaryLang, rowToEntry } from "@/server/content";
-import { deleteEntryFiles, deleteFile, getFileMeta, saveUpload, syncInlineFiles } from "@/server/files";
+import { cleanupOrphanFiles, deleteEntryFiles, deleteFile, getFileMeta, saveUpload, syncInlineFiles } from "@/server/files";
 import { galleryIds, galleryItems } from "@/lib/gallery";
 import { sanitizeRichText } from "@/server/richtext";
 import { ignorePost } from "@/server/social/store";
@@ -253,6 +253,12 @@ export async function saveEntry(
     if (oldFileId !== data.fileId) await deleteFile(oldFileId);
   }
 
+  // Berkas yang diunggah bersama data baru belum tahu ID datanya saat disimpan: kaitkan sekarang,
+  // supaya izin aksesnya mengikuti data ini dan berkas ikut terhapus bersama datanya.
+  if (typeof data.fileId === "string") {
+    await db.update(files).set({ entryId: savedId as number }).where(and(eq(files.id, data.fileId), isNull(files.entryId)));
+  }
+
   // Gambar di dalam isi dan gambar galeri: kaitkan ke data ini, hapus yang tidak dipakai lagi
   // (misalnya dihapus dari editor atau dilepas dari galeri).
   if (richFields.length + galleryFields.length > 0) {
@@ -277,6 +283,8 @@ export async function saveEntry(
   }
 
   invalidateSite();
+  // Bersihkan berkas yatim (unggahan dari formulir yang ditinggalkan), paling sering tiap 6 jam.
+  await cleanupOrphanFiles().catch((err) => console.error("[files] pembersihan berkas yatim gagal", err));
   return { ok: true, id: savedId as number };
 }
 

@@ -2,9 +2,9 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
-import { and, eq, inArray, isNull, or } from "drizzle-orm";
+import { and, eq, inArray, isNull, lt, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { files } from "@/db/schema";
+import { entries, files, settings } from "@/db/schema";
 
 // Berkas unggahan disimpan di disk (UPLOAD_DIR, di luar public/) dan hanya bisa dibuka lewat
 // route /files/<id>/, yang memeriksa izin: admin, item public, atau tautan berbagi yang sah.
@@ -111,4 +111,53 @@ export async function deleteFile(id: string) {
   if (meta === undefined) return;
   await rm(storedPath(meta.storedName), { force: true });
   await db.delete(files).where(eq(files.id, id));
+}
+
+// ---------- Berkas yatim ----------
+// Gambar galeri dan gambar editor diunggah sebelum formulir disimpan. Bila formulir data baru
+// ditinggalkan, berkasnya tidak pernah punya pemilik (entry_id kosong) dan tidak dipakai di mana
+// pun, jadi menumpuk di UPLOAD_DIR. Pembersih ini memeriksa berkas tanpa pemilik yang berumur
+// lebih dari ORPHAN_AGE_MS:
+// - dipakai suatu data (sebagai fileId, di galeri, atau di isi tulisan): dikaitkan ke data itu,
+//   supaya izin aksesnya mengikuti data tersebut dan /files/<id>/ tidak perlu mencari lewat JSON,
+// - tidak dipakai di mana pun: dihapus dari disk dan tabel files.
+// Dipanggil dari jalur admin (simpan data), paling sering sekali per ORPHAN_EVERY_MS.
+
+const ORPHAN_AGE_MS = 24 * 60 * 60 * 1000;
+const ORPHAN_EVERY_MS = 6 * 60 * 60 * 1000;
+const globalForFiles = globalThis as unknown as { orphanCleanupAt?: number };
+
+export async function cleanupOrphanFiles(now: number = Date.now()): Promise<{ adopted: number; deleted: number }> {
+  const result = { adopted: 0, deleted: 0 };
+  if (now - (globalForFiles.orphanCleanupAt ?? 0) < ORPHAN_EVERY_MS) return result;
+  globalForFiles.orphanCleanupAt = now;
+  const candidates = await db
+    .select({ id: files.id })
+    .from(files)
+    .where(and(isNull(files.entryId), lt(files.createdAt, new Date(now - ORPHAN_AGE_MS))))
+    .limit(500);
+  for (const { id } of candidates) {
+    // ID berkas hanya 24 karakter heksadesimal (lihat saveUpload), jadi aman di dalam LIKE.
+    if (!/^[a-f0-9]{24}$/.test(id)) continue;
+    const pattern = `%${id}%`;
+    const owner = await db
+      .select({ id: entries.id })
+      .from(entries)
+      .where(sql`CAST(${entries.data} AS CHAR) LIKE ${pattern}`)
+      .limit(1);
+    if (owner[0]) {
+      await db.update(files).set({ entryId: owner[0].id }).where(eq(files.id, id));
+      result.adopted += 1;
+      continue;
+    }
+    const inSettings = await db
+      .select({ key: settings.key })
+      .from(settings)
+      .where(sql`CAST(${settings.value} AS CHAR) LIKE ${pattern}`)
+      .limit(1);
+    if (inSettings[0]) continue;
+    await deleteFile(id);
+    result.deleted += 1;
+  }
+  return result;
 }
