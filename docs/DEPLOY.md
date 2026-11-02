@@ -63,6 +63,7 @@ Tambahkan di dalam blok `server` situs `ngiliyun.my.id`:
 
 ```nginx
 client_max_body_size 8m;
+server_tokens off;   # jangan umumkan versi Nginx di header dan halaman error
 
 location / {
     proxy_pass http://127.0.0.1:3005;
