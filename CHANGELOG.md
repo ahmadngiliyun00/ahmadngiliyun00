@@ -8,6 +8,8 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Ditambahkan
 
+- Galeri gambar (carousel) untuk berita dan tulisan serta postingan media sosial. Di CMS, banyak gambar bisa dipilih atau diseret sekaligus, disusun urutannya dengan menyeret atau tombol panah, dan gambar pertama menjadi sampul. PDF, misalnya dokumen carousel LinkedIn, dipecah otomatis menjadi satu gambar per halaman. Di situs, gambar berganti otomatis tiap 3 detik, bisa digeser di ponsel, punya tombol kiri dan kanan, titik indikator, penghitung, dan tombol jeda; tampil di Kabar terbaru beranda, arsip Kabar, halaman tulisan, dan halaman Media sosial. Tidak berputar sendiri bila pengunjung meminta gerak dikurangi
+- Gambar pertama galeri tulisan menjadi gambar pratinjau saat tautan dibagikan
 - Pilihan sumber gambar postingan media sosial: isian Tautan gambar (didahulukan) dan Gambar unggahan (dipakai bila tautan kosong); bila keduanya kosong, kartu tampil tanpa gambar. Tautan berbagi Google Drive diubah otomatis menjadi tautan gambar, dan tautan CDN LinkedIn, Facebook, atau Instagram ditolak karena kedaluwarsa dalam beberapa hari
 - Area unggah berkas baru di semua formulir CMS (isian berkas, impor lembar kerja, impor ZIP ekspor, Shares.csv LinkedIn): kotak bergaris putus-putus yang bisa diklik atau dijatuhi berkas, pratinjau gambar atau nama dan ukuran berkas sebelum diunggah, tombol batal, serta penolakan jenis atau ukuran berkas yang salah lewat toast
 

@@ -30,7 +30,7 @@ Buka <http://localhost:3000> untuk situs dan <http://localhost:3000/admin/> untu
 | `npm run build` | Ambil data GitHub, perbarui README, lalu build produksi |
 | `npm start` | Jalankan hasil build (produksi) |
 | `npm run typecheck` | Pemeriksaan TypeScript |
-| `npm test` | Unit test URL LinkedIn, form kontak, template email, rich text, hitungan pembaca, komentar, isian dua bahasa, JSON-LD, aturan beranda, teks SEO bawaan, tautan Google Drive, serta ekspor dan impor lembar kerja |
+| `npm test` | Unit test URL LinkedIn, form kontak, template email, rich text, hitungan pembaca, komentar, isian dua bahasa, JSON-LD, aturan beranda, teks SEO bawaan, tautan Google Drive, ekspor dan impor lembar kerja, media sosial, serta galeri gambar |
 | `npm run data` | Ambil data GitHub ke `src/data/github.json`, lalu buat ulang gambar dan teks README |
 | `npm run readme` | Buat ulang gambar README dan bagian teks README dari database |
 | `npm run errors` | Buat ulang halaman error statis untuk Nginx di `public/errors/` (500, 502, 503, 504) |
@@ -128,6 +128,18 @@ Bahasa utama diatur di Pengaturan, **Bahasa** (bawaan Indonesia). Formulir CMS m
 - **Gambar di dalam isi** diperkecil di peramban (lebar maksimal 1600 px, WebP atau JPEG), diunggah lewat `uploadInlineImageAction`, lalu dikaitkan ke tulisan lewat `files.entry_id` saat disimpan (`syncInlineFiles`). Gambar yang dibuang dari isi ikut dihapus. Gambar dari tulisan baru yang tidak pernah disimpan tetap tertinggal tanpa pemilik
 - **Pembaca** (`post_views`, `src/server/views.ts`, aturan di `src/lib/views.ts`): komponen `ViewBeacon` mengirim ke `/api/views/` setelah halaman terlihat 2 detik. Satu baris per pengunjung per tulisan per hari WIB; pengunjung dikenali lewat hash harian IP dan user agent dengan garam `CONTACT_IP_SALT`. Robot, admin yang sedang masuk, permintaan dari situs lain, dan lebih dari 300 kiriman per IP per jam diabaikan
 - **Komentar** (`comments`, `src/server/comments.ts`, `src/server/comment-action.ts`, aturan di `src/lib/comment.ts`): selalu menunggu persetujuan, kolom jebakan, jebakan waktu 3 detik, maksimal 2 tautan, 3 komentar per IP per 10 menit. Email pengomentar tidak pernah dirender di situs
+
+### Galeri gambar (carousel)
+
+Berita dan tulisan (isian Galeri gambar) dan postingan media sosial (isian Gambar tambahan) bisa berisi beberapa gambar yang tampil sebagai slide.
+
+- **Isian `gallery`** (`src/content/fields.ts`): daftar ID berkas sesuai urutan tampil, paling banyak 20 (`GALLERY_MAX`). Aturan murninya di `src/lib/gallery.ts` dan diuji `tests/gallery.test.mjs`
+- **CMS** (`src/components/admin/GalleryInput.tsx`): pilih atau seret banyak berkas sekaligus. Gambar diperkecil di peramban (`image-shrink.ts`) lalu diunggah satu per satu lewat `uploadInlineImageAction`, jadi batas 6 MB per permintaan tidak terlampaui. PDF dipecah menjadi satu gambar per halaman dengan pdf.js di peramban (`pdf-pages.ts`), cocok untuk dokumen carousel LinkedIn. Urutan disusun dengan menyeret kartu atau tombol panah; gambar pertama menjadi sampul. Urutan baru tersimpan saat formulir disimpan
+- **Server** (`saveEntry`): galeri hanya menerima berkas yang belum berpemilik atau milik data itu sendiri, mengaitkannya lewat `files.entry_id`, dan menghapus gambar yang dilepas dari galeri. Izin akses berkas mengikuti status data (public atau privat)
+- **Situs** (`src/components/MediaCarousel.tsx`): berganti otomatis tiap 3 detik (`SLIDE_MS`), bisa digeser (scroll-snap), tombol kiri dan kanan, titik indikator (sampai 10 gambar) dan penghitung "2 / 5", tombol jeda. Berhenti sementara saat kursor di atasnya, saat ada fokus keyboard, saat tidak terlihat, atau tab tidak aktif. Dengan `prefers-reduced-motion` tidak berputar sendiri. Satu gambar tampil diam tanpa kontrol
+- Kartu memakai bingkai berasio tetap dan gambar ditampilkan utuh (`contain`) supaya halaman PDF terbaca; halaman tulisan mengikuti rasio gambar pertama (antara 16:9 dan 4:5)
+- Postingan media sosial: urutan slide adalah Tautan gambar atau Gambar unggahan (bila ada), lalu Gambar tambahan
+- Gambar pertama galeri tulisan menjadi gambar pratinjau saat dibagikan (Open Graph) dan `image` di JSON-LD
 
 ### Menambah koleksi atau field
 

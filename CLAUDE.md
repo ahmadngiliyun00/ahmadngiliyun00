@@ -52,6 +52,7 @@ tests/drive.test.mjs             unit test tautan Google Drive untuk pratinjau s
 tests/transfer.test.mjs          unit test ekspor dan impor lembar kerja: kolom, sel, Excel, CSV (npm test)
 tests/social.test.mjs            unit test caption, tagar, topik, tanggal, CDN gambar, Shares.csv LinkedIn (npm test)
 tests/social-export.test.mjs     unit test impor ekspor Instagram dan Facebook, mojibake, pembaca ZIP (npm test, fixture buatan)
+tests/gallery.test.mjs           unit test galeri gambar: isian, urutan slide, teks alternatif, susun ulang (npm test)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, proyek, riset, mengajar, perjalanan,
@@ -67,7 +68,9 @@ src/
                                  ArchivePage, DetailPage, dan lainnya). Bersama: SubpageShell, PageHead, Section
   components/LegacyAnchors.tsx   alihkan jangkar beranda lama (#research, #teaching, #journey, #next, #activity)
   components/ErrorView.tsx       isi halaman error (404, 500) untuk situs ID dan EN, CMS, dan global-error
-  components/admin/              komponen CMS (AdminShell, EntryForm, FieldInput, ShareBox)
+  components/MediaCarousel.tsx   carousel gambar situs (kartu kabar, kartu media sosial, halaman tulisan)
+  components/admin/              komponen CMS (AdminShell, EntryForm, FieldInput, ShareBox, GalleryInput)
+  components/admin/pdf-pages.ts  pecah PDF menjadi gambar per halaman di peramban (pdf.js)
   content/
     types.ts                     tipe semua konten dan label kategori
     collections.ts               konfigurasi koleksi CMS: field, label, urutan
@@ -95,6 +98,7 @@ src/
   lib/social.ts                  aturan murni media sosial: cleanCaption, aturan topik, groupByTopic, Shares.csv LinkedIn
   lib/social-export.ts           baca ekspor Instagram dan Facebook (JSON): detectExport, parser, fixMetaText, derivedSourceId
   lib/zip-reader.ts              baca ZIP besar di peramban per berkas (Blob.slice, DecompressionStream, ZIP64)
+  lib/gallery.ts                 aturan galeri: parseGallery, slideSources, slideImages, GALLERY_MAX, SLIDE_MS
 ```
 
 ## Aturan kerja
@@ -123,6 +127,7 @@ src/
 - Judul SEO bawaan paling banyak 60 karakter, deskripsi 120 sampai 160, kalimat naratif tanpa titik dua, tanpa strip pemisah, tanpa nama kota (diuji `tests/seo-text.test.mjs`)
 - Kanal kontak di beranda hanya yang bertanda "Tampil di kontak beranda" (bawaan LinkedIn, GitHub, ORCID, YouTube)
 - Halaman error: `not-found.tsx` dan `error.tsx` di `(id)/`, `(en)/en/`, dan `(admin)/admin/`, plus `app/global-error.tsx`. Alamat tak dikenal ditangkap rute `[...missing]` supaya 404 berbahasa sesuai. Teks di `copy.errors` (`profile.ts`) dan `adminCopy.errors`. Halaman 500, 502, 503, 504 untuk Nginx dibuat `npm run errors`; jangan edit `public/errors/` manual
+- Galeri gambar (isian `gallery`, berita dan media sosial): daftar ID berkas berurutan, maksimal 20, gambar pertama sampul. Diunggah satu per satu lewat `GalleryInput`, PDF dipecah per halaman di peramban, tidak pernah base64. Di situs tampil lewat `MediaCarousel` (otomatis tiap 3 detik, bisa digeser, tombol jeda, tanpa putar otomatis bila `prefers-reduced-motion`). Server hanya menerima berkas baru atau milik data itu, dan menghapus yang dilepas
 - Semua isian unggah berkas di CMS memakai `FileDrop` (`src/components/admin/FileDrop.tsx`): area drag and drop dengan pratinjau sebelum diunggah, tetap memakai `<input type="file">` asli di dalamnya
 - Header keamanan dan CSP ada di `next.config.ts`. `img-src` sengaja mengizinkan `https:` untuk Tautan gambar media sosial. Skrip, gambar, iframe, atau `fetch` ke domain pihak ketiga baru wajib ditambahkan ke CSP, kalau tidak peramban memblokirnya
 - Gaya komponen ditulis di `globals.css` (situs) atau `admin.css` (CMS) di dalam `@layer components`
@@ -168,7 +173,7 @@ npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
 npm run errors         # buat ulang halaman error statis Nginx di public/errors/
-npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja, media sosial
+npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja, media sosial, galeri
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build
