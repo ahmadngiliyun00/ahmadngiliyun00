@@ -20,7 +20,7 @@ const VIS_PUBLIC = "public";
 const VIS_PRIVATE = "privat";
 
 // Jenis field yang tidak ikut lembar kerja: berkas, rahasia, dan isi rich text (HTML).
-const SKIPPED: Field["type"][] = ["file", "secret", "richtext"];
+const SKIPPED: Field["type"][] = ["file", "gallery", "secret", "richtext"];
 
 function getPath(doc: Doc, path: string): unknown {
   let cur: unknown = doc;
@@ -211,6 +211,10 @@ export function formFromEntry(fields: Field[], entry: TransferEntry | null): For
         break;
       case "secret":
         // Rahasia kosong berarti nilai tersimpan dipakai terus (readFields tidak menimpanya).
+        break;
+      case "gallery":
+        // Tidak ada di lembar kerja, tetapi tetap dikirim supaya impor tidak menghapus galeri.
+        if (Array.isArray(v)) put(key, (v as unknown[]).filter((x) => typeof x === "string").join(","));
         break;
       default: {
         const col: TransferColumn = { key: f.name, label: "", note: "", width: 0 };

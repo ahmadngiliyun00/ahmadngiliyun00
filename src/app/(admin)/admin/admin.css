@@ -678,6 +678,126 @@
     color: var(--color-muted);
   }
 
+  /* Isian galeri: area unggah banyak berkas, lalu kartu gambar yang bisa diseret untuk menyusun urutan. */
+  .gallery-input {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .gallery-input[data-invalid] .file-drop-zone {
+    border-color: #ff9b8a;
+  }
+
+  .gallery-count {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .gallery-count .admin-help {
+    font-weight: 400;
+  }
+
+  .gallery-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+    gap: 0.75rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gallery-item {
+    position: relative;
+    display: grid;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 0.8rem;
+    background: var(--color-ink);
+    cursor: grab;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .gallery-item:first-child {
+    border-color: color-mix(in srgb, var(--color-leaf) 60%, var(--color-line));
+  }
+
+  .gallery-item:hover,
+  .gallery-item:focus-within {
+    border-color: var(--color-sky);
+  }
+
+  .gallery-item[data-dragging] {
+    opacity: 0.4;
+    cursor: grabbing;
+  }
+
+  /* Penanda tempat jatuh saat menyeret: garis hijau di sisi kiri atau kanan kartu. */
+  .gallery-item[data-drop="before"] {
+    box-shadow: inset 4px 0 0 var(--color-leaf);
+  }
+
+  .gallery-item[data-drop="after"] {
+    box-shadow: inset -4px 0 0 var(--color-leaf);
+  }
+
+  .gallery-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .gallery-badge {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.4rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-ink) 82%, transparent);
+  }
+
+  .gallery-tools {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.25rem;
+    padding: 0.35rem;
+    border-top: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+
+  .gallery-btn {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem;
+    color: var(--color-fg);
+    cursor: pointer;
+  }
+
+  .gallery-btn:hover:not(:disabled) {
+    border-color: var(--color-leaf);
+    color: var(--color-leaf);
+  }
+
+  .gallery-btn:focus-visible {
+    outline: 2px solid var(--color-leaf);
+    outline-offset: 2px;
+  }
+
+  .gallery-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+  }
+
+  .gallery-btn-remove:hover:not(:disabled) {
+    border-color: #ff9b8a;
+    color: #ff9b8a;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .file-drop-zone {
       transition: none;

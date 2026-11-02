@@ -3120,7 +3120,6 @@ select.field {
     margin: -1.4rem -1.4rem 1.1rem;
     border-radius: 1.1rem 1.1rem 0 0;
     border-bottom: 1px solid var(--color-line);
-    object-fit: cover;
     background: var(--color-ink);
   }
 
@@ -3614,5 +3613,204 @@ select.field {
 
   .toast-timer {
     display: none;
+  }
+}
+
+/* ---------- Carousel gambar (MediaCarousel) ----------
+   Dipakai kartu media sosial, kartu kabar, dan halaman tulisan. Geser memakai scroll-snap. */
+@layer components {
+  .carousel {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-ink);
+  }
+
+  /* Bingkai berasio tetap (kartu): isi carousel mengikuti tinggi bingkai. */
+  .social-image > .carousel-track,
+  .news-media > .carousel-track {
+    position: absolute;
+    inset: 0;
+  }
+
+  .carousel:focus-visible {
+    outline: 2px solid var(--color-sky);
+    outline-offset: 3px;
+  }
+
+  .carousel-track {
+    display: flex;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .carousel-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Blok biasa, bukan grid: tinggi gambar 100% harus mengacu ke bingkai, bukan ke ukuran gambar. */
+  .carousel-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    height: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  /* Beberapa gambar ditampilkan utuh, supaya halaman PDF dan dokumen tetap terbaca. */
+  .carousel-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+  }
+
+  /* Satu gambar saja tetap memenuhi bingkai seperti sebelumnya. */
+  .carousel-single .carousel-img {
+    object-fit: cover;
+  }
+
+  .carousel-count {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-ink) 78%, transparent);
+  }
+
+  .carousel-arrow {
+    position: absolute;
+    top: 50%;
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--color-fg) 25%, transparent);
+    border-radius: 999px;
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-ink) 72%, transparent);
+    transform: translateY(-50%);
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .carousel-prev {
+    left: 0.6rem;
+  }
+
+  .carousel-next {
+    right: 0.6rem;
+  }
+
+  .carousel-arrow:hover,
+  .carousel-toggle:hover {
+    border-color: var(--color-leaf);
+    color: var(--color-leaf);
+  }
+
+  .carousel-bar {
+    position: absolute;
+    bottom: 0.6rem;
+    left: 50%;
+    display: flex;
+    max-width: calc(100% - 1.2rem);
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 78%, transparent);
+    transform: translateX(-50%);
+  }
+
+  .carousel-toggle {
+    display: grid;
+    width: 1.75rem;
+    height: 1.75rem;
+    place-items: center;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    color: var(--color-fg);
+    cursor: pointer;
+  }
+
+  .carousel-dots {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Tombol 24 px supaya mudah disentuh; titik yang terlihat lebih kecil. */
+  .carousel-dot {
+    display: grid;
+    width: 1.5rem;
+    height: 1.5rem;
+    place-items: center;
+    cursor: pointer;
+  }
+
+  .carousel-dot::before {
+    content: "";
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-fg) 55%, transparent);
+    transition: width 0.25s ease, background-color 0.25s ease;
+  }
+
+  .carousel-dot[aria-current="true"]::before {
+    width: 1.1rem;
+    background: var(--color-leaf);
+  }
+
+  .carousel-dot:hover::before {
+    background: var(--color-fg);
+  }
+
+  .carousel-arrow:focus-visible,
+  .carousel-toggle:focus-visible,
+  .carousel-dot:focus-visible {
+    outline: 2px solid var(--color-leaf);
+    outline-offset: 1px;
+  }
+
+  /* Kartu kabar dengan galeri: bingkai gambar menempel di atas kartu, seperti kartu media sosial. */
+  .news-card .news-media {
+    width: calc(100% + 2.8rem);
+    max-width: none;
+    aspect-ratio: 16 / 9;
+    margin: -1.4rem -1.4rem 1.1rem;
+    border-bottom: 1px solid var(--color-line);
+    border-radius: 1.1rem 1.1rem 0 0;
+  }
+
+  /* Halaman tulisan: tinggi mengikuti gambar pertama (diatur MediaCarousel), sebelum itu 4:3. */
+  .post-media {
+    margin-top: 1.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 1.1rem;
+  }
+
+  .post-media .carousel-track {
+    aspect-ratio: 4 / 3;
+  }
+
+  .post-media.carousel-single .carousel-img {
+    height: auto;
+    object-fit: contain;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-arrow,
+  .carousel-dot::before {
+    transition: none;
   }
 }

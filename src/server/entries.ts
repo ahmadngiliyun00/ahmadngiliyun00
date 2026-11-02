@@ -9,7 +9,8 @@ import { comments, entries, postViews, settings } from "@/db/schema";
 import { fileIdsIn, htmlToText } from "@/lib/richtext";
 import { sha256 } from "@/server/auth/session";
 import { getSettingDoc, invalidateSite, primaryLang, rowToEntry } from "@/server/content";
-import { deleteEntryFiles, deleteFile, saveUpload, syncInlineFiles } from "@/server/files";
+import { deleteEntryFiles, deleteFile, getFileMeta, saveUpload, syncInlineFiles } from "@/server/files";
+import { galleryIds } from "@/lib/gallery";
 import { sanitizeRichText } from "@/server/richtext";
 import { ignorePost } from "@/server/social/store";
 import { imageLinkProblem, parseTopicRules } from "@/lib/social";
@@ -199,7 +200,21 @@ export async function saveEntry(
   const prepared = await prepareEntry(collection, id, form);
   if (!prepared.ok) return prepared;
   const { data, existing, slug, visibility, position } = prepared.value;
-  const richFields = (getCollection(collection)?.fields ?? []).filter((f) => f.type === "richtext");
+  const fields = getCollection(collection)?.fields ?? [];
+  const richFields = fields.filter((f) => f.type === "richtext");
+  const galleryFields = fields.filter((f) => f.type === "gallery");
+
+  // Galeri hanya boleh berisi berkas yang baru diunggah (belum berpemilik) atau milik data ini,
+  // supaya gambar data lain tidak ikut terbuka lewat data ini.
+  for (const f of galleryFields) {
+    const ids: string[] = [];
+    for (const fid of galleryIds(getPath(data, f.name))) {
+      const meta = await getFileMeta(fid);
+      if (meta === undefined) continue;
+      if (meta.entryId === null ? true : meta.entryId === id) ids.push(fid);
+    }
+    setPath(data, f.name, ids.length === 0 ? undefined : ids);
+  }
 
   // Berkas: unggahan baru menggantikan yang lama; centang "hapus berkas" melepasnya.
   const upload = form.get("upload");
@@ -238,14 +253,16 @@ export async function saveEntry(
     if (oldFileId !== data.fileId) await deleteFile(oldFileId);
   }
 
-  // Gambar di dalam isi: kaitkan ke data ini, hapus yang tidak dipakai lagi.
-  if (richFields.length > 0) {
+  // Gambar di dalam isi dan gambar galeri: kaitkan ke data ini, hapus yang tidak dipakai lagi
+  // (misalnya dihapus dari editor atau dilepas dari galeri).
+  if (richFields.length + galleryFields.length > 0) {
     const html = richFields
       .map((f) => getPath(data, f.name) as { id?: string; en?: string } | undefined)
       .map((v) => `${v?.id ?? ""} ${v?.en ?? ""}`)
       .join(" ");
+    const gallery = galleryFields.flatMap((f) => galleryIds(getPath(data, f.name)));
     const keep = typeof data.fileId === "string" ? [data.fileId] : [];
-    await syncInlineFiles(savedId as number, fileIdsIn(html), keep);
+    await syncInlineFiles(savedId as number, [...fileIdsIn(html), ...gallery], keep);
   }
 
   // Hanya satu semester berjalan.

@@ -2,6 +2,7 @@
 
 import { LocalizedInputs, type LangModeLabels } from "@/components/admin/LangMode";
 import FileDrop from "@/components/admin/FileDrop";
+import GalleryInput, { type GalleryLabels } from "@/components/admin/GalleryInput";
 import RichTextPair from "@/components/admin/RichTextPair";
 import type { RichTextLabels } from "@/components/admin/RichTextEditor";
 import type { Field, Option } from "@/content/fields";
@@ -19,6 +20,7 @@ export type FieldLabels = {
   fileHint: string;
   openFile: string;
   removeFile: string;
+  gallery: GalleryLabels;
   required: string;
   editor: RichTextLabels;
   langMode: LangModeLabels;
@@ -323,6 +325,18 @@ export default function FieldInput({
           {foot}
         </div>
       );
+    case "gallery": {
+      // value = daftar ID berkas tersimpan; raw = isian mentah bila simpan sebelumnya gagal.
+      const rawIds = raw?.(key)?.[0];
+      const initial = rawIds !== undefined ? rawIds.split(",").filter((x) => x !== "") : Array.isArray(value) ? value : [];
+      return (
+        <div className="admin-field">
+          <label htmlFor={id}>{label}</label>
+          <GalleryInput id={id} name={key} initial={initial} labels={labels.gallery} invalid={invalid} describedBy={describedBy} />
+          {foot}
+        </div>
+      );
+    }
     case "file":
       return (
         <div className="admin-field">

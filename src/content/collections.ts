@@ -182,6 +182,18 @@ export const collections: CollectionConfig[] = [
       { name: "url", label: "Tautan sumber", type: "url", placeholder: "https://www.dicoding.com/blog/...", help: "Wajib untuk liputan. Untuk tulisan, isi bila diterbitkan di tempat lain." },
       { name: "summary", label: "Ringkasan", type: "localized", multiline: true, help: "Satu sampai tiga kalimat, tampil di kartu beranda dan arsip." },
       {
+        name: "gallery",
+        label: "Galeri gambar",
+        type: "gallery",
+        help: "Opsional. Satu gambar tampil diam; dua atau lebih tampil sebagai slide yang berganti otomatis tiap 3 detik dan bisa digeser, di kartu beranda, arsip Kabar, dan halaman tulisan. Gambar pertama menjadi sampul dan gambar pratinjau saat dibagikan.",
+      },
+      {
+        name: "imageAlt",
+        label: "Teks alternatif galeri",
+        type: "localized",
+        help: "Jelaskan isi gambar untuk pembaca layar, misalnya Suasana pelatihan AI di kelas. Situs menambahkan nomor gambar, misalnya gambar 2 dari 5.",
+      },
+      {
         name: "body",
         label: "Isi lengkap",
         type: "richtext",
@@ -272,6 +284,12 @@ export const collections: CollectionConfig[] = [
         label: "Gambar unggahan",
         type: "file",
         help: "Dipakai bila Tautan gambar kosong. Terisi otomatis saat impor ekspor bila postingan bergambar. PNG, JPG, atau WebP, maksimal 5 MB. Bila keduanya kosong, kartu tampil tanpa gambar.",
+      },
+      {
+        name: "gallery",
+        label: "Gambar tambahan (carousel)",
+        type: "gallery",
+        help: "Untuk postingan berisi beberapa gambar atau dokumen PDF LinkedIn. Tampil sebagai slide setelah Tautan gambar atau Gambar unggahan (bila ada), berganti otomatis tiap 3 detik dan bisa digeser.",
       },
       {
         name: "imageAlt",

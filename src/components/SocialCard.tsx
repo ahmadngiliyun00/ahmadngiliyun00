@@ -1,7 +1,9 @@
 import ExternalLink from "@/components/ExternalLink";
+import MediaCarousel from "@/components/MediaCarousel";
 import { socialPlatformLabels, type SocialPlatform, type SocialPost } from "@/content/types";
 import { copy, type Lang } from "@/data/profile";
 import { formatPartialDate } from "@/lib/achievements";
+import { slideImages, slideSources } from "@/lib/gallery";
 
 export interface SocialItem extends SocialPost {
   slug: string;
@@ -18,21 +20,12 @@ export default function SocialCard({ post, lang, profiles }: { post: SocialItem;
   const caption = post.caption[lang];
   const href = post.url ?? profiles[post.platform];
   const label = (post.url ? t.social.viewOn : t.social.profileOn).replace("{platform}", platform);
-  // Urutan gambar: tautan gambar, lalu gambar unggahan, lalu tanpa gambar.
-  const image = post.imageUrl ?? (post.fileId ? `/files/${post.fileId}/` : null);
+  // Urutan gambar: tautan gambar atau gambar unggahan, lalu galeri; tanpa gambar bila kosong.
+  // Dua gambar atau lebih tampil sebagai carousel. Tautan luar dimuat tanpa Referer.
+  const images = slideImages(slideSources(post), post.imageAlt?.[lang] ?? "", t.carousel.image);
   return (
     <article className="cred social-post" data-spot data-platform={post.platform}>
-      {image ? (
-        // Gambar unggahan disajikan dari /files/ (UPLOAD_DIR). Tautan luar tidak mengirim Referer.
-        <img
-          src={image}
-          alt={post.imageAlt?.[lang] ?? ""}
-          loading="lazy"
-          decoding="async"
-          referrerPolicy="no-referrer"
-          className="social-image"
-        />
-      ) : null}
+      {images.length > 0 ? <MediaCarousel images={images} labels={t.carousel} className="social-image" /> : null}
       <p className="cred-meta">
         <span className="cred-kind">{platform}</span>
         {post.date ? <span>{formatPartialDate(post.date, lang)}</span> : null}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { SeoSettings } from "@/content/types";
 import { copy, site, type Lang } from "@/data/profile";
+import { fileUrl, galleryIds } from "@/lib/gallery";
 import { type AchievementItem, archivePath, detailPath, formatPartialDate, kindName } from "@/lib/achievements";
 import { type PageKey, PAGE_KEYS, pagePath } from "@/lib/nav";
 import { type PostItem, hasPage, isoPartialDate, postPath, postsPath } from "@/lib/posts";
@@ -139,6 +140,9 @@ export function buildPostMetadata(lang: Lang, post: PostItem): Metadata {
   for (const l of ["id", "en"] as const) {
     if (hasPage(post, l)) languages[l] = postPath(l, post.slug);
   }
+  // Gambar pertama galeri menjadi gambar pratinjau saat tautan dibagikan.
+  const cover = galleryIds(post.gallery)[0];
+  const images = cover === undefined ? undefined : [{ url: fileUrl(cover), alt: post.imageAlt?.[lang] ?? post.title[lang] }];
   return {
     metadataBase: new URL(site.url),
     title,
@@ -152,8 +156,9 @@ export function buildPostMetadata(lang: Lang, post: PostItem): Metadata {
       locale: lang === "id" ? "id_ID" : "en_US",
       type: "article",
       publishedTime: post.date ? isoPartialDate(post.date) : undefined,
+      images,
     },
-    twitter: { card: "summary", title, description },
+    twitter: { card: images ? "summary_large_image" : "summary", title, description, images },
     icons: { icon: "/favicon.svg" },
   };
 }

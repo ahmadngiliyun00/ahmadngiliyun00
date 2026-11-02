@@ -6,6 +6,7 @@ import { EditorContent, useEditor, useEditorState, type Editor } from "@tiptap/r
 import StarterKit from "@tiptap/starter-kit";
 import { useEffect, useRef, useState } from "react";
 import { uploadInlineImageAction } from "@/app/(admin)/admin/actions";
+import { shrink } from "@/components/admin/image-shrink";
 import Icon from "@/components/admin/Icon";
 import { toast } from "@/components/Toaster";
 
@@ -40,28 +41,6 @@ export type RichTextLabels = {
   copyFrom: string;
   copyConfirm: string;
 };
-
-// Gambar diperkecil di browser sebelum diunggah: lebar maksimal 1600 px, WebP (atau JPEG di
-// browser yang tidak bisa membuat WebP). Foto ponsel 4 MB biasanya menjadi 200 sampai 400 KB.
-const MAX_WIDTH = 1600;
-const KEEP_BELOW = 400 * 1024;
-
-async function shrink(file: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, MAX_WIDTH / bitmap.width);
-  if (scale === 1) {
-    if (file.size <= KEEP_BELOW) return file;
-  }
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  const encode = (type: string) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, 0.85));
-  const webp = await encode("image/webp");
-  const blob = webp?.type === "image/webp" ? webp : await encode("image/jpeg");
-  if (blob === null) return file;
-  return blob.size < file.size ? blob : file;
-}
 
 function imageFiles(list: FileList | null | undefined): File[] {
   return [...(list ?? [])].filter((f) => /^image\/(png|jpeg|webp)$/.test(f.type));

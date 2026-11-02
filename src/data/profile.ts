@@ -102,6 +102,8 @@ export type Copy = {
   >;
   // Halaman Media sosial: kelompok topik dan tautan ke postingan asli.
   social: { topicsLabel: string; other: string; empty: string; viewOn: string; profileOn: string; noImage: string };
+  // Carousel gambar (MediaCarousel) di kartu kabar, kartu media sosial, dan halaman tulisan.
+  carousel: { label: string; slide: string; image: string; prev: string; next: string; goTo: string; pause: string; play: string };
   hero: {
     primary: string;
     secondary: string;
@@ -444,6 +446,16 @@ export const copy: Localized<Copy> = {
       viewOn: "Lihat di {platform}",
       profileOn: "Profil {platform}",
       noImage: "Tanpa gambar",
+    },
+    carousel: {
+      label: "Galeri gambar",
+      slide: "{n} dari {total}",
+      image: "gambar {n} dari {total}",
+      prev: "Gambar sebelumnya",
+      next: "Gambar berikutnya",
+      goTo: "Tampilkan gambar {n}",
+      pause: "Jeda slide otomatis",
+      play: "Putar slide otomatis",
     },
     hero: {
       primary: "Lihat proyek",
@@ -853,6 +865,16 @@ export const copy: Localized<Copy> = {
       viewOn: "View on {platform}",
       profileOn: "{platform} profile",
       noImage: "No image",
+    },
+    carousel: {
+      label: "Image gallery",
+      slide: "{n} of {total}",
+      image: "image {n} of {total}",
+      prev: "Previous image",
+      next: "Next image",
+      goTo: "Show image {n}",
+      pause: "Pause slideshow",
+      play: "Play slideshow",
     },
     hero: {
       primary: "See projects",

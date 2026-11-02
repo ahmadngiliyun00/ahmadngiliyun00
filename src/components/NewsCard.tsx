@@ -1,5 +1,7 @@
 import ExternalLink from "@/components/ExternalLink";
+import MediaCarousel from "@/components/MediaCarousel";
 import { copy, type Lang } from "@/data/profile";
+import { slideImages, slideSources } from "@/lib/gallery";
 import { type PostItem, postDate, postHref, postKindLabel } from "@/lib/posts";
 
 // Kartu satu berita atau tulisan. Dipakai di beranda dan arsip /kabar/.
@@ -12,9 +14,12 @@ export default function NewsCard({ post, lang, headingLevel = 3 }: { post: PostI
   const action = link ? (link.external ? t.news.readOn.replace("{outlet}", post.outlet ?? t.news.source) : t.news.read) : "";
   // Tautan keluar ke artikel dalam bahasa lain diberi keterangan bahasanya.
   const foreign = link ? (link.external ? (post.sourceLang ? post.sourceLang !== lang : false) : false) : false;
+  // Galeri gambar (bila ada) di atas kartu; dua gambar atau lebih menjadi carousel.
+  const images = slideImages(slideSources({ gallery: post.gallery }), post.imageAlt?.[lang] ?? "", t.carousel.image);
 
   return (
-    <article className="cred news-card" data-spot data-kind={post.kind}>
+    <article className="cred news-card" data-spot data-kind={post.kind} data-media={images.length > 0 ? "" : undefined}>
+      {images.length > 0 ? <MediaCarousel images={images} labels={t.carousel} className="news-media" /> : null}
       <p className="cred-meta">
         <span className="cred-kind">{postKindLabel(post, lang)}</span>
         <span>{postDate(post, lang)}</span>

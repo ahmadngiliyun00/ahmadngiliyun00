@@ -1,12 +1,14 @@
 import Analytics from "@/components/Analytics";
 import CommentForm from "@/components/CommentForm";
 import ExternalLink from "@/components/ExternalLink";
+import MediaCarousel from "@/components/MediaCarousel";
 import ShareButtons from "@/components/ShareButtons";
 import SubpageShell from "@/components/SubpageShell";
 import ViewBeacon from "@/components/ViewBeacon";
 import { copy, site, type Lang } from "@/data/profile";
 import { homePath } from "@/lib/nav";
 import { formatNumber } from "@/lib/github";
+import { fileUrl, galleryIds, slideImages } from "@/lib/gallery";
 import { jsonForScript } from "@/lib/json-script";
 import { asHtml, htmlToText, readingMinutes } from "@/lib/richtext";
 import type { PublicComment } from "@/server/comments";
@@ -50,6 +52,8 @@ export default function NewsPostPage({
   });
   const viewText = views === 1 ? t.news.viewsOne : t.news.views.replace("{n}", formatNumber(views, lang));
   const otherHref = hasPage(post, other) ? postPath(other, post.slug) : postsPath(other);
+  const gallery = galleryIds(post.gallery).map(fileUrl);
+  const images = slideImages(gallery, post.imageAlt?.[lang] ?? "", t.carousel.image);
 
   const structured = {
     "@context": "https://schema.org",
@@ -62,6 +66,7 @@ export default function NewsPostPage({
     publisher: post.outlet ? { "@type": "Organization", name: post.outlet } : undefined,
     inLanguage: lang,
     url: postUrl(lang, post.slug),
+    image: gallery.length > 0 ? gallery.map((src) => `${site.url}${src}`) : undefined,
     isBasedOn: post.url,
   };
 
@@ -104,6 +109,7 @@ export default function NewsPostPage({
               {views > 0 ? <span>{viewText}</span> : null}
             </p>
             {post.summary ? <p className="section-intro">{post.summary[lang]}</p> : null}
+            {images.length > 0 ? <MediaCarousel images={images} labels={t.carousel} className="post-media" natural eager /> : null}
 
             <div className="post-body" dangerouslySetInnerHTML={{ __html: html }} />
 

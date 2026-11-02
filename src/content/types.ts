@@ -146,6 +146,8 @@ export type Post = {
   summary?: Localized<string>;
   body?: Localized<string>; // isi lengkap (HTML); bila ada, tulisan punya halaman sendiri di situs
   comments?: boolean; // kolom komentar di halaman tulisan
+  gallery?: string[]; // ID berkas unggahan berurutan, tampil sebagai carousel (src/lib/gallery.ts)
+  imageAlt?: Localized<string>; // teks alternatif galeri, situs menambahkan nomor gambar
 };
 
 // ---------- Media sosial ----------
@@ -163,6 +165,7 @@ export type SocialPost = {
   tags?: string[]; // tagar dari postingan asli, tanpa tanda pagar
   imageUrl?: string; // tautan gambar; didahulukan dari fileId bila diisi
   fileId?: string; // gambar postingan yang diunggah (UPLOAD_DIR), dipakai bila imageUrl kosong
+  gallery?: string[]; // gambar tambahan berurutan (carousel), tampil setelah imageUrl atau fileId
   imageAlt?: Localized<string>;
   sourceId?: string; // ID postingan di platform asal, mencegah tarikan ganda
   importNote?: string; // peringatan dari impor untuk diperiksa di CMS, tidak pernah tampil di situs

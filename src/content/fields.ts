@@ -3,6 +3,7 @@
 
 import type { Lang, PartialDate } from "@/content/types";
 import { isDriveFolder, normalizeDriveUrl } from "@/lib/drive";
+import { galleryIds, parseGallery } from "@/lib/gallery";
 import { isBlank } from "@/lib/i18n";
 import { asHtml, htmlToText } from "@/lib/richtext";
 
@@ -17,7 +18,8 @@ interface Base {
   width?: FieldWidth; // lebar di desktop; bila kosong, ditentukan oleh fieldWidth()
 }
 interface PlainField extends Base {
-  type: "text" | "url" | "textarea" | "boolean" | "date" | "list" | "localizedList" | "links" | "file" | "secret";
+  // gallery = beberapa gambar berurutan (carousel), disimpan sebagai daftar ID berkas (src/lib/gallery.ts).
+  type: "text" | "url" | "textarea" | "boolean" | "date" | "list" | "localizedList" | "links" | "file" | "gallery" | "secret";
   // Khusus url: hanya tautan berkas Google Drive, disimpan dalam bentuk baku (src/lib/drive.ts).
   drive?: boolean;
 }
@@ -268,6 +270,11 @@ export function readField(field: Field, form: FormData, errors: FieldErrors): un
       const v = str(form, key);
       return v === "" ? undefined : v;
     }
+    case "gallery": {
+      const parsed = parseGallery(str(form, key));
+      if (parsed.error) errors[field.name] = `${label}: ${parsed.error}`;
+      return parsed.ids.length === 0 ? undefined : parsed.ids;
+    }
     case "secret": {
       // Rahasia (misalnya sandi SMTP) tidak pernah dikirim balik ke formulir. Kosong berarti
       // tetap memakai nilai tersimpan; readFields tidak menimpanya.
@@ -329,6 +336,8 @@ export function formValue(field: Field, doc: Doc): string | { id: string; en: st
     }
     case "list":
       return Array.isArray(v) ? (v as string[]).join("\n") : "";
+    case "gallery":
+      return galleryIds(v);
     case "links":
       return Array.isArray(v)
         ? (v as { label: { id: string; en: string }; href: string }[])
