@@ -69,7 +69,7 @@ src/
     robots.ts, sitemap.ts
   components/                    komponen situs (PortfolioPage, ProjectsPage, ResearchPage, TeachingPage, JourneyPage,
                                  ArchivePage, DetailPage, dan lainnya). Bersama: SubpageShell, PageHead, Section
-  components/AchievementDetail.tsx  halaman detail capaian untuk /sertifikat/ dan /riset/, alihkan 308 bila induknya salah
+  components/AchievementDetail.tsx  detail capaian /<kategori>/<slug>/ (rute [kind]/[id]), alihkan 308 bila kategorinya salah
   components/LegacyAnchors.tsx   alihkan jangkar beranda lama (#research, #teaching, #journey, #next, #activity)
   components/ErrorView.tsx       isi halaman error (404, 500) untuk situs ID dan EN, CMS, dan global-error
   components/MediaCarousel.tsx   carousel gambar situs (kartu kabar, kartu media sosial, halaman tulisan)
@@ -113,7 +113,8 @@ src/
 - Hanya data `public` yang dirender, masuk sitemap, dan masuk README. Data `private` hanya terlihat di CMS dan lewat tautan berbagi
 - Setiap halaman dan Server Action admin wajib memanggil `requireAdmin()`. Server Action bisa dipanggil langsung tanpa halaman
 - Field baru: tambah di `src/content/collections.ts` (formulir dan validasi ikut otomatis). Urutkan supaya isian pendek berpasangan di grid 12 kolom; atur `width` bila lebar bawaan `fieldWidth()` tidak pas. Kolom tabel baru: `src/db/schema.ts` lalu `npm run db:generate`
-- Capaian punya dua induk (`RESEARCH_KINDS`, `isResearchKind` di `src/content/types.ts`): buku, hak cipta, publikasi, hibah, dan reviewer adalah keluaran riset, tampil di halaman Riset dengan detail `/riset/<slug>/`; sertifikat, pelatihan, beasiswa, keanggotaan, dan penghargaan di arsip `/sertifikat/<slug>/`. Alamat detail wajib lewat `detailPath(lang, item)`, jangan merangkai `/sertifikat/` sendiri. Alamat di induk yang salah dialihkan 308 oleh `AchievementDetail` (keputusan Mas Ilyun, 10 Nov 2026)
+- Alamat detail capaian mengikuti kategorinya: `/<kategori>/<slug>/` dan `/en/<category>/<slug>/` (misalnya `/buku/<slug>/`, `/hak-cipta/<slug>/`), dari `KIND_SLUGS` di `src/content/types.ts`. Kategori baru wajib punya entri di sana dengan segmen yang tidak bertabrakan dengan halaman lain (diuji). Alamat detail wajib lewat `detailPath(lang, item)`, jangan dirangkai sendiri. Kategori yang salah, termasuk alamat lama `/sertifikat/<slug>/` untuk buku, dialihkan 308; alamat kategori tanpa slug (`/buku/`) dialihkan ke bagian yang memuatnya (keputusan Mas Ilyun, 10 Nov 2026)
+- Daftar capaian punya dua halaman induk (`RESEARCH_KINDS`, `isResearchKind`): buku, hak cipta, publikasi, hibah, dan reviewer tampil di halaman Riset (breadcrumb Riset dan Publikasi); sertifikat, pelatihan, beasiswa, keanggotaan, dan penghargaan di arsip `/sertifikat/`
 - Aturan capaian (maksimal 6 sorotan, 5 HKI beranda, LinkedIn hanya sertifikat dan pelatihan) ada di `src/server/entries.ts`
 - Isian dua bahasa memakai bahasa utama dari Pengaturan, Bahasa (bawaan Indonesia). Isian wajib cukup dalam bahasa utama; situs mengisi terjemahan yang kosong dari bahasa utama lewat `fillLocalized` di `loadSite()`. Komponen baru yang membaca teks dua bahasa dari database lain wajib memakai aturan yang sama
 - JSON di dalam tag `<script>` (JSON-LD, konfigurasi Analytics) wajib lewat `jsonForScript` dari `src/lib/json-script.ts`, bukan `JSON.stringify` langsung

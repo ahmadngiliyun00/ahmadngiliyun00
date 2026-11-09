@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound, permanentRedirect, redirect } from "next/navigation";
 import DetailPage from "@/components/DetailPage";
-import { isResearchKind } from "@/content/types";
+import { kindFromSlug } from "@/content/types";
 import { SLUG_PATTERN } from "@/content/fields";
 import type { Lang } from "@/data/profile";
-import { detailPath, publicItems } from "@/lib/achievements";
+import { detailPath, kindIndexPath, publicItems } from "@/lib/achievements";
 import { buildDetailMetadata } from "@/lib/metadata";
 import { loadSite } from "@/server/content";
 import { getFileMeta } from "@/server/files";
 
-// Halaman detail capaian public, dipakai empat rute: /sertifikat/<slug>/, /riset/<slug>/, dan
-// padanan Inggrisnya. Keluaran riset (buku, hak cipta, publikasi, hibah, reviewer) tinggal di bawah
-// Riset, yang lain di bawah arsip sertifikat. Alamat di induk yang salah, termasuk alamat lama
-// /sertifikat/<slug>/ untuk buku dan hak cipta, dialihkan permanen ke alamat yang benar.
-export type DetailSection = "certificates" | "research";
+// Halaman detail capaian public di /<kategori>/<slug>/ (Inggris /en/<category>/<slug>/), misalnya
+// /buku/<slug>/ atau /hak-cipta/<slug>/. Segmen kategori dari KIND_SLUGS (src/content/types.ts).
+// Alamat dengan kategori yang tidak cocok dengan datanya, termasuk alamat lama /sertifikat/<slug>/
+// untuk buku atau hak cipta, dialihkan permanen ke alamat yang benar.
 
 async function find(id: string) {
   if (!SLUG_PATTERN.test(id)) return undefined;
@@ -21,21 +20,21 @@ async function find(id: string) {
   return publicItems(content.achievement).find((a) => a.id === id);
 }
 
-function inSection(kind: Parameters<typeof isResearchKind>[0], section: DetailSection): boolean {
-  return isResearchKind(kind) ? section === "research" : section === "certificates";
-}
-
-export async function achievementDetailMetadata(lang: Lang, id: string, section: DetailSection): Promise<Metadata> {
+export async function achievementDetailMetadata(lang: Lang, kindSlug: string, id: string): Promise<Metadata> {
+  const kind = kindFromSlug(lang, kindSlug);
+  if (kind === undefined) return {};
   const item = await find(id);
   if (item === undefined) return {};
   // Alamat yang akan dialihkan tidak perlu metadata sendiri.
-  return inSection(item.kind, section) ? buildDetailMetadata(lang, item) : {};
+  return item.kind === kind ? buildDetailMetadata(lang, item) : {};
 }
 
-export default async function AchievementDetail({ lang, id, section }: { lang: Lang; id: string; section: DetailSection }) {
+export default async function AchievementDetail({ lang, kindSlug, id }: { lang: Lang; kindSlug: string; id: string }) {
+  const kind = kindFromSlug(lang, kindSlug);
+  if (kind === undefined) notFound();
   const item = await find(id);
   if (item === undefined) notFound();
-  if (!inSection(item.kind, section)) permanentRedirect(detailPath(lang, item));
+  if (item.kind !== kind) permanentRedirect(detailPath(lang, item));
   const content = await loadSite();
   const meta = item.fileId ? await getFileMeta(item.fileId) : undefined;
   return (
@@ -46,4 +45,12 @@ export default async function AchievementDetail({ lang, id, section }: { lang: L
       researchProfiles={content.profile.researchProfiles}
     />
   );
+}
+
+// Alamat kategori tanpa slug, misalnya /buku/. Tidak punya halaman sendiri; dialihkan sementara ke
+// bagian yang memuat kategori itu. Segmen lain yang tidak dikenal tetap 404.
+export function KindIndex({ lang, kindSlug }: { lang: Lang; kindSlug: string }): never {
+  const kind = kindFromSlug(lang, kindSlug);
+  if (kind === undefined) notFound();
+  redirect(kindIndexPath(lang, kind));
 }

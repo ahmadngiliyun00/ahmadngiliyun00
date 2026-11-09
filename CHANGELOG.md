@@ -43,7 +43,8 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Diubah
 
-- Buku, hak cipta, publikasi, hibah, dan reviewer dipindah dari arsip Sertifikat ke halaman Riset, karena semuanya keluaran atau kegiatan riset. Halaman detailnya kini di `/riset/<slug>/` (Inggris `/en/research/<slug>/`); alamat lama `/sertifikat/<slug>/` dialihkan permanen. Halaman Riset mendapat bagian baru Buku dan hak cipta, arsip Sertifikat kini hanya berisi sertifikat, pelatihan, beasiswa, keanggotaan, dan penghargaan
+- Alamat halaman detail capaian mengikuti kategorinya, misalnya `/buku/<slug>/`, `/hak-cipta/<slug>/`, `/publikasi/<slug>/`, dan `/sertifikat/<slug>/` (Inggris `/en/books/<slug>/` dan seterusnya). Alamat lama `/sertifikat/<slug>/` untuk kategori lain dialihkan permanen, dan alamat kategori tanpa slug seperti `/buku/` dialihkan ke bagian yang memuatnya
+- Buku, hak cipta, publikasi, hibah, dan reviewer pindah dari arsip Sertifikat ke halaman Riset, karena semuanya keluaran atau kegiatan riset. Halaman Riset mendapat bagian baru Buku dan hak cipta, arsip Sertifikat kini hanya berisi sertifikat, pelatihan, beasiswa, keanggotaan, dan penghargaan
 - Format sitemap disamakan dengan sitemap yang terbukti dibaca Search Console: `lastmod` dalam WIB tanpa milidetik, ditambah `changefreq` dan `priority`. Panduan deploy menjelaskan cara mencari penghalang bila status sitemap tetap Couldn't fetch (Uji URL aktif, Cloudflare Security Events, firewall aaPanel)
 - Semua unggahan gambar diperkecil di peramban sebelum dikirim (lebar maksimal 1600 px, WebP), termasuk isian Satu gambar, berkas sertifikat, dan impor ZIP ekspor. Foto ponsel di atas 5 MB kini bisa dipakai karena batas diperiksa setelah diperkecil. Gambar yang sudah tersimpan tetap ukurannya sampai diunggah ulang
 - Berkas unggahan public kini disimpan peramban sehari dan diperiksa ulang lewat ETag (jawaban 304 tanpa mengunduh ulang), sebelumnya hanya satu jam lalu diunduh utuh

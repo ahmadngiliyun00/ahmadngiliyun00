@@ -14,7 +14,7 @@ import {
   type SocialPlatform,
 } from "@/content/types";
 import { copy } from "@/data/profile";
-import { sectionPath } from "@/lib/achievements";
+import { kindPath } from "@/lib/achievements";
 import { imageModeOf } from "@/lib/gallery";
 import { showsInContact } from "@/lib/home";
 import { captionTitle } from "@/lib/social";
@@ -32,7 +32,7 @@ export type CollectionConfig = {
   subtitle?: (data: Doc) => string;
   // "date" = urut tanggal terbit terbaru (capaian); "position" = urutan manual
   order: "date" | "position";
-  // Induk halaman detail publik, bila ada. Fungsi karena capaian riset dan sertifikat beda induk.
+  // Induk halaman detail publik, bila ada. Fungsi karena alamat capaian bergantung kategorinya.
   publicPath?: (data: Doc) => { id: string; en: string };
   hasPage?: (data: Doc) => boolean; // bila ada, hanya data yang lolos fungsi ini punya halaman detail
   // Nilai formulir untuk isian yang belum pernah disimpan, supaya formulir menampilkan apa yang tampil di situs.
@@ -101,7 +101,7 @@ export const collections: CollectionConfig[] = [
     order: "date",
     publicPath: (d) => {
       const kind = s(d.kind) as AchievementKind;
-      return { id: sectionPath("id", kind), en: sectionPath("en", kind) };
+      return { id: kindPath("id", kind), en: kindPath("en", kind) };
     },
     title: (d) => loc(d.title),
     subtitle: (d) => {

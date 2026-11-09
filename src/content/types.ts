@@ -301,12 +301,33 @@ export const kindLabels: Record<AchievementKind, Localized<string>> = {
   penghargaan: { id: "Penghargaan", en: "Awards" },
 };
 
-// Jenis capaian yang merupakan keluaran atau kegiatan riset. Halaman detailnya di bawah Riset
-// (/riset/<slug>/, /en/research/<slug>/) dan tampil di halaman Riset, bukan di arsip sertifikat.
+// Jenis capaian yang merupakan keluaran atau kegiatan riset. Tampil di halaman Riset (breadcrumb dan
+// tombol kembali halaman detailnya ke Riset), bukan di arsip sertifikat.
 export const RESEARCH_KINDS: readonly AchievementKind[] = ["publikasi", "buku", "hki", "hibah", "reviewer"];
 
 export function isResearchKind(kind: AchievementKind): boolean {
   return RESEARCH_KINDS.includes(kind);
+}
+
+// Segmen alamat halaman detail per kategori: /buku/<slug>/, /en/books/<slug>/, dan seterusnya.
+// Kategori baru wajib punya entri di sini (TypeScript menolak bila lupa). Segmen tidak boleh sama
+// dengan halaman lain situs (diuji tests/research-kinds.test.mjs).
+export const KIND_SLUGS: Record<AchievementKind, Localized<string>> = {
+  sertifikat: { id: "sertifikat", en: "certificates" },
+  pelatihan: { id: "pelatihan", en: "training" },
+  beasiswa: { id: "beasiswa", en: "scholarships" },
+  hki: { id: "hak-cipta", en: "copyrights" },
+  buku: { id: "buku", en: "books" },
+  hibah: { id: "hibah", en: "grants" },
+  publikasi: { id: "publikasi", en: "publications" },
+  reviewer: { id: "reviewer", en: "reviewing" },
+  keanggotaan: { id: "keanggotaan", en: "memberships" },
+  penghargaan: { id: "penghargaan", en: "awards" },
+};
+
+// Kategori dari segmen alamat, atau undefined bila segmen itu bukan kategori.
+export function kindFromSlug(lang: Lang, slug: string): AchievementKind | undefined {
+  return (Object.keys(KIND_SLUGS) as AchievementKind[]).find((k) => KIND_SLUGS[k][lang] === slug);
 }
 
 export const kindSingular: Record<AchievementKind, Localized<string>> = {

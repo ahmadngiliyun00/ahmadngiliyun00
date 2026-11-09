@@ -1,6 +1,7 @@
 import {
   authorshipLabels,
   isResearchKind,
+  KIND_SLUGS,
   kindLabels,
   kindSingular,
   type Achievement,
@@ -106,14 +107,36 @@ export function researchPath(lang: Lang): string {
   return lang === "id" ? "/riset/" : "/en/research/";
 }
 
-// Induk halaman detail: Riset untuk keluaran riset (buku, hak cipta, publikasi, hibah, reviewer),
-// arsip sertifikat untuk yang lain.
+// Halaman induk (breadcrumb, tombol kembali): Riset untuk keluaran riset (buku, hak cipta,
+// publikasi, hibah, reviewer), arsip sertifikat untuk yang lain.
 export function sectionPath(lang: Lang, kind: AchievementKind): string {
   return isResearchKind(kind) ? researchPath(lang) : archivePath(lang);
 }
 
+// Induk alamat detail per kategori: /buku/, /hak-cipta/, /en/books/, dan seterusnya.
+export function kindPath(lang: Lang, kind: AchievementKind): string {
+  const slug = KIND_SLUGS[kind][lang];
+  return lang === "id" ? `/${slug}/` : `/en/${slug}/`;
+}
+
 export function detailPath(lang: Lang, item: { id: string; kind: AchievementKind }): string {
-  return `${sectionPath(lang, item.kind)}${item.id}/`;
+  return `${kindPath(lang, item.kind)}${item.id}/`;
+}
+
+// Tujuan alamat kategori tanpa slug (misalnya /buku/): bagian yang memuat kategori itu di halaman
+// Riset, atau arsip sertifikat yang sudah disaring ke kategori itu.
+const RESEARCH_ANCHORS: Partial<Record<AchievementKind, string>> = {
+  publikasi: "publications",
+  buku: "outputs",
+  hki: "outputs",
+  hibah: "themes",
+  reviewer: "themes",
+};
+
+export function kindIndexPath(lang: Lang, kind: AchievementKind): string {
+  const anchor = RESEARCH_ANCHORS[kind];
+  if (anchor !== undefined) return `${researchPath(lang)}#${anchor}`;
+  return `${archivePath(lang)}?kategori=${kind}`;
 }
 
 export function detailUrl(lang: Lang, item: { id: string; kind: AchievementKind }): string {

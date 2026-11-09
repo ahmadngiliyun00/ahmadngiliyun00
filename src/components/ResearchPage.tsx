@@ -14,7 +14,7 @@ import { loadSite } from "@/server/content";
 
 // Halaman Riset dan Publikasi (/riset/, /en/research/): angka sitasi bertanggal, tema riset,
 // hibah, reviewer jurnal, profil riset, daftar publikasi per tahun, serta buku dan hak cipta.
-// Semua keluaran riset ini punya halaman detail di bawah /riset/<slug>/.
+// Halaman detailnya beralamat per kategori, misalnya /buku/<slug>/ dan /hak-cipta/<slug>/.
 export default async function ResearchPage({ lang }: { lang: Lang }) {
   const t = copy[lang];
   const other: Lang = lang === "id" ? "en" : "id";
