@@ -106,7 +106,7 @@ export default async function AdminList({ params, searchParams }: Props) {
             const data = e.data as Record<string, unknown>;
             const withPage = cfg.hasPage ? cfg.hasPage(data) : true;
             const gaps = translationGaps(cfg.fields, data);
-            const publicHref = cfg.publicPath ? (e.visibility === "public" ? (withPage ? `${cfg.publicPath.id}${e.slug}/` : null) : null) : null;
+            const publicHref = cfg.publicPath ? (e.visibility === "public" ? (withPage ? `${cfg.publicPath(data).id}${e.slug}/` : null) : null) : null;
             return (
               <li key={e.id} className="admin-row">
                 <div className="min-w-0">

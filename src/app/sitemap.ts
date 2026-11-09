@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import type { Entry } from "@/content/types";
+import { type Entry, isResearchKind } from "@/content/types";
 import { site } from "@/data/profile";
 import { archivePath, detailPath } from "@/lib/achievements";
 import { type PageKey, PAGE_KEYS, pagePath } from "@/lib/nav";
@@ -31,6 +31,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pair = (id: string, en: string, date: Date | undefined, rule: Rule) => [item(id, date, rule), item(en, date, rule)];
 
   const achievements = content.achievement.filter((e) => e.visibility === "public");
+  // Arsip sertifikat tanpa keluaran riset; detail keluaran riset ada di bawah /riset/.
+  const certificates = achievements.filter((e) => !isResearchKind(e.data.kind));
   const everything = Object.values(content).filter(Array.isArray).flat() as Entry[];
   const posts = publicPosts(content.post);
   const news = content.post.filter((e) => e.visibility === "public");
@@ -38,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Halaman dalam memakai waktu ubah data yang tampil di dalamnya.
   const sources: Record<PageKey, Entry[]> = {
     projects: [...content.project, ...content.system, ...content.contribution, ...content.area],
-    research: achievements.filter((e) => ["publikasi", "hibah", "reviewer"].includes(e.data.kind)),
+    research: achievements.filter((e) => isResearchKind(e.data.kind)),
     teaching: [...content.institution, ...content.course, ...content.term, ...content.focus],
     journey: [...content.milestone, ...content.plan, ...content.principle],
     social: content.social,
@@ -53,10 +55,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...pair("/", "/en/", latest(everything), SITEMAP_RULES.home),
     ...innerPages,
-    ...pair(archivePath("id"), archivePath("en"), latest(achievements), SITEMAP_RULES.archive),
-    ...achievements.flatMap((e) =>
-      pair(detailPath("id", e.slug), detailPath("en", e.slug), new Date(e.updatedAt), SITEMAP_RULES.detail),
-    ),
+    ...pair(archivePath("id"), archivePath("en"), latest(certificates), SITEMAP_RULES.archive),
+    ...achievements.flatMap((e) => {
+      const item = { id: e.slug, kind: e.data.kind };
+      return pair(detailPath("id", item), detailPath("en", item), new Date(e.updatedAt), SITEMAP_RULES.detail);
+    }),
     ...(news.length === 0 ? [] : pair(postsPath("id"), postsPath("en"), latest(news), SITEMAP_RULES.archive)),
     ...postPages,
   ];

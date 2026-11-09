@@ -8,6 +8,7 @@ export type PageKey = "projects" | "research" | "teaching" | "journey" | "social
 
 export const PAGE_KEYS: PageKey[] = ["projects", "research", "teaching", "journey", "social"];
 
+// Slug research juga dipakai researchPath di src/lib/achievements.ts (induk detail keluaran riset).
 const PAGE_SLUGS: Record<PageKey, Record<Lang, string>> = {
   projects: { id: "proyek", en: "projects" },
   research: { id: "riset", en: "research" },

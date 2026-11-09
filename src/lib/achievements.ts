@@ -1,5 +1,6 @@
 import {
   authorshipLabels,
+  isResearchKind,
   kindLabels,
   kindSingular,
   type Achievement,
@@ -99,12 +100,29 @@ export function archivePath(lang: Lang): string {
   return lang === "id" ? "/sertifikat/" : "/en/certificates/";
 }
 
-export function detailPath(lang: Lang, id: string): string {
-  return `${archivePath(lang)}${id}/`;
+// Sama dengan pagePath(lang, "research") di src/lib/nav.ts. Ditulis ulang di sini karena nav.ts
+// mengimpor berkas ini (impor melingkar). Bila slug riset di PAGE_SLUGS berubah, ubah juga di sini.
+export function researchPath(lang: Lang): string {
+  return lang === "id" ? "/riset/" : "/en/research/";
 }
 
-export function detailUrl(lang: Lang, id: string): string {
-  return `${site.url}${detailPath(lang, id)}`;
+// Induk halaman detail: Riset untuk keluaran riset (buku, hak cipta, publikasi, hibah, reviewer),
+// arsip sertifikat untuk yang lain.
+export function sectionPath(lang: Lang, kind: AchievementKind): string {
+  return isResearchKind(kind) ? researchPath(lang) : archivePath(lang);
+}
+
+export function detailPath(lang: Lang, item: { id: string; kind: AchievementKind }): string {
+  return `${sectionPath(lang, item.kind)}${item.id}/`;
+}
+
+export function detailUrl(lang: Lang, item: { id: string; kind: AchievementKind }): string {
+  return `${site.url}${detailPath(lang, item)}`;
+}
+
+// Isi arsip /sertifikat/: semua capaian kecuali keluaran riset.
+export function archiveItems(items: AchievementItem[]): AchievementItem[] {
+  return items.filter((a) => !isResearchKind(a.kind));
 }
 
 export function kindLabel(kind: AchievementKind, lang: Lang): string {
@@ -129,7 +147,7 @@ export function linkedInUrl(item: AchievementItem): string | null {
     organizationName: item.issuer,
     issued: item.issued,
     expires: item.expires,
-    certUrl: item.verifyUrl ?? detailUrl("id", item.id),
+    certUrl: item.verifyUrl ?? detailUrl("id", item),
     certId: item.credentialId,
   });
 }
@@ -174,7 +192,7 @@ export function toCards(items: AchievementItem[], lang: Lang): AchievementCard[]
       summary,
       date,
       year: item.issued === null ? null : item.issued.year,
-      href: detailPath(lang, item.id),
+      href: detailPath(lang, item),
       verifyUrl: item.verifyUrl ?? null,
       proof: hasProof(item),
       authorship: item.authorship ? authorshipLabels[item.authorship][lang] : null,

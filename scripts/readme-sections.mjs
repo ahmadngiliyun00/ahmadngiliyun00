@@ -84,7 +84,8 @@ function proyek(c, copy) {
   ].join("\n");
 }
 
-function capaian(pub, metrics) {
+// Keluaran riset (isResearchKind di src/content/types.ts) punya halaman detail di /riset/, yang lain di /sertifikat/.
+function capaian(pub, metrics, isResearchKind) {
   const newest = (a, b) => dateKey(b.issued) - dateKey(a.issued);
   const featured = pub.filter((a) => a.featured === true).sort(newest).slice(0, LIMIT_FEATURED);
   const hki = pub.filter((a) => a.kind === "hki");
@@ -97,7 +98,7 @@ function capaian(pub, metrics) {
   const rows = featured.map((a) => {
     const verify = a.verifyUrl
       ? `[${verifyLabel(a.verifyUrl)}](${a.verifyUrl})`
-      : `[Detail](${SITE}/sertifikat/${a.id}/)`;
+      : `[Detail](${SITE}/${isResearchKind(a.kind) ? "riset" : "sertifikat"}/${a.id}/)`;
     return `| **${cell(a.title.id)}** | ${cell(a.issuer)} | ${partial(a.issued)} | ${verify} |`;
   });
 
@@ -184,7 +185,7 @@ export async function renderReadmeSections() {
     return;
   }
   const { copy } = await importTs(new URL("src/data/profile.ts", ROOT));
-  const { programLabels } = await importTs(new URL("src/content/types.ts", ROOT));
+  const { programLabels, isResearchKind } = await importTs(new URL("src/content/types.ts", ROOT));
   const { by, metrics } = await loadPublicContent();
   const data = (k) => (by[k] ?? []).map((e) => e.data);
   const terms = Object.fromEntries(data("term").map((t) => [t.code, t.label]));
@@ -204,7 +205,7 @@ export async function renderReadmeSections() {
 
   let text = await readFile(README, "utf8");
   text = replaceBlock(text, "proyek", proyek(c, copy));
-  text = replaceBlock(text, "capaian", capaian(c.achievements, metrics));
+  text = replaceBlock(text, "capaian", capaian(c.achievements, metrics, isResearchKind));
   text = replaceBlock(text, "mengajar", mengajar(c, copy, programLabels));
   text = replaceBlock(text, "perjalanan", perjalanan(c));
 

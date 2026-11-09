@@ -301,6 +301,14 @@ export const kindLabels: Record<AchievementKind, Localized<string>> = {
   penghargaan: { id: "Penghargaan", en: "Awards" },
 };
 
+// Jenis capaian yang merupakan keluaran atau kegiatan riset. Halaman detailnya di bawah Riset
+// (/riset/<slug>/, /en/research/<slug>/) dan tampil di halaman Riset, bukan di arsip sertifikat.
+export const RESEARCH_KINDS: readonly AchievementKind[] = ["publikasi", "buku", "hki", "hibah", "reviewer"];
+
+export function isResearchKind(kind: AchievementKind): boolean {
+  return RESEARCH_KINDS.includes(kind);
+}
+
 export const kindSingular: Record<AchievementKind, Localized<string>> = {
   sertifikat: { id: "Sertifikat", en: "Certificate" },
   pelatihan: { id: "Pelatihan", en: "Training" },

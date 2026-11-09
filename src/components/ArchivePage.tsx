@@ -4,7 +4,7 @@ import ExternalLink from "@/components/ExternalLink";
 import PageHead from "@/components/PageHead";
 import SubpageShell from "@/components/SubpageShell";
 import { copy, type Lang } from "@/data/profile";
-import { archivePath, itemYears, kindFilters, publicItems, toCards } from "@/lib/achievements";
+import { archivePath, archiveItems, itemYears, kindFilters, publicItems, toCards } from "@/lib/achievements";
 import { formatDate, formatNumber } from "@/lib/github";
 import { loadSite } from "@/server/content";
 
@@ -14,7 +14,8 @@ export default async function ArchivePage({ lang }: { lang: Lang }) {
   const content = await loadSite();
   const { msLearn } = content.metrics;
   const { credentialProfiles, researchProfiles } = content.profile;
-  const all = publicItems(content.achievement);
+  // Keluaran riset (buku, hak cipta, publikasi, hibah, reviewer) ada di halaman Riset.
+  const all = archiveItems(publicItems(content.achievement));
   const items = toCards(all, lang);
   const hours = Math.floor(msLearn.learningMinutes / 60);
   const minutes = msLearn.learningMinutes % 60;

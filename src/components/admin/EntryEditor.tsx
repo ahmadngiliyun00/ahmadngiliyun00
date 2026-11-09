@@ -43,7 +43,7 @@ export default async function EntryEditor({
       ? cfg.publicPath
         ? entry.visibility === "public"
           ? withPage
-            ? `${siteUrl}${cfg.publicPath.id}${entry.slug}/`
+            ? `${siteUrl}${cfg.publicPath(data).id}${entry.slug}/`
             : null
           : null
         : null

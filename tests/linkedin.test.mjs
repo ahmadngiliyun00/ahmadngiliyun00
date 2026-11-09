@@ -79,7 +79,7 @@ test("teks siap tempel memuat kolom yang ada saja", () => {
     issuer: "DJKI",
     date: "Februari 2025",
     summary: "Analisis sentimen.",
-    url: "https://ngiliyun.my.id/sertifikat/hki-datacraft/",
+    url: "https://ngiliyun.my.id/riset/hki-datacraft/",
     labels,
   });
   assert.equal(
@@ -91,7 +91,7 @@ test("teks siap tempel memuat kolom yang ada saja", () => {
       "",
       "Analisis sentimen.",
       "",
-      "Tautan: https://ngiliyun.my.id/sertifikat/hki-datacraft/",
+      "Tautan: https://ngiliyun.my.id/riset/hki-datacraft/",
     ].join("\n"),
   );
   assert.equal(text.includes("ID kredensial"), false);

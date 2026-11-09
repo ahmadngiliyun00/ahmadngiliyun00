@@ -200,6 +200,8 @@ export type Copy = {
     focusIntro: string;
     reviewerTitle: string;
     publicationsIntro: string;
+    outputsTitle: string;
+    outputsIntro: string;
   };
   achievements: {
     title: string;
@@ -243,6 +245,7 @@ export type Copy = {
   };
   detail: {
     back: string;
+    backResearch: string;
     issuer: string;
     issued: string;
     expires: string;
@@ -412,7 +415,7 @@ export const copy: Localized<Copy> = {
       },
       research: {
         title: "Riset dan Publikasi",
-        intro: "Tema riset, hibah, publikasi per tahun, dan angka sitasi dari profil riset resmi.",
+        intro: "Tema riset, hibah, publikasi per tahun, buku, hak cipta, dan angka sitasi dari profil riset resmi.",
         metaTitle: "Riset dan publikasi machine learning Ahmad Ngiliyun",
         metaDescription:
           "Ahmad Ngiliyun meneliti machine learning untuk klasifikasi, analisis sentimen, dan keamanan data, dengan publikasi di jurnal nasional terindeks SINTA.",
@@ -557,6 +560,8 @@ export const copy: Localized<Copy> = {
       focusIntro: "Bidang yang saya teliti, hibah yang sedang berjalan, dan peran sebagai reviewer jurnal.",
       reviewerTitle: "Reviewer jurnal",
       publicationsIntro: "Artikel di jurnal nasional, terbaru di atas, dengan posisi saya di daftar penulis.",
+      outputsTitle: "Buku dan hak cipta",
+      outputsIntro: "Keluaran riset di luar artikel jurnal, yaitu buku dan program komputer yang hak ciptanya terdaftar di DJKI, terbaru di atas.",
     },
     achievements: {
       title: "Sertifikat dan capaian",
@@ -580,7 +585,7 @@ export const copy: Localized<Copy> = {
     archive: {
       metaTitle: "Sertifikat dan capaian Ahmad Ngiliyun",
       metaDescription:
-        "Arsip sertifikat, pelatihan, hak cipta, buku, publikasi, dan hibah Ahmad Ngiliyun, lengkap dengan tautan verifikasi resmi dari setiap penerbitnya.",
+        "Arsip sertifikat, pelatihan, beasiswa, keanggotaan, dan penghargaan Ahmad Ngiliyun, lengkap dengan tautan verifikasi resmi dari setiap penerbitnya.",
       title: "Sertifikat dan capaian",
       intro: "Arsip lengkap. Cari berdasarkan judul, penerbit, atau keterampilan, lalu saring per kategori dan tahun.",
       searchLabel: "Cari",
@@ -601,6 +606,7 @@ export const copy: Localized<Copy> = {
     },
     detail: {
       back: "Kembali ke arsip",
+      backResearch: "Kembali ke riset",
       issuer: "Penerbit",
       issued: "Tanggal terbit",
       expires: "Berlaku sampai",
@@ -831,7 +837,7 @@ export const copy: Localized<Copy> = {
       },
       research: {
         title: "Research and Publications",
-        intro: "Research themes, grants, publications by year, and citation figures from official research profiles.",
+        intro: "Research themes, grants, publications by year, books, copyrights, and citation figures from official research profiles.",
         metaTitle: "Machine learning research by Ahmad Ngiliyun",
         metaDescription:
           "Ahmad Ngiliyun researches machine learning for classification, sentiment analysis, and data security, publishing in SINTA indexed Indonesian journals.",
@@ -976,6 +982,8 @@ export const copy: Localized<Copy> = {
       focusIntro: "What I research, the grant currently running, and my role as a journal reviewer.",
       reviewerTitle: "Journal reviewer",
       publicationsIntro: "Articles in Indonesian journals, newest first, with my position in the author list.",
+      outputsTitle: "Books and copyrights",
+      outputsIntro: "Research outputs beyond journal articles, namely books and computer programs with copyrights registered at DJKI, newest first.",
     },
     achievements: {
       title: "Credentials and achievements",
@@ -999,7 +1007,7 @@ export const copy: Localized<Copy> = {
     archive: {
       metaTitle: "Certificates and achievements of Ahmad Ngiliyun",
       metaDescription:
-        "The certificates, training, copyrights, books, publications, and grants of Ahmad Ngiliyun, each with an official verification link from its issuer.",
+        "The certificates, training, scholarships, memberships, and awards of Ahmad Ngiliyun, each with an official verification link from its issuer.",
       title: "Credentials and achievements",
       intro: "The full archive. Search by title, issuer, or skill, then filter by category and year.",
       searchLabel: "Search",
@@ -1020,6 +1028,7 @@ export const copy: Localized<Copy> = {
     },
     detail: {
       back: "Back to the archive",
+      backResearch: "Back to research",
       issuer: "Issuer",
       issued: "Issued",
       expires: "Valid until",

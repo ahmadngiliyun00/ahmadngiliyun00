@@ -49,14 +49,15 @@ Beranda sengaja ringkas: tujuh bagian yang menjawab siapa, keahlian apa, bukti t
 | --- | --- | --- | --- |
 | Beranda | `/` | `/en/` | Hero dengan plot K-Means, Tentang singkat (empat bidang kerja, alat utama), Jelajahi, tiga proyek unggulan, sorotan capaian, Kabar terbaru (dua kabar dan dua postingan media sosial), Kontak |
 | Proyek | `/proyek/` | `/en/projects/` | Proyek unggulan lengkap, sistem yang dikembangkan, terbaru di GitHub, kontribusi dan di luar kode, teknologi dan topik |
-| Riset dan Publikasi | `/riset/` | `/en/research/` | Angka sitasi bertanggal, tema, profil riset, hibah, reviewer jurnal, publikasi per tahun |
+| Riset dan Publikasi | `/riset/` | `/en/research/` | Angka sitasi bertanggal, tema, profil riset, hibah, reviewer jurnal, publikasi per tahun, buku dan hak cipta. Detail keluaran riset di `/riset/<slug>/` |
 | Mengajar | `/mengajar/` | `/en/teaching/` | Dua kampus, mata kuliah semester ini dan yang pernah diampu, materi, bidang keahlian mengajar |
 | Perjalanan | `/perjalanan/` | `/en/journey/` | Garis waktu, lalu Arah ke depan (rencana lima tahun, cara bekerja dengan AI, sedang didalami) |
-| Sertifikat | `/sertifikat/` | `/en/certificates/` | Arsip capaian dengan pencarian dan saringan, halaman detail per capaian |
+| Sertifikat | `/sertifikat/` | `/en/certificates/` | Arsip sertifikat, pelatihan, beasiswa, keanggotaan, dan penghargaan dengan pencarian dan saringan, halaman detail di `/sertifikat/<slug>/` |
 | Kabar | `/kabar/` | `/en/news/` | Arsip liputan, tulisan, dan kabar |
 | Media sosial | `/media-sosial/` | `/en/social/` | Postingan public dari Instagram, Facebook, dan LinkedIn, dikelompokkan per topik |
 
 - Halaman dalam memakai `SubpageShell` (header, tautan kembali ke beranda, footer) dan `PageHead` (breadcrumb "Beranda / Judul", satu h1, kalimat pembuka, data terstruktur BreadcrumbList)
+- Capaian dibagi dua induk menurut jenisnya (`RESEARCH_KINDS` di `src/content/types.ts`). Buku, hak cipta, publikasi, hibah, dan reviewer adalah keluaran riset: tampil di halaman Riset dengan detail di `/riset/<slug>/`. Jenis lain tampil di arsip `/sertifikat/`. Alamat detail selalu dibuat lewat `detailPath(lang, item)`; alamat di induk yang salah, termasuk alamat lama `/sertifikat/<slug>/` untuk buku dan hak cipta, dialihkan permanen (308) oleh `src/components/AchievementDetail.tsx`
 - Alamat halaman, menu header, dan tautan footer diatur di `src/lib/nav.ts`. Menu desktop tampil mulai lebar 1024px; di bawahnya menu ponsel yang ditutup dengan Escape
 - Jangkar beranda lama (`/#research`, `/#teaching`, `/#journey`, `/#next`, `/#activity`) dialihkan ke halaman barunya oleh `LegacyAnchors`. Tautan berawalan `#` di koleksi Di luar kode diarahkan dengan `sectionHref`
 - Di ponsel, kartu proyek, sorotan, dan kabar di beranda menjadi baris geser (kelas `snap-row`) supaya beranda tidak memanjang

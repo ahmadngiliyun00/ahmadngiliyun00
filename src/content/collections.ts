@@ -14,6 +14,7 @@ import {
   type SocialPlatform,
 } from "@/content/types";
 import { copy } from "@/data/profile";
+import { sectionPath } from "@/lib/achievements";
 import { imageModeOf } from "@/lib/gallery";
 import { showsInContact } from "@/lib/home";
 import { captionTitle } from "@/lib/social";
@@ -31,7 +32,8 @@ export type CollectionConfig = {
   subtitle?: (data: Doc) => string;
   // "date" = urut tanggal terbit terbaru (capaian); "position" = urutan manual
   order: "date" | "position";
-  publicPath?: { id: string; en: string }; // halaman detail publik, bila ada
+  // Induk halaman detail publik, bila ada. Fungsi karena capaian riset dan sertifikat beda induk.
+  publicPath?: (data: Doc) => { id: string; en: string };
   hasPage?: (data: Doc) => boolean; // bila ada, hanya data yang lolos fungsi ini punya halaman detail
   // Nilai formulir untuk isian yang belum pernah disimpan, supaya formulir menampilkan apa yang tampil di situs.
   fill?: (slug: string, data: Doc) => Doc;
@@ -93,10 +95,14 @@ export const collections: CollectionConfig[] = [
     key: "achievement",
     label: "Sertifikat dan capaian",
     singular: "capaian",
-    description: "Sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, reviewer, dan keanggotaan.",
+    description:
+      "Sertifikat, pelatihan, hak cipta, buku, publikasi, hibah, reviewer, dan keanggotaan. Buku, hak cipta, publikasi, hibah, dan reviewer tampil di halaman Riset, yang lain di arsip Sertifikat.",
     group: "Capaian",
     order: "date",
-    publicPath: { id: "/sertifikat/", en: "/en/certificates/" },
+    publicPath: (d) => {
+      const kind = s(d.kind) as AchievementKind;
+      return { id: sectionPath("id", kind), en: sectionPath("en", kind) };
+    },
     title: (d) => loc(d.title),
     subtitle: (d) => {
       const kind = s(d.kind) as AchievementKind;
@@ -149,7 +155,7 @@ export const collections: CollectionConfig[] = [
     description: "Liputan media tentang Anda, tulisan sendiri, dan kabar terbaru. Isi lengkap yang diisi membuat halaman sendiri di situs.",
     group: "Kabar",
     order: "date",
-    publicPath: { id: "/kabar/", en: "/en/news/" },
+    publicPath: () => ({ id: "/kabar/", en: "/en/news/" }),
     hasPage: (d) => loc(d.body) !== "",
     title: (d) => loc(d.title),
     subtitle: (d) => {

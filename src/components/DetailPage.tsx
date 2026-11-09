@@ -2,17 +2,17 @@ import Analytics from "@/components/Analytics";
 import CopyButton from "@/components/CopyButton";
 import ExternalLink from "@/components/ExternalLink";
 import SubpageShell from "@/components/SubpageShell";
-import { authorshipLabels, type ProfileLink, type PartialDate } from "@/content/types";
+import { authorshipLabels, isResearchKind, type ProfileLink, type PartialDate } from "@/content/types";
 import { copy, site, type Lang } from "@/data/profile";
 import {
   type AchievementItem,
-  archivePath,
   detailPath,
   detailUrl,
   formatPartialDate,
   hasLinkedInForm,
   kindName,
   linkedInUrl,
+  sectionPath,
 } from "@/lib/achievements";
 import { drivePreviewUrl, driveViewUrl, parseDriveUrl } from "@/lib/drive";
 import { jsonForScript } from "@/lib/json-script";
@@ -34,7 +34,7 @@ const CREDENTIAL_KINDS = ["sertifikat", "pelatihan", "beasiswa", "keanggotaan"];
 
 // Data terstruktur schema.org sesuai jenis capaian.
 function jsonLd(item: AchievementItem, lang: Lang) {
-  const url = detailUrl(lang, item.id);
+  const url = detailUrl(lang, item);
   const person = { "@type": "Person", name: site.name, url: site.url };
   const summary = item.summary ? item.summary[lang] : undefined;
 
@@ -100,6 +100,10 @@ export default function DetailPage({
   const t = copy[lang];
   const other: Lang = lang === "id" ? "en" : "id";
   const kind = kindName(item.kind, lang);
+  // Induk halaman: Riset untuk keluaran riset, arsip sertifikat untuk yang lain.
+  const research = isResearchKind(item.kind);
+  const parentHref = sectionPath(lang, item.kind);
+  const parentTitle = research ? t.pages.research.title : t.archive.title;
   const title = item.title[lang];
   const summary = item.summary ? item.summary[lang] : "";
   const issued = item.issued ? formatPartialDate(item.issued, lang) : "";
@@ -113,7 +117,7 @@ export default function DetailPage({
     date: issued === "" ? undefined : issued,
     credentialId: item.credentialId,
     summary: summary === "" ? undefined : summary,
-    url: item.verifyUrl ?? (shared ? undefined : detailUrl(lang, item.id)),
+    url: item.verifyUrl ?? (shared ? undefined : detailUrl(lang, item)),
     labels: t.detail.paste,
   });
 
@@ -131,7 +135,7 @@ export default function DetailPage({
   const drive = file ? null : item.driveUrl ? parseDriveUrl(item.driveUrl) : null;
 
   return (
-    <SubpageShell lang={lang} current="certificates" otherHref={otherHref ?? detailPath(other, item.id)}>
+    <SubpageShell lang={lang} current={research ? "research" : "certificates"} otherHref={otherHref ?? detailPath(other, item)}>
       {shared ? null : <Analytics />}
       {structured === null ? null : (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonForScript(structured) }} />
@@ -147,8 +151,8 @@ export default function DetailPage({
               </li>
               {shared ? null : (
                 <li>
-                  <a href={archivePath(lang)} className="link">
-                    {t.archive.title}
+                  <a href={parentHref} className="link">
+                    {parentTitle}
                   </a>
                 </li>
               )}
@@ -300,8 +304,8 @@ export default function DetailPage({
 
           {shared ? null : (
             <p className="mt-16">
-              <a href={archivePath(lang)} className="btn btn-line btn-small">
-                {t.detail.back}
+              <a href={parentHref} className="btn btn-line btn-small">
+                {research ? t.detail.backResearch : t.detail.back}
               </a>
             </p>
           )}

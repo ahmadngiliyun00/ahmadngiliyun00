@@ -55,6 +55,7 @@ tests/social.test.mjs            unit test caption, tagar, topik, tanggal, CDN g
 tests/social-export.test.mjs     unit test impor ekspor Instagram dan Facebook, mojibake, pembaca ZIP (npm test, fixture buatan)
 tests/gallery.test.mjs           unit test galeri gambar: isian, urutan slide, teks alternatif, susun ulang (npm test)
 tests/sitemap.test.mjs           unit test format lastmod (WIB tanpa milidetik) dan bobot sitemap (npm test)
+tests/research-kinds.test.mjs    unit test pembagian jenis capaian antara Riset dan Sertifikat (npm test)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, proyek, riset, mengajar, perjalanan,
@@ -68,6 +69,7 @@ src/
     robots.ts, sitemap.ts
   components/                    komponen situs (PortfolioPage, ProjectsPage, ResearchPage, TeachingPage, JourneyPage,
                                  ArchivePage, DetailPage, dan lainnya). Bersama: SubpageShell, PageHead, Section
+  components/AchievementDetail.tsx  halaman detail capaian untuk /sertifikat/ dan /riset/, alihkan 308 bila induknya salah
   components/LegacyAnchors.tsx   alihkan jangkar beranda lama (#research, #teaching, #journey, #next, #activity)
   components/ErrorView.tsx       isi halaman error (404, 500) untuk situs ID dan EN, CMS, dan global-error
   components/MediaCarousel.tsx   carousel gambar situs (kartu kabar, kartu media sosial, halaman tulisan)
@@ -111,6 +113,7 @@ src/
 - Hanya data `public` yang dirender, masuk sitemap, dan masuk README. Data `private` hanya terlihat di CMS dan lewat tautan berbagi
 - Setiap halaman dan Server Action admin wajib memanggil `requireAdmin()`. Server Action bisa dipanggil langsung tanpa halaman
 - Field baru: tambah di `src/content/collections.ts` (formulir dan validasi ikut otomatis). Urutkan supaya isian pendek berpasangan di grid 12 kolom; atur `width` bila lebar bawaan `fieldWidth()` tidak pas. Kolom tabel baru: `src/db/schema.ts` lalu `npm run db:generate`
+- Capaian punya dua induk (`RESEARCH_KINDS`, `isResearchKind` di `src/content/types.ts`): buku, hak cipta, publikasi, hibah, dan reviewer adalah keluaran riset, tampil di halaman Riset dengan detail `/riset/<slug>/`; sertifikat, pelatihan, beasiswa, keanggotaan, dan penghargaan di arsip `/sertifikat/<slug>/`. Alamat detail wajib lewat `detailPath(lang, item)`, jangan merangkai `/sertifikat/` sendiri. Alamat di induk yang salah dialihkan 308 oleh `AchievementDetail` (keputusan Mas Ilyun, 10 Nov 2026)
 - Aturan capaian (maksimal 6 sorotan, 5 HKI beranda, LinkedIn hanya sertifikat dan pelatihan) ada di `src/server/entries.ts`
 - Isian dua bahasa memakai bahasa utama dari Pengaturan, Bahasa (bawaan Indonesia). Isian wajib cukup dalam bahasa utama; situs mengisi terjemahan yang kosong dari bahasa utama lewat `fillLocalized` di `loadSite()`. Komponen baru yang membaca teks dua bahasa dari database lain wajib memakai aturan yang sama
 - JSON di dalam tag `<script>` (JSON-LD, konfigurasi Analytics) wajib lewat `jsonForScript` dari `src/lib/json-script.ts`, bukan `JSON.stringify` langsung
@@ -118,7 +121,7 @@ src/
 - Hitungan pembaca tidak menyimpan IP (hanya hash harian) dan tidak memakai cookie. Komentar selalu menunggu persetujuan; email pengomentar tidak pernah tampil di situs
 - Berita dan tulisan (koleksi `post`): liputan media wajib media dan tautan sumber, dan ringkasannya ditulis sendiri tanpa menyalin detail sistem internal kampus dari artikel. Hanya tulisan dengan isi lengkap yang punya halaman `/kabar/<slug>/`
 - Metrik riset wajib bertanggal (`asOf`) dan bersumber
-- Bukti capaian: berkas unggahan atau tautan Google Drive (isian `driveUrl`, disematkan di `/sertifikat/<slug>/#bukti`). Berkas unggahan didahulukan. Berkas di Drive juga wajib sudah disensor
+- Bukti capaian: berkas unggahan atau tautan Google Drive (isian `driveUrl`, disematkan di `#bukti` halaman detail). Berkas unggahan didahulukan. Berkas di Drive juga wajib sudah disensor
 - Ekspor dan impor lembar kerja (`src/server/transfer.ts`): sel kosong tidak mengubah data, impor selalu lewat pratinjau lalu `saveEntry`, jadi validasi CMS tetap berlaku. Field baru otomatis ikut lembar kerja, kecuali berkas, rahasia, dan rich text
 - Berkas unggahan disimpan di `UPLOAD_DIR` (di luar repo dan `public/`), disajikan lewat `/files/<id>/`. Semua berkas memakai `X-Robots-Tag: noindex, nofollow` dan `/files/` sengaja tidak diblokir di `robots.txt` (bila diblokir, header noindex tidak terbaca)
 - Bagian README di antara penanda `<!-- ...:mulai -->` dibangkitkan skrip, jangan diedit manual
@@ -181,7 +184,7 @@ npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
 npm run errors         # buat ulang halaman error statis Nginx di public/errors/
-npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja, media sosial, galeri, sitemap
+npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja, media sosial, galeri, sitemap, jenis riset
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build

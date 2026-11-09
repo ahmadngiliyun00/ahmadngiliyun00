@@ -19,7 +19,7 @@ import SiteFooter from "@/components/SiteFooter";
 import Spotlight from "@/components/Spotlight";
 import type { Lang } from "@/content/types";
 import { copy, site } from "@/data/profile";
-import { archivePath, countKind, homeCopyrights, homeFeatured, publicItems, toCards } from "@/lib/achievements";
+import { archiveItems, archivePath, countKind, homeCopyrights, homeFeatured, publicItems, toCards } from "@/lib/achievements";
 import { formatDate, formatNumber, getContributionModel, getGithubMeta } from "@/lib/github";
 import { dateValue, firstYear, homeSocial, mainTools, showsInContact } from "@/lib/home";
 import { jsonForScript } from "@/lib/json-script";
@@ -66,7 +66,8 @@ export default async function PortfolioPage({ lang }: { lang: Lang }) {
   const contrib = getContributionModel(lang);
   const gh = getGithubMeta();
   const cardLabels = { verify: t.achievements.verify, details: t.achievements.details, proof: t.achievements.proof, newTab: t.newTab };
-  const totalPublic = achievements.length;
+  // Jumlah di tombol "Lihat semua" sama dengan isi arsip sertifikat yang dituju.
+  const totalPublic = archiveItems(achievements).length;
   const posts = publicPosts(content.post);
   const latestPosts = posts.slice(0, HOME_POSTS);
   // Kabar terbaru: paling banyak 2 kabar dan 2 postingan media sosial, terbaru di atas.

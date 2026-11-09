@@ -5,7 +5,7 @@ import PageHead from "@/components/PageHead";
 import Reveal from "@/components/Reveal";
 import Section from "@/components/Section";
 import SubpageShell from "@/components/SubpageShell";
-import { authorshipLabels } from "@/content/types";
+import { authorshipLabels, kindLabels } from "@/content/types";
 import { copy, type Lang } from "@/data/profile";
 import { countKind, detailPath, publicItems, publicationsByYear } from "@/lib/achievements";
 import { formatDate } from "@/lib/github";
@@ -13,7 +13,8 @@ import { pagePath } from "@/lib/nav";
 import { loadSite } from "@/server/content";
 
 // Halaman Riset dan Publikasi (/riset/, /en/research/): angka sitasi bertanggal, tema riset,
-// hibah, reviewer jurnal, profil riset, dan daftar publikasi per tahun.
+// hibah, reviewer jurnal, profil riset, daftar publikasi per tahun, serta buku dan hak cipta.
+// Semua keluaran riset ini punya halaman detail di bawah /riset/<slug>/.
 export default async function ResearchPage({ lang }: { lang: Lang }) {
   const t = copy[lang];
   const other: Lang = lang === "id" ? "en" : "id";
@@ -25,6 +26,10 @@ export default async function ResearchPage({ lang }: { lang: Lang }) {
   const reviewing = achievements.filter((a) => a.kind === "reviewer");
   const pubYears = publicationsByYear(achievements);
   const pubCount = countKind(achievements, "publikasi");
+  // Keluaran riset selain artikel jurnal. Kelompok kosong tidak ditampilkan.
+  const outputs = (["buku", "hki"] as const)
+    .map((kind) => ({ kind, label: kindLabels[kind][lang], items: achievements.filter((a) => a.kind === kind) }))
+    .filter((g) => g.items.length > 0);
 
   const indicators = [
     { value: scholar.citations, label: t.achievements.citations },
@@ -109,7 +114,7 @@ export default async function ResearchPage({ lang }: { lang: Lang }) {
                       <span>{g.issued ? g.issued.year : ""}</span>
                     </p>
                     <h4 className="mt-3 font-display text-xl font-bold tracking-tight">
-                      <a href={detailPath(lang, g.id)} className="cred-link">
+                      <a href={detailPath(lang, g)} className="cred-link">
                         {g.title[lang]}
                       </a>
                     </h4>
@@ -128,7 +133,7 @@ export default async function ResearchPage({ lang }: { lang: Lang }) {
                       <span>{r.ongoing ? t.detail.ongoing : r.issued ? r.issued.year : ""}</span>
                     </p>
                     <h4 className="mt-3 font-display text-xl font-bold tracking-tight">
-                      <a href={detailPath(lang, r.id)} className="cred-link">
+                      <a href={detailPath(lang, r)} className="cred-link">
                         {r.title[lang]}
                       </a>
                     </h4>
@@ -154,7 +159,7 @@ export default async function ResearchPage({ lang }: { lang: Lang }) {
               <ul className="pub-list">
                 {group.items.map((pub) => (
                   <li key={pub.id} className="pub">
-                    <a href={detailPath(lang, pub.id)} className="pub-title">
+                    <a href={detailPath(lang, pub)} className="pub-title">
                       {pub.title[lang]}
                     </a>
                     <p className="pub-meta">
@@ -173,6 +178,31 @@ export default async function ResearchPage({ lang }: { lang: Lang }) {
         </div>
         <p className="mt-8 text-sm text-muted">{t.research.noLink}</p>
       </Section>
+
+      {outputs.length === 0 ? null : (
+        <Section id="outputs" title={t.research.outputsTitle} intro={t.research.outputsIntro}>
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+            {outputs.map((group, i) => (
+              <Reveal key={group.kind} delay={i * 80}>
+                <h3 className="sub-title">{group.label}</h3>
+                <ul className="pub-list mt-5">
+                  {group.items.map((item) => (
+                    <li key={item.id} className="pub">
+                      <a href={detailPath(lang, item)} className="pub-title">
+                        {item.title[lang]}
+                      </a>
+                      <p className="pub-meta">
+                        <span>{item.issuer}</span>
+                        {item.issued ? <span>{item.issued.year}</span> : null}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+            ))}
+          </div>
+        </Section>
+      )}
     </SubpageShell>
   );
 }

@@ -83,7 +83,7 @@ export function buildDetailMetadata(lang: Lang, item: AchievementItem): Metadata
   const when = item.issued ? `, ${formatPartialDate(item.issued, lang)}` : "";
   const fallback = `${kindName(item.kind, lang)}, ${item.issuer}${when}.`;
   const description = item.summary ? item.summary[lang] : fallback;
-  const path = detailPath(lang, item.id);
+  const path = detailPath(lang, item);
 
   return {
     metadataBase: new URL(site.url),
@@ -92,9 +92,9 @@ export function buildDetailMetadata(lang: Lang, item: AchievementItem): Metadata
     alternates: {
       canonical: path,
       languages: {
-        id: detailPath("id", item.id),
-        en: detailPath("en", item.id),
-        "x-default": detailPath("id", item.id),
+        id: detailPath("id", item),
+        en: detailPath("en", item),
+        "x-default": detailPath("id", item),
       },
     },
     openGraph: {
