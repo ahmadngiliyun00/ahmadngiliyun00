@@ -14,6 +14,10 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 - NET-01: notifikasi email form kontak dan komentar dikirim setelah pengunjung mendapat balasan, dan SMTP diberi batas waktu. Sebelumnya pengunjung bisa menunggu 30 detik sampai 2 menit bila SMTP tidak menjawab
 - BUG-02, NET-02: langkah deploy memulihkan berkas hasil build sebelum `git pull`, dan Nginx disarankan memakai `server_tokens off`
 
+### Diperbaiki
+
+- Berkas unggahan (`/files/<id>/`) tidak lagi diblokir `robots.txt`, melainkan selalu dikirim dengan `X-Robots-Tag: noindex, nofollow`. Sebelumnya Google mencatat alamat gambar sebagai "Blocked by robots.txt" dan bisa mengindeks alamatnya tanpa isi, sedangkan header noindex tidak pernah terbaca. Sekarang berkas pasti tidak diindeks, halaman dirender Google lengkap dengan gambar, dan gambar pratinjau tautan bisa diambil LinkedIn dan X
+
 ### Ditambahkan
 
 - Placeholder skeleton untuk semua gambar dan sematan: blok abu-abu dengan kilau bergerak selama gambar diunduh, lalu gambar muncul perlahan. Berlaku di kartu media sosial, kartu kabar, halaman tulisan (termasuk gambar di dalam isi), bukti sertifikat dan pratinjau Google Drive, serta thumbnail galeri di CMS

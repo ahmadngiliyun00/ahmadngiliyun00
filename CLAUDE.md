@@ -120,7 +120,7 @@ src/
 - Metrik riset wajib bertanggal (`asOf`) dan bersumber
 - Bukti capaian: berkas unggahan atau tautan Google Drive (isian `driveUrl`, disematkan di `/sertifikat/<slug>/#bukti`). Berkas unggahan didahulukan. Berkas di Drive juga wajib sudah disensor
 - Ekspor dan impor lembar kerja (`src/server/transfer.ts`): sel kosong tidak mengubah data, impor selalu lewat pratinjau lalu `saveEntry`, jadi validasi CMS tetap berlaku. Field baru otomatis ikut lembar kerja, kecuali berkas, rahasia, dan rich text
-- Berkas unggahan disimpan di `UPLOAD_DIR` (di luar repo dan `public/`), disajikan lewat `/files/<id>/`
+- Berkas unggahan disimpan di `UPLOAD_DIR` (di luar repo dan `public/`), disajikan lewat `/files/<id>/`. Semua berkas memakai `X-Robots-Tag: noindex, nofollow` dan `/files/` sengaja tidak diblokir di `robots.txt` (bila diblokir, header noindex tidak terbaca)
 - Bagian README di antara penanda `<!-- ...:mulai -->` dibangkitkan skrip, jangan diedit manual
 - `src/data/profile.ts`, `src/content/types.ts`, `src/lib/linkedin.ts`, dan `seed/` hanya boleh `import type` (dibaca skrip Node)
 - Repo terbaru otomatis dari GitHub, atur lewat `recentRepos.exclude` di `profile.ts`

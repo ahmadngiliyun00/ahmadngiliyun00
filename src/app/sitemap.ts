@@ -8,8 +8,8 @@ import { SITEMAP_RULES, w3cDate } from "@/lib/sitemap";
 import { loadSite } from "@/server/content";
 
 // Dibaca dari database saat diminta, jadi data yang baru dipublikasikan di CMS langsung masuk
-// dan data yang disembunyikan langsung keluar. Hanya item public yang masuk sitemap; data privat,
-// CMS, tautan berbagi, dan berkas unggahan diblokir di robots.ts.
+// dan data yang disembunyikan langsung keluar. Hanya item public yang masuk sitemap; CMS dan tautan
+// berbagi diblokir di robots.ts, berkas unggahan tidak pernah masuk dan diberi X-Robots-Tag noindex.
 // lastModified memakai waktu ubah data terakhir, bukan waktu sekarang, supaya Google
 // hanya merayapi ulang halaman yang memang berubah.
 // Pasangan bahasa (hreflang) tidak ditulis di sini karena sudah ada di <head> setiap halaman

@@ -181,6 +181,7 @@ Di halaman ubah capaian, **Buat tautan berbagi** menghasilkan alamat `/s/<token>
 
 - Unggah lewat CMS: PDF, PNG, JPG, atau WebP, maksimal 5 MB. Jenis berkas diperiksa dari isinya, bukan dari nama
 - Berkas disimpan di `UPLOAD_DIR` (di luar `public/` dan di luar repo) dan hanya bisa dibuka lewat `/files/<id>/` bila datanya public, pembukanya admin, atau membawa token berbagi yang cocok
+- Semua berkas, termasuk yang public, dikirim dengan `X-Robots-Tag: noindex, nofollow`, jadi tidak pernah muncul di Google atau Google Gambar. `/files/` sengaja tidak diblokir di `robots.txt` supaya header itu terbaca, halaman dirender Google lengkap dengan gambarnya, dan gambar pratinjau tautan (og:image) bisa diambil LinkedIn dan X
 - **Sebelum mengunggah, tutup semua data pribadi secara manual:** NIK, alamat, nomor telepon, NIDN atau NUPTK, nomor anggota, dan kode QR keanggotaan. CMS tidak bisa mendeteksinya
 - Jangan memasukkan nomor kontrak hibah, anggaran, topologi atau alamat IP jaringan kampus, nama mahasiswa, nama kolega atau atasan, isi telaah naskah, atau penelitian yang belum terbit ke data public. Bila ragu, biarkan privat
 

@@ -46,7 +46,10 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   // boleh dipakai sambil diperiksa ulang seminggu; berkas privat tidak pernah disimpan.
   const etag = `"${meta.id}-${meta.size}"`;
   const cache = isPublic ? "public, max-age=86400, stale-while-revalidate=604800" : "private, no-store";
-  const robots = isPublic ? "all" : "noindex, nofollow";
+  // Berkas tidak pernah diindeks mesin pencari, termasuk Google Gambar, walaupun public. Yang
+  // diindeks hanya halaman resmi situs. robots.txt sengaja tidak memblokir /files/ supaya header ini
+  // terbaca (lihat src/app/robots.ts).
+  const robots = "noindex, nofollow";
   if (isPublic) {
     const match = (req.headers.get("if-none-match") ?? "").split(",").map((t) => t.trim().replace(/^W\//, ""));
     if (match.includes(etag)) {
