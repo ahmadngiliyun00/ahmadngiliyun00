@@ -6,6 +6,7 @@ import { toast } from "@/components/Toaster";
 import FieldInput, { type FieldLabels, type FieldValue } from "@/components/admin/FieldInput";
 import FieldTabs from "@/components/admin/FieldTabs";
 import { LangModeProvider } from "@/components/admin/LangMode";
+import { RICH_TEXT_CHANGE } from "@/components/admin/RichTextEditor";
 import { fieldVisible, fieldWidth, type Field, type Option } from "@/content/fields";
 import type { Lang } from "@/content/types";
 
@@ -56,7 +57,7 @@ export default function EntryForm({
   const errors = state?.errors ?? {};
   const formRef = useRef<HTMLFormElement>(null);
 
-  // Isian bersyarat (showWhen di src/content/fields.ts). Nilai isian pengendali dibaca ulang dari
+  // Isian bersyarat (showWhen, src/lib/conditions.ts). Nilai isian pengendali dibaca ulang dari
   // formulir setiap ada perubahan, lalu isian yang tidak berlaku disembunyikan (hidden). Isian yang
   // tersembunyi tetap ada di formulir, jadi ketikannya kembali bila pilihannya dikembalikan.
   const controllers = useMemo(() => [...new Set(fields.flatMap((f) => (f.showWhen ? [f.showWhen.field] : [])))], [fields]);
@@ -65,19 +66,46 @@ export default function EntryForm({
     const form = formRef.current;
     if (form === null) return;
     if (controllers.length === 0) return;
+    // new FormData juga memicu event formdata, jadi isi editor rich text ikut terbaca.
     const data = new FormData(form);
+    const text = (key: string) => data.getAll(key).filter((v): v is string => typeof v === "string");
     const next: Record<string, unknown> = {};
     for (const name of controllers) {
       const field = fields.find((f) => f.name === name);
-      const all = data.getAll(`f.${name}`).filter((v): v is string => typeof v === "string");
-      next[name] = field?.type === "boolean" ? all.includes("on") : field?.type === "multiselect" ? all : (all[0] ?? "");
+      const type = field?.type;
+      if (type === "boolean") next[name] = text(`f.${name}`).includes("on");
+      else if (type === "multiselect") next[name] = text(`f.${name}`);
+      else if (type === "localized" || type === "localizedList" || type === "richtext") {
+        next[name] = { id: text(`f.${name}.id`)[0] ?? "", en: text(`f.${name}.en`)[0] ?? "" };
+      } else next[name] = text(`f.${name}`)[0] ?? "";
     }
-    setWatched(next);
+    setWatched((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
   }, [controllers, fields]);
   // Saat dibuka dan setelah simpan (React mengatur ulang formulir dari nilai terakhir).
   useEffect(() => {
     sync();
   }, [sync, state]);
+  // Listener bawaan peramban, bukan onChange React, supaya perubahan editor rich text (event
+  // RICH_TEXT_CHANGE) juga terbaca. Hanya perubahan pada isian pengendali yang memicu sync.
+  useEffect(() => {
+    const form = formRef.current;
+    if (form === null) return;
+    if (controllers.length === 0) return;
+    const prefixes = controllers.map((name) => `f.${name}`);
+    const onEvent = (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      const name = target?.getAttribute("name") ?? "";
+      if (prefixes.some((p) => name === p || name.startsWith(`${p}.`))) sync();
+    };
+    form.addEventListener("input", onEvent);
+    form.addEventListener("change", onEvent);
+    form.addEventListener(RICH_TEXT_CHANGE, sync);
+    return () => {
+      form.removeEventListener("input", onEvent);
+      form.removeEventListener("change", onEvent);
+      form.removeEventListener(RICH_TEXT_CHANGE, sync);
+    };
+  }, [controllers, sync]);
   const visible = (field: Field) => fieldVisible(field, fields, (name) => (name in watched ? watched[name] : values[name]));
 
   // Hasil simpan tampil sebagai toast. Bila gagal, isian pertama yang salah langsung difokus;
@@ -120,7 +148,7 @@ export default function EntryForm({
   }
 
   return (
-    <form ref={formRef} action={formAction} className="admin-form" noValidate onChange={controllers.length === 0 ? undefined : sync}>
+    <form ref={formRef} action={formAction} className="admin-form" noValidate>
       {Object.entries(hidden).map(([k, v]) => (
         <input key={k} type="hidden" name={k} value={v} />
       ))}

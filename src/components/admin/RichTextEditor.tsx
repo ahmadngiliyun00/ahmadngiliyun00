@@ -48,6 +48,9 @@ function imageFiles(list: FileList | null | undefined): File[] {
 
 // Satu editor rich text untuk satu bahasa. Isinya ikut terkirim bersama formulir lewat
 // event "formdata", jadi tidak bergantung pada input tersembunyi yang bisa direset React.
+// Nama event yang dikirim editor ke formulir setiap isinya berubah.
+export const RICH_TEXT_CHANGE = "richtextchange";
+
 export default function RichTextEditor({
   name,
   initial,
@@ -85,6 +88,12 @@ export default function RichTextEditor({
       Placeholder.configure({ placeholder }),
     ],
     content: initial,
+    // Kabari formulir bahwa isi berubah (dipakai isian bersyarat di EntryForm). Event tersendiri,
+    // bukan "input", karena ProseMirror memproses event input miliknya sendiri, dan tombol seperti
+    // Backspace ditangani editor tanpa event input dari peramban.
+    onUpdate: () => {
+      wrapRef.current?.dispatchEvent(new Event(RICH_TEXT_CHANGE, { bubbles: true }));
+    },
     editorProps: {
       attributes: {
         class: "rte-content",

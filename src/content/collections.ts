@@ -1,7 +1,7 @@
 // Konfigurasi koleksi CMS: field formulir, label admin, cara menampilkan judul, dan urutan.
 // Menambah field baru di sini otomatis muncul di formulir admin dan ikut divalidasi.
 
-import type { Field, Option } from "@/content/fields";
+import type { Field, Option, ShowWhen } from "@/content/fields";
 import {
   kindLabels,
   postKindLabels,
@@ -184,27 +184,34 @@ export const collections: CollectionConfig[] = [
     fields: [
       {
         name: "kind",
-        width: "third",
+        width: "half",
         label: "Jenis",
         type: "select",
         required: true,
         options: (Object.keys(postKindLabels) as PostKind[]).map((k) => ({ value: k, label: postKindLabels[k].id })),
       },
-      { name: "date", width: "third", label: "Tanggal terbit", type: "date", help: "Wajib untuk data public." },
+      { name: "date", width: "half", label: "Tanggal terbit", type: "date", help: "Wajib untuk data public." },
+      { name: "title", label: "Judul", type: "localized", required: true, help: "Untuk liputan, tulis judul asli di versi bahasa sumber dan terjemahannya di versi lain." },
+      {
+        name: "outlet",
+        label: "Media atau penerbit",
+        type: "text",
+        placeholder: "Dicoding Blog",
+        help: "Wajib untuk liputan media.",
+        showWhen: { field: "kind", values: ["liputan", "tulisan"] },
+      },
+      { name: "url", label: "Tautan sumber", type: "url", placeholder: "https://www.dicoding.com/blog/...", help: "Wajib untuk liputan. Untuk tulisan, isi bila diterbitkan di tempat lain." },
       {
         name: "sourceLang",
-        width: "third",
         label: "Bahasa sumber",
         type: "select",
         options: [
           { value: "id", label: "Bahasa Indonesia" },
           { value: "en", label: "Bahasa Inggris" },
         ],
-        help: "Untuk tautan ke luar. Situs versi lain menandai bahasa artikel sumber.",
+        help: "Situs versi lain menandai bahasa artikel sumber.",
+        showWhen: { field: "url", filled: true },
       },
-      { name: "title", label: "Judul", type: "localized", required: true, help: "Untuk liputan, tulis judul asli di versi bahasa sumber dan terjemahannya di versi lain." },
-      { name: "outlet", label: "Media atau penerbit", type: "text", placeholder: "Dicoding Blog", help: "Wajib untuk liputan media." },
-      { name: "url", label: "Tautan sumber", type: "url", placeholder: "https://www.dicoding.com/blog/...", help: "Wajib untuk liputan. Untuk tulisan, isi bila diterbitkan di tempat lain." },
       { name: "summary", label: "Ringkasan", type: "localized", multiline: true, help: "Satu sampai tiga kalimat, tampil di kartu beranda dan arsip." },
       {
         name: "gallery",
@@ -229,6 +236,8 @@ export const collections: CollectionConfig[] = [
         width: "full",
         label: "Izinkan komentar",
         type: "boolean",
+        // Komentar hanya ada di halaman tulisan, dan halaman itu hanya ada bila Isi lengkap diisi.
+        showWhen: { field: "body", filled: true },
         help: "Menampilkan kolom komentar di halaman tulisan. Komentar yang masuk tampil setelah Anda setujui di menu Komentar. Mematikannya menyembunyikan form dan semua komentar.",
       },
     ],
@@ -506,7 +515,7 @@ export const collections: CollectionConfig[] = [
       { name: "title", label: "Judul", type: "localized", required: true },
       { name: "body", label: "Isi", type: "localized", multiline: true, required: true },
       { name: "href", label: "Tautan", type: "url", help: "Awali dengan # untuk bagian situs, misalnya #achievements (beranda) atau #research (halaman Riset)." },
-      { name: "linkLabel", width: "half", label: "Teks tautan", type: "localized" },
+      { name: "linkLabel", width: "half", label: "Teks tautan", type: "localized", showWhen: { field: "href", filled: true } },
     ],
   },
   {
@@ -588,6 +597,10 @@ export type SettingsConfig = {
   fields: Field[];
 };
 
+// Isian Email dan SMTP selain Server SMTP hanya tampil bila server diisi. keep: mengosongkan server
+// untuk mematikan penerusan sementara tidak menghapus port, akun, dan penerima yang sudah diatur.
+const SMTP_ON: ShowWhen = { field: "smtp.host", filled: true, keep: true };
+
 export const settingsConfigs: SettingsConfig[] = [
   {
     key: "profile",
@@ -599,7 +612,8 @@ export const settingsConfigs: SettingsConfig[] = [
       { name: "heroLead", label: "Paragraf hero", type: "localized", multiline: true, required: true },
       { name: "aboutStatement", label: "Pernyataan Tentang", type: "localized", multiline: true, required: true },
       { name: "email.user", label: "Email: nama", type: "text", placeholder: "ahmad", help: "Kosongkan untuk menyembunyikan email dan formulir pesan." },
-      { name: "email.domain", label: "Email: domain", type: "text", placeholder: "ngiliyun.my.id" },
+      // keep: mengosongkan nama untuk sementara tidak menghapus domain.
+      { name: "email.domain", label: "Email: domain", type: "text", placeholder: "ngiliyun.my.id", showWhen: { field: "email.user", filled: true, keep: true } },
       { name: "skills", label: "Daftar teknologi", type: "list", required: true, help: "Tampil lengkap di halaman Proyek, bagian Teknologi dan topik." },
       {
         name: "homeTools",
@@ -785,9 +799,9 @@ export const settingsConfigs: SettingsConfig[] = [
       "Pesan dari form kontak selalu tersimpan di Pesan masuk. Isi SMTP supaya pesan baru juga diteruskan ke email. Kosongkan Server SMTP untuk mematikan penerusan.",
     fields: [
       { name: "smtp.host", label: "Server SMTP", type: "text", placeholder: "smtp.gmail.com" },
-      { name: "smtp.port", width: "quarter", label: "Port", type: "number", min: 1, max: 65535, placeholder: "465", help: "465 untuk SSL/TLS, 587 untuk STARTTLS." },
+      { name: "smtp.port", showWhen: SMTP_ON, width: "quarter", label: "Port", type: "number", min: 1, max: 65535, placeholder: "465", help: "465 untuk SSL/TLS, 587 untuk STARTTLS." },
       {
-        name: "smtp.security", width: "quarter",
+        name: "smtp.security", showWhen: SMTP_ON, width: "quarter",
         label: "Keamanan koneksi",
         type: "select",
         options: [
@@ -795,17 +809,17 @@ export const settingsConfigs: SettingsConfig[] = [
           { value: "starttls", label: "STARTTLS (port 587)" },
         ],
       },
-      { name: "smtp.user", label: "Nama pengguna SMTP", type: "text", placeholder: "nama@gmail.com", help: "Untuk Gmail: alamat Gmail lengkap." },
+      { name: "smtp.user", showWhen: SMTP_ON, label: "Nama pengguna SMTP", type: "text", placeholder: "nama@gmail.com", help: "Untuk Gmail: alamat Gmail lengkap." },
       {
-        name: "smtp.pass",
+        name: "smtp.pass", showWhen: SMTP_ON,
         label: "Kata sandi SMTP",
         type: "secret",
         help: "Untuk Gmail: sandi aplikasi 16 huruf dari myaccount.google.com/apppasswords, bukan kata sandi akun. Tidak pernah ditampilkan ulang; kosongkan untuk tetap memakai sandi tersimpan.",
       },
-      { name: "smtp.from", label: "Alamat pengirim", type: "text", placeholder: "nama@gmail.com", help: "Kosongkan untuk memakai nama pengguna SMTP. Gmail hanya mengizinkan alamat akunnya sendiri atau alias yang sudah diverifikasi." },
-      { name: "contactTo", label: "Penerima notifikasi pesan", type: "text", placeholder: "ahmad@ngiliyun.my.id", help: "Alamat utama yang menerima pesan baru." },
+      { name: "smtp.from", showWhen: SMTP_ON, label: "Alamat pengirim", type: "text", placeholder: "nama@gmail.com", help: "Kosongkan untuk memakai nama pengguna SMTP. Gmail hanya mengizinkan alamat akunnya sendiri atau alias yang sudah diverifikasi." },
+      { name: "contactTo", showWhen: SMTP_ON, label: "Penerima notifikasi pesan", type: "text", placeholder: "ahmad@ngiliyun.my.id", help: "Alamat utama yang menerima pesan baru." },
       {
-        name: "contactCopy",
+        name: "contactCopy", showWhen: SMTP_ON,
         width: "half",
         label: "Teruskan juga ke",
         type: "list",

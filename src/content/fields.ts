@@ -21,11 +21,10 @@ interface Base {
   // show = nilai tab tempat field tampil; kosong berarti tampil di bawah semua tab.
   // Field di tab yang tidak aktif tetap ikut terkirim, jadi isinya tidak hilang saat berganti tab.
   tab?: { of: string; show?: string[] };
-  // Isian bersyarat: tampil hanya bila isian lain (select, boolean, atau multiselect) bernilai salah
-  // satu values, atau bukan salah satu not. Boolean dibandingkan sebagai "true" atau "false".
-  // Selama formulir dibuka, isian yang tersembunyi tetap menyimpan ketikannya (berganti pilihan tidak
-  // menghapus apa pun), tetapi saat disimpan isian itu tidak divalidasi dan dikosongkan, karena tidak
-  // berlaku untuk pilihan tersebut. Lihat fieldVisible.
+  // Isian bersyarat: tampil hanya bila isian lain bernilai tertentu (values, not) atau sudah diisi
+  // (filled). Selama formulir dibuka, isian yang tersembunyi tetap menyimpan ketikannya (berganti
+  // pilihan tidak menghapus apa pun). Saat disimpan isian itu tidak divalidasi dan dikosongkan karena
+  // tidak berlaku, kecuali bertanda keep. Lihat ShowWhen dan fieldVisible di src/lib/conditions.ts.
   showWhen?: ShowWhen;
 }
 
@@ -335,13 +334,15 @@ export function readFields(fields: Field[], form: FormData, base: Doc = {}, prim
       if (empty) errors[field.name] = errors[field.name] ?? `${field.label} wajib diisi.`;
     }
   }
-  // Isian bersyarat yang tidak berlaku untuk pilihan saat ini: tidak divalidasi dan tidak disimpan.
-  // Rahasia (token) tidak pernah dikosongkan diam-diam.
+  // Isian bersyarat yang tidak berlaku untuk pilihan saat ini: tidak divalidasi, dan dikosongkan
+  // kecuali bertanda keep. Rahasia (sandi, token) tidak pernah dikosongkan diam-diam.
   const get = (name: string) => getPath(data, name);
-  const hidden = fields.filter((f) => f.type !== "secret").filter((f) => !fieldVisible(f, fields, get));
+  const hidden = fields.filter((f) => !fieldVisible(f, fields, get));
   for (const field of hidden) {
-    setPath(data, field.name, undefined);
     delete errors[field.name];
+    if (field.type === "secret") continue;
+    if (field.showWhen?.keep === true) continue;
+    setPath(data, field.name, undefined);
   }
   return { data, errors };
 }
