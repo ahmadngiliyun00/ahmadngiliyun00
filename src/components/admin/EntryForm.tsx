@@ -1,12 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormState } from "@/app/(admin)/admin/actions";
 import { toast } from "@/components/Toaster";
 import FieldInput, { type FieldLabels, type FieldValue } from "@/components/admin/FieldInput";
 import FieldTabs from "@/components/admin/FieldTabs";
 import { LangModeProvider } from "@/components/admin/LangMode";
-import { fieldWidth, type Field, type Option } from "@/content/fields";
+import { fieldVisible, fieldWidth, type Field, type Option } from "@/content/fields";
 import type { Lang } from "@/content/types";
 
 const LOCALIZED: Field["type"][] = ["localized", "localizedList", "richtext"];
@@ -56,6 +56,30 @@ export default function EntryForm({
   const errors = state?.errors ?? {};
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Isian bersyarat (showWhen di src/content/fields.ts). Nilai isian pengendali dibaca ulang dari
+  // formulir setiap ada perubahan, lalu isian yang tidak berlaku disembunyikan (hidden). Isian yang
+  // tersembunyi tetap ada di formulir, jadi ketikannya kembali bila pilihannya dikembalikan.
+  const controllers = useMemo(() => [...new Set(fields.flatMap((f) => (f.showWhen ? [f.showWhen.field] : [])))], [fields]);
+  const [watched, setWatched] = useState<Record<string, unknown>>({});
+  const sync = useCallback(() => {
+    const form = formRef.current;
+    if (form === null) return;
+    if (controllers.length === 0) return;
+    const data = new FormData(form);
+    const next: Record<string, unknown> = {};
+    for (const name of controllers) {
+      const field = fields.find((f) => f.name === name);
+      const all = data.getAll(`f.${name}`).filter((v): v is string => typeof v === "string");
+      next[name] = field?.type === "boolean" ? all.includes("on") : field?.type === "multiselect" ? all : (all[0] ?? "");
+    }
+    setWatched(next);
+  }, [controllers, fields]);
+  // Saat dibuka dan setelah simpan (React mengatur ulang formulir dari nilai terakhir).
+  useEffect(() => {
+    sync();
+  }, [sync, state]);
+  const visible = (field: Field) => fieldVisible(field, fields, (name) => (name in watched ? watched[name] : values[name]));
+
   // Hasil simpan tampil sebagai toast. Bila gagal, isian pertama yang salah langsung difokus;
   // pesan per isian tetap tampil di bawah isiannya.
   useEffect(() => {
@@ -85,8 +109,18 @@ export default function EntryForm({
     );
   }
 
+  // Isian di dalam tab yang juga bersyarat.
+  function conditional(field: Field) {
+    if (field.showWhen === undefined) return input(field);
+    return (
+      <div key={field.name} hidden={!visible(field)}>
+        {input(field)}
+      </div>
+    );
+  }
+
   return (
-    <form ref={formRef} action={formAction} className="admin-form" noValidate>
+    <form ref={formRef} action={formAction} className="admin-form" noValidate onChange={controllers.length === 0 ? undefined : sync}>
       {Object.entries(hidden).map(([k, v]) => (
         <input key={k} type="hidden" name={k} value={v} />
       ))}
@@ -184,15 +218,15 @@ export default function EntryForm({
                     error={errors[field.name]}
                     panels={options.map((o) => ({
                       value: o.value,
-                      children: members.filter((m) => m.tab?.show?.includes(o.value)).map((m) => input(m)),
+                      children: members.filter((m) => m.tab?.show?.includes(o.value)).map((m) => conditional(m)),
                     }))}
-                    shared={members.filter((m) => (m.tab?.show ?? []).length === 0).map((m) => input(m))}
+                    shared={members.filter((m) => (m.tab?.show ?? []).length === 0).map((m) => conditional(m))}
                   />
                 </div>
               );
             }
             return (
-              <div key={field.name} className="admin-cell" data-w={fieldWidth(field)}>
+              <div key={field.name} className="admin-cell" data-w={fieldWidth(field)} hidden={!visible(field)}>
                 {input(field)}
               </div>
             );

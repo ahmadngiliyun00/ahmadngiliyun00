@@ -4,6 +4,7 @@
 import type { Lang, PartialDate } from "@/content/types";
 import { isDriveFolder, normalizeDriveUrl } from "@/lib/drive";
 import { galleryItems, parseGallery } from "@/lib/gallery";
+import { fieldVisible, type ShowWhen } from "@/lib/conditions";
 import { isBlank } from "@/lib/i18n";
 import { asHtml, htmlToText } from "@/lib/richtext";
 
@@ -20,7 +21,17 @@ interface Base {
   // show = nilai tab tempat field tampil; kosong berarti tampil di bawah semua tab.
   // Field di tab yang tidak aktif tetap ikut terkirim, jadi isinya tidak hilang saat berganti tab.
   tab?: { of: string; show?: string[] };
+  // Isian bersyarat: tampil hanya bila isian lain (select, boolean, atau multiselect) bernilai salah
+  // satu values, atau bukan salah satu not. Boolean dibandingkan sebagai "true" atau "false".
+  // Selama formulir dibuka, isian yang tersembunyi tetap menyimpan ketikannya (berganti pilihan tidak
+  // menghapus apa pun), tetapi saat disimpan isian itu tidak divalidasi dan dikosongkan, karena tidak
+  // berlaku untuk pilihan tersebut. Lihat fieldVisible.
+  showWhen?: ShowWhen;
 }
+
+// fieldVisible ada di src/lib/conditions.ts (berkas murni, diuji); diekspor ulang untuk formulir.
+export { fieldVisible, type ShowWhen };
+
 interface PlainField extends Base {
   // gallery = beberapa gambar berurutan (carousel), disimpan sebagai daftar ID berkas (src/lib/gallery.ts).
   type: "text" | "url" | "textarea" | "boolean" | "date" | "list" | "localizedList" | "links" | "file" | "gallery" | "secret";
@@ -323,6 +334,14 @@ export function readFields(fields: Field[], form: FormData, base: Doc = {}, prim
       const empty = value === undefined || value === null || value === "";
       if (empty) errors[field.name] = errors[field.name] ?? `${field.label} wajib diisi.`;
     }
+  }
+  // Isian bersyarat yang tidak berlaku untuk pilihan saat ini: tidak divalidasi dan tidak disimpan.
+  // Rahasia (token) tidak pernah dikosongkan diam-diam.
+  const get = (name: string) => getPath(data, name);
+  const hidden = fields.filter((f) => f.type !== "secret").filter((f) => !fieldVisible(f, fields, get));
+  for (const field of hidden) {
+    setPath(data, field.name, undefined);
+    delete errors[field.name];
   }
   return { data, errors };
 }

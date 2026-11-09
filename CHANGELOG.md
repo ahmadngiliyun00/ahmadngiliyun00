@@ -20,6 +20,7 @@ Semua perubahan penting pada proyek ini dicatat di berkas ini. Format mengikuti
 
 ### Ditambahkan
 
+- Isian bersyarat di formulir CMS: isian yang hanya berlaku untuk pilihan tertentu muncul saat pilihan itu dipilih dan hilang untuk pilihan lain, tanpa memuat ulang halaman. Isian yang tersembunyi tidak divalidasi dan tidak disimpan, tetapi ketikannya tetap ada selama formulir dibuka. Formulir capaian kini hanya menampilkan isian yang sesuai kategorinya: posisi penulis untuk publikasi, berkas bukti dan Google Drive untuk semua kecuali publikasi, tombol LinkedIn untuk sertifikat dan pelatihan, tab Hak cipta beranda untuk hak cipta, tanggal berlaku untuk sertifikat, pelatihan, dan keanggotaan
 - Placeholder skeleton untuk semua gambar dan sematan: blok abu-abu dengan kilau bergerak selama gambar diunduh, lalu gambar muncul perlahan. Berlaku di kartu media sosial, kartu kabar, halaman tulisan (termasuk gambar di dalam isi), bukti sertifikat dan pratinjau Google Drive, serta thumbnail galeri di CMS
 - Tab Gambar postingan di formulir media sosial: Tautan gambar, Satu gambar, atau Beberapa gambar (carousel), menggantikan tiga isian yang berderet. Hanya tab yang dipilih yang tampil di situs, isi tab lain tetap tersimpan. Komponen tab bisa dipakai isian lain
 - Teks alternatif per gambar di galeri (opsional, dua bahasa). Gambar tanpa teks sendiri memakai teks alternatif umum dengan nomor gambar

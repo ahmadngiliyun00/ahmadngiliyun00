@@ -56,6 +56,7 @@ tests/social-export.test.mjs     unit test impor ekspor Instagram dan Facebook, 
 tests/gallery.test.mjs           unit test galeri gambar: isian, urutan slide, teks alternatif, susun ulang (npm test)
 tests/sitemap.test.mjs           unit test format lastmod (WIB tanpa milidetik) dan bobot sitemap (npm test)
 tests/research-kinds.test.mjs    unit test pembagian jenis capaian antara Riset dan Sertifikat (npm test)
+tests/conditions.test.mjs        unit test isian bersyarat formulir CMS (showWhen) (npm test)
 src/
   app/
     (id)/, (en)/en/              situs publik ID dan EN: beranda, proyek, riset, mengajar, perjalanan,
@@ -105,6 +106,7 @@ src/
   lib/zip-reader.ts              baca ZIP besar di peramban per berkas (Blob.slice, DecompressionStream, ZIP64)
   lib/gallery.ts                 aturan galeri: parseGallery, slideSources, slideImages, GALLERY_MAX, SLIDE_MS
   lib/sitemap.ts                 format sitemap: w3cDate (WIB tanpa milidetik), changefreq dan priority per jenis halaman
+  lib/conditions.ts              aturan isian bersyarat formulir CMS: fieldVisible untuk showWhen (dipakai EntryForm dan readFields)
 ```
 
 ## Aturan kerja
@@ -137,6 +139,7 @@ src/
 - Halaman error: `not-found.tsx` dan `error.tsx` di `(id)/`, `(en)/en/`, dan `(admin)/admin/`, plus `app/global-error.tsx`. Alamat tak dikenal ditangkap rute `[...missing]` supaya 404 berbahasa sesuai. Teks di `copy.errors` (`profile.ts`) dan `adminCopy.errors`. Halaman 500, 502, 503, 504 untuk Nginx dibuat `npm run errors`; jangan edit `public/errors/` manual
 - Galeri gambar (isian `gallery`, berita dan media sosial): daftar item `{ file, alt? }` berurutan (teks alternatif per gambar opsional, lalu teks umum bernomor), maksimal 20, gambar pertama sampul. Diunggah satu per satu lewat `GalleryInput`, PDF dipecah per halaman di peramban, tidak pernah base64. Di situs tampil lewat `MediaCarousel` (otomatis tiap 3 detik, bisa digeser, tombol jeda, tanpa putar otomatis bila `prefers-reduced-motion`). Server hanya menerima berkas baru atau milik data itu, dan menghapus yang dilepas
 - Isian yang saling menggantikan dikelompokkan dengan tab (`FieldTabs`): select `tabs: true` dan isian anggota `tab: { of, show }`. Isi tab yang tidak aktif tetap tersimpan, tidak dihapus. Contoh: tab Gambar postingan media sosial (`imageMode`), hanya tab terpilih yang tampil di situs
+- Isian yang hanya berlaku untuk pilihan tertentu memakai `showWhen: { field, values }` atau `{ field, not }` (`src/lib/conditions.ts`): isi A maka B tampil, selain A maka B tidak tampil. Berlaku di semua formulir CMS (koleksi dan Pengaturan). Isian tersembunyi tidak divalidasi dan dikosongkan saat disimpan; selama formulir dibuka ketikannya tetap ada. Isian baru yang hanya berlaku untuk pilihan tertentu wajib diberi `showWhen`, jangan cukup dengan label "khusus ..." (keputusan Mas Ilyun, 10 Nov 2026)
 - Semua gambar dan sematan situs memakai `LazyImage`, `LazyIframe`, atau `PostBody` (placeholder skeleton berkilau, lazy, menghormati `prefers-reduced-motion`), bukan `<img>` langsung. Semua unggahan gambar diperkecil di peramban lewat `image-shrink.ts` (maksimal 1600 px). `/files/<id>/` memberi ETag dan 304 untuk berkas public
 - Semua isian unggah berkas di CMS memakai `FileDrop` (`src/components/admin/FileDrop.tsx`): area drag and drop dengan pratinjau sebelum diunggah, tetap memakai `<input type="file">` asli di dalamnya
 - Header keamanan dan CSP ada di `next.config.ts`. `img-src` sengaja mengizinkan `https:` untuk Tautan gambar media sosial. Skrip, gambar, iframe, atau `fetch` ke domain pihak ketiga baru wajib ditambahkan ke CSP, kalau tidak peramban memblokirnya
@@ -185,7 +188,7 @@ npm run dev            # http://localhost:3000 dan /admin/
 npm run data           # perbarui src/data/github.json dan README
 npm run readme         # buat ulang gambar dan bagian teks README dari database
 npm run errors         # buat ulang halaman error statis Nginx di public/errors/
-npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja, media sosial, galeri, sitemap, jenis riset
+npm test               # unit test LinkedIn, kontak, email, rich text, pembaca, komentar, dua bahasa, JSON-LD, beranda, teks SEO, Drive, lembar kerja, media sosial, galeri, sitemap, jenis riset, isian bersyarat
 npm run typecheck
 npm run build          # data GitHub, README, lalu next build
 npm start              # jalankan hasil build
